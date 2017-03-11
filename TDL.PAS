@@ -80,11 +80,16 @@ type
     TitleIDs:PTitleArray;
   end;
 
+  txtcoords=record
+    x,y:byte;
+  end;
+
 var
   _memavail:longint;
   Files:PFileIndex;
   Titles:PTitleIndex;
   titleSets:array[0..maxSearchTerms-1] of workingTitleSet;
+  jcloc:txtcoords;
 
 procedure StrPadAfter(var str:OpenString;b:byte); assembler;
 {Pads a string with nulls after position b}
@@ -195,7 +200,9 @@ begin
     screen.clear(colors.background,#176);
     screen.PartClear(1,1,screen.width,3,colors.pickern,' ');
     screen.WriteCenter(1,colors.pickerh,TDLTitle);
-    screen.WriteAt(1,tpos.y1-2,colors.pickern,'Jump by letter: '); screen.gotoxy(17,tpos.y1-2);
+    jcloc.x:=17;
+    jcloc.y:=tpos.y1-2;
+    screen.WriteAt(1,tpos.y1-2,colors.pickern,'Jump by letter: '); screen.gotoxy(jcloc.x,jcloc.y);
     screen.WriteAt(1,tpos.y1-1,colors.pickern,'Or, choose from the following programs:');
 
     {status bar}
@@ -523,6 +530,7 @@ begin
         for w:=0 to titleSets[activeSet].numTitles-1 do begin
           titles^.retrieve(titleSets[activeSet].titleIDs^[w],ttbuf);
           if upcase(ttbuf^.title[1])=ch then begin
+            screen.writeat(jcloc.x,jcloc.y,LookTOT^.vWinBody,ch);
             pcursor:=w;
             pwinloc:=w;
             opwinloc:=-1;               {force window refresh}
