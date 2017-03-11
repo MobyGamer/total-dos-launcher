@@ -1,0 +1,20 @@
+echo off
+
+LOOPSTART:
+cls
+dir
+echo You've selected a bootable floppy disk image.  These can only reliably
+echo be executed from an actual bootable floppy, so we're going to make one.
+echo .
+ask Do you have a blank floppy disk handy?  Hit Y to continue, or N to abort.
+
+ask Type a number to explore some games:
+if ERRORLEVEL 56 goto STRATEGY
+
+pause
+formatf a1
+img2dsk %1 a:
+cls
+echo Your floppy disk has now been written with the image file you selected.
+echo Please exit the TDL, then use CTRL-ALT-DELETE to boot your floppy disk.
+pause

@@ -1,0 +1,48 @@
+Avoiding CGA Snow: FALSE
+Number of titles: 1348
+Base directory: D:\PROJECTS\TDL\DISTRO\
+Swapping enabled: TRUE
+Preloading enabled: TRUE
+Cache Directory: C:\TEMP\CACHE.DIR\
+Refreshing display
+Getting input
+Refreshing display
+Getting input
+Refreshing display
+Getting input
+Refreshing display
+Getting input
+Refreshing display
+Getting input
+Refreshing display
+Getting input
+Refreshing display
+Getting input
+Refreshing display
+Getting input
+Refreshing display
+Getting input
+Refreshing display
+Getting input
+Refreshing display
+Getting input
+Refreshing display
+Getting input
+Attempting to Launch title #11:
+3-Demon v488170 [SW][o1] (1984)(PC Research Inc.) [Action]
+cache dir C:\TEMP\CACHE.DIR\3-DEMONA not found; attempting to create
+Entering handler framework: ZIP
+Execution template:  -d 3-DEMONA.ZIP C:\TEMP\CACHE.DIR\3-DEMONA\
+Switching to d:\projects\tdl\output\files\ to execute D:\PROJECTS\TDL\distro\utils\pkunzip.exe -d 3-DEMONA.ZIP C:\TEMP\CACHE.DIR\3-DEMONA\
+Switching back to d:\projects\tdl\output\files
+Saving DOS screen contents
+Found 1 files in C:\TEMP\CACHE.DIR\3-DEMONA
+Entering handler framework: EXE
+Execution template: 
+Switching to C:\TEMP\CACHE.DIR\3-DEMONA\ to execute 3-DEMON.EXE
+Switching back to C:\TEMP\CACHE.DIR\3-DEMONA
+Saving DOS screen contents
+Switching back to D:\PROJECTS\TDL
+Refreshing display
+Getting input
+Debug Console closing...
