@@ -195,7 +195,7 @@ begin
     screen.clear(colors.background,#176);
     screen.PartClear(1,1,screen.width,3,colors.pickern,' ');
     screen.WriteCenter(1,colors.pickerh,TDLTitle);
-    screen.WriteAt(1,tpos.y1-2,colors.pickern,'Search: '); screen.gotoxy(9,tpos.y1-2);
+    screen.WriteAt(1,tpos.y1-2,colors.pickern,'Jump by letter: '); screen.gotoxy(17,tpos.y1-2);
     screen.WriteAt(1,tpos.y1-1,colors.pickern,'Or, choose from the following programs:');
 
     {status bar}
@@ -515,15 +515,26 @@ begin
         pwinloc:=pcursor;               {this will get clamped later}
         opwinloc:=-1;                   {force a window refresh}
       end;
+      ord('0')..ord('9'),
+      ord('A')..ord('Z'),
+      ord('a')..ord('z'):begin
+        {Crude "search by letter" until we implement actual searching}
+        ch:=upcase(chr(key.lastkey));
+        for w:=0 to titleSets[activeSet].numTitles-1 do begin
+          titles^.retrieve(titleSets[activeSet].titleIDs^[w],ttbuf);
+          if upcase(ttbuf^.title[1])=ch then begin
+            pcursor:=w;
+            pwinloc:=w;
+            opwinloc:=-1;               {force window refresh}
+            break;
+          end;
+        end;
+      end;
       kEnter:begin
-        {msgConsole^.logmsg(info,'Recording key state')}
         recordKeyState;
-        {msgConsole^.logmsg(info,'Saving temp screen');}
         tmpScreenSave;
         Launch(titleSets[activeSet].titleids^[pcursor]);
-        {msgConsole^.logmsg(info,'Restoring temp screen');}
         tmpScreenRestore;
-        {msgConsole^.logmsg(info,'Restoring key state');}
         restoreKeyState;
       end;
       kCtlF3:begin {show debug console}
