@@ -1,9 +1,9 @@
-unit tdl_overlay;
+unit tdl_over;
 {needed to get the overlay manager initialized before all others}
 
-{{$DEFINE USEEMS}
+{$DEFINE USEEMS}
 
-{{$DEFINE BUFEXPAND}
+{$DEFINE BUFEXPAND}
 
 interface
 
@@ -16,11 +16,13 @@ Uses
   overlay;
 
 const
-  ovrname:string[12]='tdl.ovr';
   {$IFDEF BUFEXPAND}
   minfreeram=128 * 1024; {amount of free RAM we can't dip below}
   ovrsize=64 * 1024;
   {$ENDIF}
+
+var
+  ovrname:string;
 
 procedure __doswrite(s:string); assembler;
 asm
@@ -31,11 +33,9 @@ asm
   xor     ah,ah
   xchg    cx,ax           {cx=#0 of string which contains length}
   jcxz    @exit           {if string is length 0 then bail}
-  mov     ah,2            {get ready for DOS func. INT 21,2 - Standard Output}
 @L1:
   lodsb
-  mov     dl,al           {ah=02, dl=character to output}
-  int     21h             {do it}
+  int     29h             {do it}
   loop @L1
 @exit:
   pop     ds
@@ -58,8 +58,9 @@ Procedure ReportError;
 begin
   case OvrResult of
     ovrOK            :__dosWriteln('Overlay operation successful');
+    ovrError         :__dosWriteln('Error initializing overlay');
     ovrNotFound      :__dosWriteln('Overlay file not found');
-    ovrNoMemory      :__dosWriteln('Not enough memory to alter overlay cache');
+    ovrNoMemory      :__dosWriteln('Not enough memory for overlay');
     ovrIOError       :__dosWriteln('Overlay I/O error');
     {$IFDEF USEEMS}
     ovrNoEMSDriver   :__dosWriteln('No EMS driver found');
@@ -81,17 +82,28 @@ begin
 
   {First, initialize the overlay, since we can't continue until this succeeds.}
   __dosWrite('Initializing overlay manager... ');
+  ovrname:=paramstr(0);
   OvrInit(ovrname);
   if OvrResult <> ovrOk then begin
-    ReportError;
-    Halt(1);
+    delete(ovrname,length(ovrname)-3+1,3);
+    ovrname:=ovrname+'ovr';
+    OvrInit(ovrname);
+    if OvrResult <> ovrOk then begin
+      ReportError;
+      Halt(1);
+    end;
   end;
   {$IFDEF USEEMS}
   OvrInitEMS;
+  if OvrResult <> ovrOk then begin
+    ReportError;
+    {Halt(1);}
+  end;
   {$ENDIF}
   {$IFDEF BUFEXPAND}
   {Do we have room to expand the buffer?  If so, do it}
-  if (memavail > (minfreeram+ovrsize)) then OvrSetBuf(ovrsize);
+  if (memavail > (minfreeram+ovrsize))
+    then OvrSetBuf(ovrsize);
   {$ENDIF}
   __doswriteln('using '+__inttostr(OvrGetBuf div 1024)+'KB with '+__inttostr(memavail div 1024)+'KB remaining.')
 end.

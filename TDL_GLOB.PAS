@@ -1,4 +1,4 @@
-unit tdl_global;
+unit tdl_glob;
 {
 Contains global constants and type definitions.
 }
@@ -13,7 +13,7 @@ const
   maxCacheableTitles=maxbufsize div sizeof(longint);
   TDLtitleFull='The Total DOS Launcher, v. 0.1, 20170310';
   TDLtitle='The Total DOS Launcher';
-  TDLstatus='F1=Help~³~'#24'/'#25'/PgUp/PgDn/Home/End = Navigate~³~Enter = GO~³~ESC=exit~³~';
+  TDLstatus='F1=Help~³~'#24'/'#25'/PgUp/PgDn/Home/End = Navigate~³~Enter = START~³~ESC=exit~³~';
 
   numAboutLines=9;
   AboutText:array[0..numAboutLines-1] of pChar=(

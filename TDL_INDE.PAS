@@ -1,5 +1,5 @@
-{$I tdl_directives.inc}
-unit tdl_index;
+{$I tdl_dire.inc}
+unit tdl_inde;
 {
 Indexing routines for working with the files we've copied over.
 }
@@ -9,8 +9,8 @@ interface
 uses
   DOS,
   objects,
-  tdl_global,
-  tdl_config;
+  tdl_glob,
+  tdl_conf;
 
 type
   PIndex=^TIndex;
@@ -59,6 +59,7 @@ type
     Constructor Init(fpath:PathStr;caching:boolean);
     Destructor Done; VIRTUAL;
     Function retrieve(i:word;var d:pTitleStruct):boolean;
+    Function retrieve1c(i:word):char; {first char of title returned}
     Function verify:boolean; VIRTUAL;
 
     PRIVATE
@@ -234,7 +235,6 @@ begin
     data^.read(l,sizeof(longint));
     data^.seek(l);
   end;
-  {l:=data^.getpos;}
   data^.read(tmpdata^,minReadSize);
   {Our speed optimization of reading minReadSize can go past the end of the
   stream.  If we do this, we'll fall back to slower but 100% accurate reading.}
@@ -253,6 +253,35 @@ begin
   {$ENDIF}
   d:=tmpdata;
   retrieve:=(data^.status=stOK);
+end;
+
+Function TTitleIndex.retrieve1c(i:word):char;
+{
+Seeks are costly on slow I/O systems.  Normally we would seek to the title
+length, read it, then read only the title characters we need.  To remove
+one seek per retrieval, we are just going to read 256 bytes.  This will
+always dip into the next record, but the extra junk won't be visible
+to the calling program.
+}
+const
+  tcofs=2+16+1;
+var
+  l:longint;
+  status:integer;
+  b:byte;
+  c:char;
+begin
+  {find offset in stream header, then grab the data into temporary buffer}
+  if headerCached then begin
+    l:=headerCache^[i];
+    data^.seek(l+tcofs);
+  end else begin
+    data^.seek(2+(longint(i)*sizeof(longint)));
+    data^.read(l,sizeof(longint));
+    data^.seek(l+tcofs);
+  end;
+  data^.read(c,1);
+  retrieve1c:=c;
 end;
 
 Function TTItleIndex.Verify:boolean;

@@ -1,9 +1,9 @@
-{$I tdl_directives.inc}
+{$I tdl_dire.inc}
 
 {$IFDEF USEOVERLAYS}
 {$O+,F+}
 {$ENDIF}
-unit tdl_handlers;
+unit tdl_hand;
 {
 Contains logic and data structures necessary to implement file handlers.
 
@@ -66,8 +66,8 @@ uses
   support,
   totFAST,
   inifiles,
-  tdl_config,
-  tdl_console;
+  tdl_conf,
+  tdl_cons;
 
 Constructor THandler.Init;
 begin
@@ -337,11 +337,11 @@ begin
   if config^.swapping then begin
     result:=(retval<>-1);
     if result=false
-      then msgConsole^.logmsg(tdl_console.error,'Spawn failure; Error code = '+inttostr(spawno_error));
+      then msgConsole^.logmsg(tdl_cons.error,'Spawn failure; Error code = '+inttostr(spawno_error));
   end else begin
     result:=(DOSError=0);
     if result=false
-      then msgConsole^.logmsg(tdl_console.error,'EXEC failure; Error code = '+inttostr(DOSError))
+      then msgConsole^.logmsg(tdl_cons.error,'EXEC failure; Error code = '+inttostr(DOSError))
   end;
 
   msgConsole^.logmsg(info,'Switching back to '+wrkdir);

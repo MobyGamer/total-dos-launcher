@@ -1,9 +1,9 @@
-{$I tdl_directives.inc}
+{$I tdl_dire.inc}
 
 {$IFDEF USEOVERLAYS}
 {$O+,F+}
 {$ENDIF}
-unit tdl_config;
+unit tdl_conf;
 {
 TDL configuration definitions and objects.  The goal is to have every piece
 of configurable data for the program managed in these structures so that data
@@ -17,7 +17,7 @@ uses
   DOS,
   objects,
   support,
-  tdl_global;
+  tdl_glob;
 
 const
   maxHandlers=256;
@@ -27,12 +27,14 @@ type
     x1,y1,x2,y2:byte;
   end;
 
+  (*
   {holds character "backfore" color attribute choices}
   colorchoices=record
     background,                         {desktop background}
     pickern,                            {picker normal text}
     pickerh:byte;                       {picker highlighted text}
   end;
+  *)
 
   {
   TConfig is the master configuration record for the TDL.  It contains the
@@ -55,7 +57,7 @@ type
     titlesIDXname:baseftype;
     filesIDXname:baseftype;
     tPos:windowposition;                {titles picker dimensions}
-    colors:colorchoices;
+    {colors:colorchoices;}
 
     Constructor Init(cfile,bdir:PathStr);
 
@@ -73,6 +75,7 @@ implementation
 
 uses
   totSYS,
+  totLOOK,
   inifiles;
 
 const
@@ -107,17 +110,22 @@ begin
   with tpos do begin
     x1:=1; y1:=4; x2:=79; y2:=23;
   end;
+  (*
   with colors do begin
     if Monitor^.ColorOn then begin
       background:=$07;
       pickern:=$70;
       pickerh:=$3f;
+      {let's try using the global TOT vars}
+      pickern:=LookTOT^.vMenuLoNorm;
+      pickerh:=LookTOT^.vMenuHiNorm;
     end else begin
       background:=$07;
       pickern:=$07;
       pickerh:=$70;
     end;
   end;
+  *)
 
   {configure the system using the configuration file}
   ini:=new(PINIFile,init(configFile,readfile,INIBufSize));

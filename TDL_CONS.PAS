@@ -1,10 +1,10 @@
-{$I tdl_directives.inc}
+{$I tdl_dire.inc}
 
 {$IFDEF USEOVERLAYS}
 {$O+,F+}
 {$ENDIF}
 
-unit tdl_console;
+unit tdl_cons;
 {Implements mechanisms for interacting with the user,
 including a message console, simple pop-up dialogs, etc.}
 
@@ -13,8 +13,8 @@ interface
 uses
   objects,
   strings,
-  TDL_global,
-  TDL_config,
+  TDL_glob,
+  TDL_conf,
   totSYS,
   totWIN,
   totFAST,

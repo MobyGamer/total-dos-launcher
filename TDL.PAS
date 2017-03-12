@@ -1,6 +1,6 @@
 program tdl;
 
-{$I tdl_directives.inc}
+{$I tdl_dire.inc}
 
 {
 Total DOS Launcher, main program.
@@ -17,7 +17,7 @@ move all cache management into unit, so that we can:
 
 uses
   {$IFDEF USEOVERLAYS}
-  tdl_overlay, {must be first in uses clause}
+  tdl_over, {must be first in uses clause}
   {$ENDIF}
   DOS,
   support,
@@ -29,18 +29,17 @@ uses
   totLOOK,
   totLIST,
   totKEY,
-  tdl_global,
-  tdl_config,
-  tdl_index,
-  tdl_console,
-  tdl_handlers;
+  tdl_glob,
+  tdl_conf,
+  tdl_inde,
+  tdl_cons,
+  tdl_hand;
 
 {$IFDEF USEOVERLAYS}
   {Note: documentation discourages overlaying TOTSYS, TOTINPUT, and TOTFAST}
   {{$O totDATE}
   {{$O totDIR}
   {$O totFAST}
-  {$O totINPUT}
   {$O totINPUT}
   {$O totIO1}
   {{$O totIO2}
@@ -63,9 +62,9 @@ uses
   {$O cmdlin}
   {$O inifiles}
 
-  {$O tdl_config}
-  {$O tdl_console}
-  {$O tdl_handlers}
+  {$O tdl_conf}
+  {$O tdl_cons}
+  {$O tdl_hand}
 
 {$ENDIF}
 
@@ -192,24 +191,36 @@ begin
     fastInit;
   end;
 
+  {
+  Customize color choices.  For MDA, make selected/special text black on white, everything else white on black.
+  For color, pick blue background and some reasonable choices for others.
+  At some point, the user will be able
+  to pick any color set they like, but for now, these are the defaults.
+  }
+  {Bor,Tit,Icon,HiHot,HiNorm,LoHot,LoNorm,Off}
+  if Monitor^.ColorOn
+    {then LookTOT^.SetMenu($1b,$1e,$7f,$3f,$3b,$1e,$17,$19)}
+    then LookTOT^.SetMenu($1b,$1e,$7f,$31,$3f,$1e,$17,$19)
+    else LookTOT^.SetMenu($0F,$09,$78,$78,$70,$01,$07,$07);
+
   DOSScreen:=new(PScreenObj,init);
   DOSScreen^.save;
   with config^ do begin
     tpos.y2:=screen.depth-1;
     tpos.x2:=screen.width;
-    screen.clear(colors.background,#176);
-    screen.PartClear(1,1,screen.width,3,colors.pickern,' ');
-    screen.WriteCenter(1,colors.pickerh,TDLTitle);
+    screen.clear(LookTOT^.vMenuBorder,#0);
+    {screen.PartClear(1,1,screen.width,3,LookTOT^.vMenuHiHot.pickern,' ');}
+    screen.WriteCenter(1,LookTOT^.vMenuTitle,TDLTitle);
     jcloc.x:=17;
     jcloc.y:=tpos.y1-2;
-    screen.WriteAt(1,tpos.y1-2,colors.pickern,'Jump by letter: '); screen.gotoxy(jcloc.x,jcloc.y);
-    screen.WriteAt(1,tpos.y1-1,colors.pickern,'Or, choose from the following programs:');
+    screen.WriteAt(1,tpos.y1-2,LookTOT^.vMenuLoNorm,'Jump by letter: '); screen.gotoxy(jcloc.x,jcloc.y);
+    screen.WriteAt(1,tpos.y1-1,LookTOT^.vMenuLoNorm,'Or, choose from the following programs:');
 
     {status bar}
     screen.PartClear(1,screen.depth,screen.width,screen.depth,
-      LookTOT^.vMenuLoNorm,' ');
+      LookTOT^.vMenuHiNorm,' ');
     screen.WriteHI(1,screen.depth,
-      LookTOT^.vMenuLoHot,LookTOT^.vMenuLoNorm,TDLStatus);
+      LookTOT^.vMenuHiHot,LookTOT^.vMenuHiNorm,TDLStatus);
 
     {init message console now that we have our screen mode locked in}
     MsgConsole:=new(PMConsole,init(config^.basedir+'tdl.log'));
@@ -442,13 +453,13 @@ var
     s2:='#'+intPadded(pcursor,5,'0')
        +'/'+intpadded(titleSets[activeSet].numTitles-1,5,'0');
     screen.WriteAT(screen.width-negofs,screen.depth,
-      LookTOT^.vMenuLoHot,s2);
+      LookTOT^.vMenuHiNorm,s2);
   end;
 
 begin
   if config^.userlevel=kiosk
     then escapeKey:=kAltMinus;
-  with config^.tpos do Screen.Box(X1,Y1,X2,Y2,config^.colors.pickern,4);
+  with config^.tpos do Screen.Box(X1,Y1,X2,Y2,LookTOT^.vMenuLoNorm,4);
   pcursor:=0; pwinloc:=0;
   pwheight:=config^.tpos.y2-config^.tpos.y1-1;
   {if we have less titles than screen lines, truncate}
@@ -481,9 +492,9 @@ begin
       if b<pwwidth
         then strPadAfter(s,b);          {pad to window width}
       {determine when to use highlight color}
-      if pwinloc+dl=pcursor
-        then b:=config^.colors.pickerh
-        else b:=config^.colors.pickern;
+      if pwinloc+dl=pcursor {this is where the menu bar is}
+        then b:=LookTOT^.vMenuHiNorm
+        else b:=LookTOT^.vMenuLoNorm;
       with config^.tpos do screen.writeat(x1+iconsPad,y1+dl+1,b,s);
     end;
     {msgConsole^.logmsg(info,'Getting input');}
@@ -528,9 +539,9 @@ begin
         {Crude "search by letter" until we implement actual searching}
         ch:=upcase(chr(key.lastkey));
         for w:=0 to titleSets[activeSet].numTitles-1 do begin
-          titles^.retrieve(titleSets[activeSet].titleIDs^[w],ttbuf);
-          if upcase(ttbuf^.title[1])=ch then begin
-            screen.writeat(jcloc.x,jcloc.y,LookTOT^.vWinBody,ch);
+          {check first character only}
+          if upcase(titles^.retrieve1c(titleSets[activeSet].titleIDs^[w]))=ch then begin
+            screen.writeat(jcloc.x,jcloc.y,LookTOT^.vMenuLoHot,ch);
             pcursor:=w;
             pwinloc:=w;
             opwinloc:=-1;               {force window refresh}
