@@ -7,8 +7,10 @@ Total DOS Launcher, main program.
 Initial author Jim Leonard, started 20170211
 
 todo:
-power user file picker, show everything but only highlight files that can be handled
-command key in title picker to extract/switch to cache dir and then exit the program
+warn user with popup if file not found, don't just error silently
+power user file picker, ability to delete a file from cache dir?
+power user able to delete from title picker (file,
+power user command key in title picker to extract/switch to cache dir and then exit the program
 move all cache management into unit, so that we can:
  come up with cache purge strategy.
  strategy can be limited to 5 dirs for testing and then avail disk space for final
@@ -120,17 +122,18 @@ var
 begin
   RecordDOSScreen;
 
-  writeln('Configuring '+TDLtitle);
 
   {determine TDL base directory and configuration file to use}
-  if paramcount>0 then sf:=paramstr(1) else sf:='tdl.ini';
-  if paramcount>1 then sd:=paramstr(2) else sd:='';
+  if non_flag_count>0 then sf:=non_flag_param(1) else sf:='tdl.ini';
+  if non_flag_count>1 then sd:=non_flag_param(2) else sd:='';
   sd:=StdPath(FExpand(sd));
   {attempt TDL config init}
+  writeln('Configuring '+TDLtitle+' using '+sf+'...');
   config:=new(pconfig,init(sf,sd));
   if config=nil
     then fatalerror(1,'Error while configuring; check '+sd+'\'+sf);
   {attempt TDL handlers init}
+  writeln('Registering handlers from handlers.ini...');
   Handlers:=new(PHandlers,init(sd+'handlers.ini'));
   {We can only show files properly for up to 42 filemasks.  If we have
   more handlers than that, switch to power user mode so that we only have
@@ -184,10 +187,28 @@ begin
   pick up the new dimensions.}
   if is_param('c') then begin
     Monitor^.SetCondensed;
-    {reset mouse and screen so that they pick up new dimensions}
+    config^.customvidmode:=3;
+  end;
+  {if VESA text mode specified, set it}
+  w:=config^.customvidmode;
+  if w>$100 then begin
+    w:=setVESA(w);
+    if w<>0 then begin
+      write('Attempt to set VESA mode ',hexword(config^.customvidmode),'failed: ');
+      case w of
+        1:writeln('VESA not installed');
+        2:writeln('VESA BIOS cannot set mode');
+      end;
+    end;
+  end;
+  if config^.customvidmode<>0 then begin
+    {reset mouse, totsys.monitor, and screen so that they pick up new dimensions}
     Mouse.done;
-    Mouse.init;
     fastDone;
+    dispose(monitor,done);
+
+    SysInit;
+    Mouse.init;
     fastInit;
   end;
 
@@ -213,7 +234,7 @@ begin
     screen.WriteCenter(1,LookTOT^.vMenuTitle,TDLTitle);
     jcloc.x:=17;
     jcloc.y:=tpos.y1-2;
-    screen.WriteAt(1,tpos.y1-2,LookTOT^.vMenuLoNorm,'Jump by letter: '); screen.gotoxy(jcloc.x,jcloc.y);
+    screen.WriteAt(1,tpos.y1-2,LookTOT^.vMenuLoNorm,jumplabel); screen.gotoxy(jcloc.x,jcloc.y);
     screen.WriteAt(1,tpos.y1-1,LookTOT^.vMenuLoNorm,'Or, choose from the following programs:');
 
     {status bar}
@@ -226,8 +247,9 @@ begin
     MsgConsole:=new(PMConsole,init(config^.basedir+'tdl.log'));
     if (userlevel=power) or (logging=true) then begin
       MsgConsole^.verboseLog:=true;
-      MsgConsole^.logmsg(info,'Avoiding CGA Snow: '+booltostr(boolean(snowprone)));
     end;
+    if boolean(snowprone)
+      then MsgConsole^.logmsg(info,'Video system affected by CGA "snow"; measures will be taken to avoid');
   end;
 
   {power users want to know everything}
@@ -538,21 +560,28 @@ begin
       ord('a')..ord('z'):begin
         {Crude "search by letter" until we implement actual searching}
         ch:=upcase(chr(key.lastkey));
+        screen.writeat(jcloc.x,jcloc.y,LookTOT^.vMenuLoHot,ch);
+        screen.writeat(jcloc.x+3,jcloc.y,LookTOT^.vMenuLoNorm OR $80,'Seeking, please wait');
         for w:=0 to titleSets[activeSet].numTitles-1 do begin
           {check first character only}
           if upcase(titles^.retrieve1c(titleSets[activeSet].titleIDs^[w]))=ch then begin
-            screen.writeat(jcloc.x,jcloc.y,LookTOT^.vMenuLoHot,ch);
             pcursor:=w;
             pwinloc:=w;
             opwinloc:=-1;               {force window refresh}
             break;
           end;
         end;
+        screen.writeat(jcloc.x+3,jcloc.y,LookTOT^.vMenuLoNorm OR $80,'                    ');
       end;
       kEnter:begin
         recordKeyState;
         tmpScreenSave;
         Launch(titleSets[activeSet].titleids^[pcursor]);
+        {if we have any goofy modes set, restore them}
+        if config^.customVidMode<>0 then begin
+          if config^.customVidMode=3 then Monitor^.SetCondensed;
+          if config^.customVidMode>$100 then setVESA(config^.customVidMode);
+        end;
         tmpScreenRestore;
         restoreKeyState;
       end;

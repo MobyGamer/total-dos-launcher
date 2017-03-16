@@ -77,6 +77,7 @@ procedure restoreKeyState;
 procedure pause;
 procedure tmpScreenSave;
 procedure tmpScreenRestore;
+function setVESA(mode:word):word;
 
 implementation
 
@@ -86,6 +87,25 @@ uses
 var
   keyState:word;
   tmpScreen:PScreenObj;
+
+function setVESA(mode:word):word; assembler;
+asm
+        mov     bx,mode
+        mov     mode,0
+        mov     ax,4f02h
+        int     10h
+        cmp     al,4fh
+        je      @FunctionSupported
+        mov     mode,1                  {function not supported}
+        jmp     @done
+
+@FunctionSupported:
+        cmp     ah,01h
+        jne     @done
+        mov     mode,2
+@done:
+        mov     ax,mode
+end;
 
 procedure die(s:string);
 begin

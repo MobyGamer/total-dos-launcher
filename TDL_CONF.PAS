@@ -48,6 +48,7 @@ type
     logging:boolean;
     preloading:boolean;                 {preload indexes in ram}
     userlevel:userlevels;               {what level user is operating in}
+    customVidMode:word;
 
     cacheDir:DirStr;                    {cache directory}
     baseDir:DirStr;                     {base directory (where config file is)}
@@ -164,6 +165,7 @@ begin
       if upstring(key)='SWAPPING' then swapping:=(upstring(value)='ENABLED');
       if upstring(key)='FORCELOGGING' then logging:=(upstring(value)='ENABLED');
       if upstring(key)='PRELOADING' then preloading:=(upstring(value)='ENABLED');
+      if upstring(key)='VESA' then customvidmode:=hexStrToLong(upstring(value));
     end;
     INIResult:=ini^.ReadNextItem;
   end;

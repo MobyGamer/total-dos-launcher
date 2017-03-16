@@ -14,6 +14,7 @@ const
   TDLtitleFull='The Total DOS Launcher, v. 0.1, 20170310';
   TDLtitle='The Total DOS Launcher';
   TDLstatus='F1=Help~³~'#24'/'#25'/PgUp/PgDn/Home/End = Navigate~³~Enter = START~³~ESC=exit~³~';
+  jumpLabel='Jump by letter: ';
 
   numAboutLines=9;
   AboutText:array[0..numAboutLines-1] of pChar=(

@@ -108,10 +108,10 @@ begin
 
   {Populate collection with contents of handlers.ini}
   if not fileexists(hfile)
-    then die('Handler config '+hfile+' not found');
+    then fatalerror(1,'Handler config '+hfile+' not found');
   ini:=new(PINIFile,init(hfile,readfile,INIBufSize));
   if ini=NIL then begin
-    die('Problem opening handler INI file: '+hfile);
+    fatalerror(2,'Problem opening handler INI file: '+hfile);
     exit;
   end;
 
@@ -125,7 +125,8 @@ locations=utils;distro\utils;c:\utils\common
 
   {read first line}
   first:=true;
-  INIResult:=ini^.ReadNextItem; if INIResult=nil then die('Initial INI read failed');
+  INIResult:=ini^.ReadNextItem;
+  if INIResult=nil then fatalerror(3,'Initial INI read failed');
   while (INIResult<>nil) do begin
     INIResult:=ini^.ReadNextItem; {won't go past section header unless we ACK}
     if (ini^.newSection) then begin;
@@ -133,7 +134,7 @@ locations=utils;distro\utils;c:\utils\common
         {fill in the rest of the fields, verify input, etc.}
         {determine base utility filename.  Handle special case of just '%s'.}
         util:=t.template;
-        if (pos('%',util)=0) then die('Handler launcher string "'+util+'" malformed');
+        if (pos('%',util)=0) then fatalerror(4,'Handler launcher string "'+util+'" malformed');
         if util<>'%s' then begin
           system.delete(util,pos(' ',util),length(util));
           {remove it from the template string}
@@ -144,7 +145,7 @@ locations=utils;distro\utils;c:\utils\common
             then util:=FSearch(util,GetEnv('PATH'))
             else util:=FSearch(util,upath);
           if util=''
-            then die(s+' handler helper util not found in '+upath);
+            then fatalerror(5,s+' handler helper util not found in '+upath);
           {add drive letter to convert relative path to absolute path}
           if pos(':',util)=0 then begin
             getdir(0,s);
