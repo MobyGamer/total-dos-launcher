@@ -7,7 +7,6 @@ Total DOS Launcher, main program.
 Initial author Jim Leonard, started 20170211
 
 todo:
-warn user with popup if file not found, don't just error silently
 power user file picker, ability to delete a file from cache dir?
 power user able to delete from title picker (file,
 power user command key in title picker to extract/switch to cache dir and then exit the program
@@ -211,6 +210,9 @@ begin
     Mouse.init;
     fastInit;
   end;
+  {set a marker for 40-col mode}
+  if Monitor^.width=40
+    then config^.customVidMode:=40;
 
   {
   Customize color choices.  For MDA, make selected/special text black on white, everything else white on black.
@@ -219,10 +221,14 @@ begin
   to pick any color set they like, but for now, these are the defaults.
   }
   {Bor,Tit,Icon,HiHot,HiNorm,LoHot,LoNorm,Off}
+  {SetWindow(Border,Body,Icons,Title:byte);}
   if Monitor^.ColorOn
-    {then LookTOT^.SetMenu($1b,$1e,$7f,$3f,$3b,$1e,$17,$19)}
-    then LookTOT^.SetMenu($1b,$1e,$7f,$31,$3f,$1e,$17,$19)
-    else LookTOT^.SetMenu($0F,$09,$78,$78,$70,$01,$07,$07);
+    then begin
+      LookTOT^.SetMenu($1b,$1e,$7f,$31,$3f,$1e,$17,$19);
+      LookTOT^.SetWindow($19,$1e,$1e,$1b);
+    end else begin
+      LookTOT^.SetMenu($0F,$09,$78,$78,$70,$01,$07,$07);
+    end;
 
   DOSScreen:=new(PScreenObj,init);
   DOSScreen^.save;
@@ -249,7 +255,7 @@ begin
       MsgConsole^.verboseLog:=true;
     end;
     if boolean(snowprone)
-      then MsgConsole^.logmsg(info,'Video system affected by CGA "snow"; measures will be taken to avoid');
+      then MsgConsole^.logmsg(info,'Slower display routines enabled to avoid CGA "snow"');
   end;
 
   {power users want to know everything}
@@ -301,6 +307,7 @@ var
   ttbuf:PTitleStruct;
 
   ListWin:pListDirSortObj;
+  x1,y1,x2,y2,style:byte;
 
   s,filemasks:string;
   b:byte;
@@ -309,8 +316,9 @@ var
   procedure prepExec;
   begin
     screen.clear($07,' ');
-    screen.writeCenter(1,$0f,'Executing: '+filepath);
-    screen.gotoxy(1,2);
+    screen.writeCenter(1,$0f,'Executing:');
+    screen.writeCenter(2,$07,filepath);
+    screen.gotoxy(1,3);
   end;
 
 begin
@@ -336,7 +344,10 @@ begin
   tcachedir:=config^.cachedir+base;
   {files can be in multiple drives/paths; find where we put our file}
   filepath:=fsearch(full,config^.ProgLocs);
-  if filepath='' then die('Could not find '+full+' in '+config^.ProgLocs);
+  if filepath='' then begin
+    popUserMessage(error,'PATH "'+config^.ProgLocs+'" did not contain "'+full+'".  Did you delete it?');
+    exit;
+  end;
   {determine extension so we know which handler to use}
   fsplit(filepath,dir,base,ext);
   delete(ext,1,1); {remove period}
@@ -354,8 +365,11 @@ begin
           if not DirExists(tcachedir) then die('Could not create '+tcachedir);
           {burst archive into cache dir}
           screen.clear($07,' ');
-          screen.writeCenter(1,$0f,'This program requires unpacking before it can be executed.');
-          screen.writeCenter(2,$07,'Starting unpacking, please wait...');
+          if screen.width<80
+            then s:='This program requires unpacking.'
+            else s:='This program requires unpacking before it can be executed.';
+          screen.writeCenter(1,$0f,s);
+          screen.writeCenter(2,$87,'Please wait...');
           screen.gotoxy(1,3);
           if not Handlers^.handle(ext,filepath,tcachedir)
             then die('Failed to extract '+filepath+' to '+tcachedir);
@@ -405,7 +419,15 @@ begin
            if (vTotPicks=1) and (config^.userlevel<>power) then begin
              s:=vActiveDir + GetString(vTopPick,0,0);
            end else begin
-             win^.setTitle('Multiple components found; pick one to execute:');
+             if Monitor^.width<80
+               then begin
+                 win^.setTitle('Pick one to execute');
+                 win^.getsize(x1,y1,x2,y2,style);
+                 x1:=x1 div 2; x2:=x2 div 2;
+                 win^.setsize(x1,y1,x2,y2,style);
+               end else begin
+                 win^.setTitle('Multiple components found; pick one to execute:');
+               end;
              Go; {display the file picker dialog}
            end;
            if s=''
@@ -577,10 +599,13 @@ begin
         recordKeyState;
         tmpScreenSave;
         Launch(titleSets[activeSet].titleids^[pcursor]);
+        RestoreDOSScreen;
         {if we have any goofy modes set, restore them}
         if config^.customVidMode<>0 then begin
-          if config^.customVidMode=3 then Monitor^.SetCondensed;
-          if config^.customVidMode>$100 then setVESA(config^.customVidMode);
+          case config^.customVidMode of
+            3:Monitor^.SetCondensed;
+            $100..$110:setVESA(config^.customVidMode);
+          end;
         end;
         tmpScreenRestore;
         restoreKeyState;
@@ -651,6 +676,7 @@ begin
   RestoreDOSScreen;
 
   writeln('Exiting '+TDLtitleFull);
+  writeln('Have a nice DOS!');
 end;
 
 begin
