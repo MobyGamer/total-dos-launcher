@@ -6,14 +6,16 @@ program tdl;
 Total DOS Launcher, main program.
 Initial author Jim Leonard, started 20170211
 
-todo:
-power user file picker, ability to delete a file from cache dir?
-power user able to delete from title picker (file,
-power user command key in title picker to extract/switch to cache dir and then exit the program
-move all cache management into unit, so that we can:
- come up with cache purge strategy.
- strategy can be limited to 5 dirs for testing and then avail disk space for final
- strategy should determine exact amount of storage needed from archive header but can estimate 4*archive size 4now
+To-Do:
+Search-as-you-type
+Favorites tagging
+Cache management strategy.  Move all cache management into unit so we can:
+  come up with cache purge strategy.
+  strategy can be limited to 5 dirs for testing and then avail disk space for final
+  strategy should determine exact amount of storage needed from archive header but can estimate 4*archive size 4now
+Power user file picker:  Delete a file from cache dir
+Power user title picker: Delete a title (will need to remove cache dir, file, and rewrite indexes)
+Power user title picker: Command key to switch to cache dir and then exit the program
 }
 
 uses
