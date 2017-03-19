@@ -122,13 +122,9 @@ slow in DOS.)
 
 =====================================================================
 
-Favorites format:
-
+Favorites export/import format:
 
         numEntries:     16-bit word of how many favorites are in the file
-REPEAT  (This structure repeats numEntries times)
-        titleID:        16-bit word title ID
-END
 REPEAT  (This structure repeats numEntries times)
         titleHash:      16 bytes of the MD5 hash of the title string
 END
@@ -137,11 +133,14 @@ Purpose:
 Contains the list of games the user has "favorited".
 
 Implementation Notes:
-This contains a list of "titleHash"s that the user has denoted a
-favorite title.  It also contains the current titleID to save scanning
-time.  The titleID is updated whenever new index loads are detected by
-scanning the new index for hash matches.
 
-The titleIDs are included in a block before the hashes (as opposed to
-being interleaved with them) so that they can be loaded in a single IO
-operation directly into their target buffer on program load.
+The actual favorites list is just an array of bytes (booleans) that, if
+modified, is saved to disk before each handle() call.  However, a user
+may want to reload the list of files in the future while still retaining
+their favorites.  Since the titleids will change if this happens, and
+our existing favorites won't map to the new indexes, we offer the user a
+way to export their favorites and then later import them.
+
+One future improvement is to eliminate the need for export/import by
+storing the titleids in a block before the titlehashes; that way, the
+titleid could be updated whenever a new index load is detected.
