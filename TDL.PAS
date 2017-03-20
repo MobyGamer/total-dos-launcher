@@ -485,6 +485,7 @@ Picker draw logic:
 const
   iconsPad=2;                           {padding on left edge for icons}
   escapeKey:word=kEsc;
+  clearBlank:boolean=false;
 
 var
   w,dl:word;
@@ -546,9 +547,14 @@ begin
     if pwheight>titleSets[activeSet].numTitles
       then begin
         pwheight:=titleSets[activeSet].numTitles;
-        {clear the part of the display that will never get updated}
-        with config^.tpos do
-          screen.partclear(x1+iconspad-1,y1+pwheight+1,x2-1,y2-1,LookTOT^.vMenuLoNorm,#0);
+        {Clear the part of the display that will never get updated.
+        We only need to do this once, so keep track if we've done it.
+        Otherwise, 8088 systems will suffer}
+        if clearblank then begin
+          with config^.tpos do
+            screen.partclear(x1+iconspad-1,y1+pwheight+1,x2-1,y2-1,LookTOT^.vMenuLoNorm,#0);
+          clearblank:=false;
+        end;
       end;
 
     {draw our choices}
@@ -667,6 +673,7 @@ begin
                 end;
             end;
           end;
+          clearBlank:=true;
         end else begin
           {discard our favorites titleset}
           with titleSets[activeSet] do begin
