@@ -29,11 +29,18 @@ const
     ''
   );
 
+  favicon=#03;
+
 type
   PTitleArray=^TTitleArray;
   TTitleArray=array[0..maxTitles] of word;
+
   PTitleOffsets=^TTitleOffsets;
   TTitleOffsets=array[0..maxCacheableTitles-1] of longint;
+
+  PFavoritesArray=^TFavoritesArray;
+  TFavoritesArray=array[0..maxTitles-1] of boolean;
+
   baseftype=string[12];
   cmdlinetype=string[127-sizeof(baseftype)];
   titleStrType=string[132]; {Max screenmode we'll support is 132x60}

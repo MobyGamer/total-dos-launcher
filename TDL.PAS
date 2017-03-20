@@ -1,5 +1,4 @@
 program tdl;
-
 {$I tdl_dire.inc}
 
 {
@@ -7,8 +6,9 @@ Total DOS Launcher, main program.
 Initial author Jim Leonard, started 20170211
 
 To-Do:
+Build better handling of when an extraction goes wrong and "No Files" shows up
+Info screen
 Search-as-you-type
-Favorites tagging
 Cache management strategy.  Move all cache management into unit so we can:
   come up with cache purge strategy.
   strategy can be limited to 5 dirs for testing and then avail disk space for final
@@ -16,6 +16,7 @@ Cache management strategy.  Move all cache management into unit so we can:
 Power user file picker:  Delete a file from cache dir
 Power user title picker: Delete a title (will need to remove cache dir, file, and rewrite indexes)
 Power user title picker: Command key to switch to cache dir and then exit the program
+Ability to track what titles have been executed, how many times, and top20
 }
 
 uses
@@ -45,7 +46,7 @@ uses
   {$O totFAST}
   {$O totINPUT}
   {$O totIO1}
-  {{$O totIO2}
+  {$O totIO2}
   {{$O totIO3}
   {$O totKEY}
   {$O totLINK}
@@ -73,8 +74,10 @@ uses
 
 
 const
-  maxSearchTerms=8;
+  maxTitleSets=16;
   activeSet:byte=0;
+  favIconCol:byte=$0f;
+  favsOn:boolean=false;
 
 type
   workingTitleSet=record
@@ -90,8 +93,9 @@ var
   _memavail:longint;
   Files:PFileIndex;
   Titles:PTitleIndex;
-  titleSets:array[0..maxSearchTerms-1] of workingTitleSet;
-  jcloc:txtcoords;
+  titleSets:array[0..maxTitleSets-1] of workingTitleSet;
+  jcloc:txtcoords; {jumpcursor location}
+  Favorites:PFavorites;
 
 procedure StrPadAfter(var str:OpenString;b:byte); assembler;
 {Pads a string with nulls after position b}
@@ -149,6 +153,8 @@ begin
   titles:=new(PTitleIndex,
           init(config^.baseDir+config^.titlesIDXname,config^.preloading));
   if titles=nil then fatalerror(1,'Titles index init failed');
+  favorites:=new(PFavorites,init(sd+'\'+'cache.fav',config^.numTitles));
+  if favorites=nil then fatalerror(1,'Favorites cache init failed');
 
   if config^.userlevel=power then begin
     writeln('Performing additional checks:');
@@ -228,6 +234,7 @@ begin
     then begin
       LookTOT^.SetMenu($1b,$1e,$7f,$31,$3f,$1e,$17,$19);
       LookTOT^.SetWindow($19,$1e,$1e,$1b);
+      faviconcol:=$1c; {bright red foreground}
     end else begin
       LookTOT^.SetMenu($0F,$09,$78,$78,$70,$01,$07,$07);
     end;
@@ -325,6 +332,10 @@ var
 
 begin
   msgConsole^.logmsg(info,'Attempting to Launch title #'+inttostr(titleSets[activeSet].titleids^[tid])+':');
+  if favorites^.changed then begin
+    msgConsole^.logmsg(info,'Flushing favorites cache');
+    favorites^.flush;
+  end;
   titles^.retrieve(titleSets[activeSet].titleIDs^[tid],ttbuf);
   msgConsole^.logmsg(info, ttbuf^.title);
   {determine cache directory}
@@ -490,7 +501,7 @@ var
   pwwidth:word;                         {picker window width}
   pwinloc,opwinloc:longint;             {picker window location(s)}
 
-  procedure updateStatus;
+  procedure updateStatusBar;
   const
     negofs=11;
   var
@@ -502,18 +513,25 @@ var
       LookTOT^.vMenuHiNorm,s2);
   end;
 
+  procedure showStatus(on:boolean;s:string);
+  var
+    b:byte;
+  begin
+    b:=LookTOT^.vMenuLoNorm AND $F0;
+    b:=b OR (b SHR 4);
+    if on
+      then screen.writeat(jcloc.x+3,jcloc.y,LookTOT^.vMenuLoNorm OR $80,s)
+      else screen.writeat(jcloc.x+3,jcloc.y,b,s);
+  end;
+
 begin
   if config^.userlevel=kiosk
     then escapeKey:=kAltMinus;
   with config^.tpos do Screen.Box(X1,Y1,X2,Y2,LookTOT^.vMenuLoNorm,4);
   pcursor:=0; pwinloc:=0;
-  pwheight:=config^.tpos.y2-config^.tpos.y1-1;
-  {if we have less titles than screen lines, truncate}
-  if pwheight>titleSets[activeSet].numTitles
-    then pwheight:=titleSets[activeSet].numTitles;
   pwwidth:=config^.tpos.x2-config^.tpos.x1-iconsPad-iconsPad+1; {leave room for icon column}
   p:=@s;
-  updateStatus;
+  updateStatusBar;
   opwinloc:=pwinloc+1;
   opcursor:=pcursor+1;
   repeat
@@ -521,6 +539,17 @@ begin
     (*{update vertical scrollbar}
     with config^.tpos do
       screen.WriteVScrollBar(X2,Y1,Y2,config^.colors.pickern,pcursor+1,titleSets[activeSet].numTitles);*)
+
+    {determine height of our drawloop}
+    pwheight:=config^.tpos.y2-config^.tpos.y1-1;
+    {if we have less titles than screen lines, truncate}
+    if pwheight>titleSets[activeSet].numTitles
+      then begin
+        pwheight:=titleSets[activeSet].numTitles;
+        {clear the part of the display that will never get updated}
+        with config^.tpos do
+          screen.partclear(x1+iconspad-1,y1+pwheight+1,x2-1,y2-1,LookTOT^.vMenuLoNorm,#0);
+      end;
 
     {draw our choices}
     for dl:=0 to pwheight-1 do begin
@@ -541,7 +570,12 @@ begin
       if pwinloc+dl=pcursor {this is where the menu bar is}
         then b:=LookTOT^.vMenuHiNorm
         else b:=LookTOT^.vMenuLoNorm;
-      with config^.tpos do screen.writeat(x1+iconsPad,y1+dl+1,b,s);
+      with config^.tpos do begin
+        screen.writeat(x1+iconsPad,y1+dl+1,b,s);
+        if favorites^.userChoices^[tid]
+          then screen.writeat(x1+iconspad-1,y1+dl+1,faviconcol,favicon)
+          else screen.writeat(x1+iconspad-1,y1+dl+1,LookTOT^.vMenuLoNorm,' ')
+      end;
     end;
     {msgConsole^.logmsg(info,'Getting input');}
     key.getinput;
@@ -585,7 +619,7 @@ begin
         {Crude "search by letter" until we implement actual searching}
         ch:=upcase(chr(key.lastkey));
         screen.writeat(jcloc.x,jcloc.y,LookTOT^.vMenuLoHot,ch);
-        screen.writeat(jcloc.x+3,jcloc.y,LookTOT^.vMenuLoNorm OR $80,'Seeking, please wait');
+        showStatus(true,'Seeking, please wait');
         for w:=0 to titleSets[activeSet].numTitles-1 do begin
           {check first character only}
           if upcase(titles^.retrieve1c(titleSets[activeSet].titleIDs^[w]))=ch then begin
@@ -595,9 +629,59 @@ begin
             break;
           end;
         end;
-        screen.writeat(jcloc.x+3,jcloc.y,LookTOT^.vMenuLoNorm OR $80,'                    ');
+        showStatus(false,'Seeking, please wait');
       end;
-      kEnter:begin
+      kF2:begin {Toggle favorite for where the picker cursor is on}
+        with favorites^ do begin
+          {get the real full title id we are sitting on}
+          w:=titlesets[activeSet].TitleIDs^[pcursor];
+          userChoices^[w] := not userChoices^[w];
+          changed:=true;
+          if not userChoices^[w] then opwinloc:=-1 {force window refresh}
+        end;
+      end;
+      kCtlF:begin
+        if not favson then begin
+          {build a new title set out of just the favorites}
+          {find how many favorites there are}
+          w:=0;
+          for dl:=0 to titleSets[activeSet].numTitles-1 do begin
+            with favorites^ do begin
+              if userChoices^[dl] then inc(w);
+            end;
+          end;
+          {build new title set}
+          inc(activeSet);
+          with titleSets[activeSet] do begin
+            numTitles:=w;
+            getmem(TitleIDs,numTitles*2);
+          end;
+          {populate new title set}
+          w:=0;
+          with titleSets[activeSet-1] do begin
+            for dl:=0 to numTitles-1 do begin
+              if Favorites^.userChoices^[TitleIDs^[dl]]
+                then begin
+                  titleSets[activeSet].TitleIDs^[w]:=dl;
+                  inc(w);
+                end;
+            end;
+          end;
+        end else begin
+          {discard our favorites titleset}
+          with titleSets[activeSet] do begin
+            freemem(TitleIDs,numTitles*2);
+            numTitles:=0;
+          end;
+          titleSets[activeSet].TitleIDs:=nil;
+          dec(activeSet);
+        end;
+        pcursor:=0;
+        pwinloc:=0;
+        opwinloc:=-1;                   {force a window refresh}
+        favson:=not favson;             {toggle "favorites on" status}
+      end;
+      kEnter:begin {LAUNCH!}
         recordKeyState;
         tmpScreenSave;
         Launch(titleSets[activeSet].titleids^[pcursor]);
@@ -617,12 +701,12 @@ begin
         pause;
         MsgConsole^.hide;
       end;
-      kF10:begin
+      kF10:begin {show About This Program window}
         recordKeyState;
         popAbout;
         restoreKeyState;
       end;
-      kF1:begin
+      kF1:begin {show help screen}
         recordKeyState;
         tmpScreenSave;
         popHelp;
@@ -646,10 +730,14 @@ begin
       then pcursor:=titleSets[activeSet].numTitles-1;
     if pwinloc<0 then pwinloc:=0;
     if pwinloc+pwheight>titleSets[activeSet].numTitles-1
-      then pwinloc:=titleSets[activeSet].numTitles-pwheight;
+      then begin
+        pwinloc:=titleSets[activeSet].numTitles;
+        pwinloc:=pwinloc-pwheight;
+        if pwinloc<0 then pwinloc:=0;
+      end;
 
     {msgConsole^.logmsg(info,'Updating status line');}
-    updateStatus;
+    updateStatusBar;
   until key.lastkey=escapeKey;
   {msgConsole^.logmsg(info,'Exiting picker loop');}
 end;
@@ -661,11 +749,13 @@ Close TDL down gracefully so we can check for programming errors
 var
   w:word;
 begin
+  Favorites^.flush;
+  dispose(Favorites,done);
   {free message console}
   dispose(MsgConsole,done);
 
   {free any working title sets }
-  for w:=maxSearchTerms-1 downto 0 do
+  for w:=maxTitleSets-1 downto 0 do
     if titleSets[w].TitleIDs<>nil
       then freemem(titleSets[w].TitleIDs,titleSets[w].numTitles*2);
 

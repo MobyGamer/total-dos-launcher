@@ -1,0 +1,72 @@
+Troubleshooting:
+
+Q: TDL locks up when I try to run something.
+
+A: This is most commonly caused by two things:
+  1. The TDL had trouble trying to swap itself out of low DOS RAM before
+     running your program
+  2. The program is not compatible with your system
+
+Problems with swapping are usually due to a misbehaving DOS TSR or
+device driver, usually anything dealing with I/O (like a parallel-port
+storage device).  Try booting with a cleaner environment with only the
+bare minimum drivers/TSRs necessary.  Alternately, you can disable
+swapping by setting "swapping=disabled" in TDL.INI, but this will lower
+the amount of free RAM available for running programs that don't use
+protected mode.
+
+As for program compatibility, the TDL can't help you run programs that
+are incompatible with your system.  That said, if you try to run a
+program and one of the choices is an executable program like SETUP.EXE
+or INSTALL.EXE, you should run that first before running the program
+file, so that the program file can be configured for the system you are
+running it on.
+
+------------------------------------------------------------------------------
+
+Q: I ran a game but it didn't have any sound.
+
+A: The game may have not been configured for your system.  If you run a
+program and one of the choices is an executable program like SETUP.EXE
+or INSTALL.EXE, always run that first to configure the game for your
+specific setup.  Then, launch it again and pick the game executable.
+
+------------------------------------------------------------------------------
+
+Q: I get "No recognizable files were produced by the extraction phase"
+when I try to launch a program.
+
+A: This means the extraction phase, where files in a compressed archive
+are uncompressed and extracted, failed to produce anything the TDL knows
+what to do with.  The most likely cause is that the archive has one or
+more files in them that use long filenames, and the helper utility
+you're using (pkunzip, etc.) doesn't know how to extract files with long
+filenames.  You can try to fix this by not copying archives over with
+long filenames, or by trying a later version of your helper utility that
+may have a way to automatically rename long filenames to DOS-friendly
+8.3 filenames.
+
+------------------------------------------------------------------------------
+
+Q: I ran a BASIC program and it locked up or rebooted my system.
+
+A: Make sure you only try to run the .BAS file, and not any .BAT (batch
+files) or included versions of BASICA.  HANDLERS.INI is set up by
+default to run GW-BASIC when you pick a .BAS file, and that should be
+the most compatible with all systems.
+
+------------------------------------------------------------------------------
+
+Q: BASIC programs are really slow on my IBM system.
+Q: BASIC programs don't seem to be running correctly on my IBM system.
+A: You can change the [BAS] handler in HANDLERS.INI to point to actual
+IBM BASICA for better speed and compatibility on true IBM systems
+(except the IBM PCjr).
+
+=============================================================================
+
+Miscellaneous:
+
+Q: What language is the TDL written in?
+A: 95% Turbo Pascal and 5% assembler.  As of 3/18/2017, the TDL consists
+of over 150K lines of source code.

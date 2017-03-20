@@ -2,6 +2,7 @@
 unit tdl_inde;
 {
 Indexing routines for working with the files we've copied over.
+Also contains structures for working with favorites.
 }
 
 interface
@@ -13,6 +14,7 @@ uses
   tdl_conf;
 
 type
+  {base class for indexes in general}
   PIndex=^TIndex;
   TIndex=object(TObject)
     PUBLIC
@@ -73,6 +75,24 @@ type
   Not yet written:
     Mapping index (contains what titles contain which search words)
   }
+
+  PFavorites=^TFavorites;
+  TFavorites=object(TObject)
+    PUBLIC
+    numEntries:word;
+    userchoices:pFavoritesArray;
+    changed:boolean;
+
+    Constructor Init(favcache:PathStr;ne:word);
+    Destructor Done; VIRTUAL;
+    (*Procedure FileExport(fname:PathStr);
+    Procedure FileImport(fname:PathStr);*)
+    function Flush:boolean;
+
+    PRIVATE
+    fname:string;
+    fhandle:file;
+  end;
 
 implementation
 
@@ -315,6 +335,43 @@ begin
 
   {if we get here, we didn't detect anything wrong}
   Verify:=true;
+end;
+
+
+Constructor TFavorites.init;
+begin
+  Inherited Init;
+  numEntries:=ne;
+  fname:=favcache;
+  changed:=false;
+  getmem(userChoices,numEntries); {no *sizeof(boolean) because we know =1byte}
+  fillchar(userChoices^,numEntries,0); {byte(booleanvar)=0 = FALSE, 1=TRUE}
+  assign(fhandle,fname);
+  if not fileexists(fname) then begin
+    rewrite(fhandle,1);
+    blockwrite(fhandle,userChoices^,numEntries);
+  end else begin
+    reset(fhandle,1);
+    blockread(fhandle,userChoices^,numEntries);
+  end;
+  close(fhandle);
+end;
+
+Destructor TFavorites.done;
+begin
+  freemem(userChoices,numEntries);
+  Inherited Done;
+end;
+
+function TFavorites.Flush;
+begin
+  if changed then begin
+    assign(fhandle,fname);
+    rewrite(fhandle,1);
+    blockwrite(fhandle,userChoices^,numEntries);
+    close(fhandle);
+    changed:=false;
+  end;
 end;
 
 end.

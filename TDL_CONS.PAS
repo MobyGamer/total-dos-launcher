@@ -71,6 +71,7 @@ Procedure PopUserMessage(class:messagetype;s:string);
 Procedure PopAbout;
 Procedure PopHelp;
 Function PromptYN(msg:string):boolean;
+Function PromptForFilename(blurb:string):string;
 procedure die(s:string);
 procedure recordKeyState;
 procedure restoreKeyState;
@@ -82,7 +83,8 @@ function setVESA(mode:word):word;
 implementation
 
 uses
-  totINPUT;
+  totINPUT,
+  totIO2;
 
 var
   keyState:word;
@@ -391,5 +393,32 @@ begin
   PromptYN:=(Result = Finished);
   dispose(promptwin,done);
 end;
+
+Function PromptForFilename(blurb:string):string;
+var
+  PromptWin:PWinOBJ;
+  fname:PLateralIOOBJ;
+  wid:byte;
+begin
+  new(PromptWin,init);
+  wid:=Monitor^.width;
+  with PromptWin^ do begin
+    SetSize(4,2,wid-5,4,1);
+    SetTitle(blurb);
+    SetClose(false);
+    draw;
+    screen.writeplain(1,1,'Filename: ');
+  end;
+  new(fname,init(10,1,wid-10,127));
+  with fname^ do begin
+    SetLabel('Filename: ');
+    Activate;
+    PromptForFilename:=GetValue;
+  end;
+  dispose(fname,done);
+  dispose(PromptWin,done);
+end;
+
+
 
 end.
