@@ -154,6 +154,9 @@ end;
 procedure helpdata; external;
 {$L helpdata.obj}
 
+procedure help_40c; external;
+{$L help_40c.obj}
+
 Procedure PopHelp;
 const
   x1=1;
@@ -180,7 +183,9 @@ begin
   placeholder:='placeholder$';
   c:=@placeholder;
   {$ELSE}
-  c:=@helpdata;
+  if screen.width<80
+    then c:=@help_40c
+    else c:=@helpdata;
   {$ENDIF}
   col:=LookTOT^.vmenulonorm;
   while c^ <> '$' do begin
@@ -213,12 +218,18 @@ begin
 
   logname:=name;
   assign(loghandle,logname);
-  rewrite(loghandle);
+  if not fileexists(logname)
+    then rewrite(loghandle)
+    else append(loghandle);
+  writeln(loghandle,stdDate+': Log opening');
   close(loghandle);
 end;
 
 Destructor TLog.Done;
 begin
+  append(loghandle);
+  writeln(loghandle,stdDate+': Log closing');
+  close(loghandle);
   Inherited Done;
 end;
 
@@ -241,7 +252,9 @@ begin
   _cunderline:=$01;
   _cblink:=$8c;
 
-  new(fileLog,init(logfname));
+  if logfname<>''
+    then new(fileLog,init(logfname))
+    else fileLog:=nil;
   verboseLog:=false;
 
   new(ConScreen,init);
@@ -253,7 +266,7 @@ Destructor TMConsole.Done;
 begin
   logMsg(info,'Debug Console closing...');
   dispose(ConScreen,done);
-  dispose(fileLog,done);
+  if fileLog<>nil then dispose(fileLog,done);
 
   Inherited Done;
 end;
@@ -276,8 +289,10 @@ Procedure TMConsole.LogMsg;
 var
   color:byte;
 begin
+  {prepend a standardized date onto the message to help with troubleshooting}
+  msg:=stdDate+': '+msg;
   {first, make sure it gets into the log file if it is important}
-  case m of
+  if fileLog<>nil then case m of
     info:if verboseLog then fileLog^.Commit(msg);
     warning:fileLog^.Commit('Warning: '+msg);
     error  :fileLog^.Commit('=ERROR=  '+msg);
@@ -299,7 +314,8 @@ begin
   if m=fatal then begin
     RestoreDOSScreen;
     system.writeln('FATAL ERROR: '+msg);
-    system.writeln('It might be prudent to check '+fileLog^.logname+' for clues.');
+    if fileLog<>nil
+      then system.writeln('It might be prudent to check '+fileLog^.logname+' for clues.');
     halt(1);
   end;
 end;

@@ -6,6 +6,7 @@ Total DOS Launcher, main program.
 Initial author Jim Leonard, started 20170211
 
 To-Do:
+timestamps on logging, append to logfile
 Build better handling of when an extraction goes wrong and "No Files" shows up
 Info screen
 Search-as-you-type
@@ -41,7 +42,7 @@ uses
 
 {$IFDEF USEOVERLAYS}
   {Note: documentation discourages overlaying TOTSYS, TOTINPUT, and TOTFAST}
-  {{$O totDATE}
+  {$O totDATE}
   {{$O totDIR}
   {$O totFAST}
   {$O totINPUT}
@@ -115,6 +116,34 @@ asm
         rep     stosb
 end;
 
+Procedure PrintHelp;
+begin
+  asm
+    jmp @start
+@message:
+    db 0ah,'Usage: TDL.EXE <switches>',0dh,0ah,0ah
+
+    db 'Switches:',0dh,0ah
+    db '-?, -h  This help',0dh,0ah
+    db '-c      Set 43-line (EGA) or 50-line (VGA) mode.',0dh,0ah
+    db '        (If you need more lines than that, see TDL.INI for VESA options.)',0dh,0ah
+    db '-r      Instructs TDL that it is on read-only media (ie. CDROM or DVDROM)',0dh,0ah
+    db '        and that it should not try to write anything to its local filesystem.',0dh,0ah
+    db '        This disables "favorites" as well as writing the debug log to disk.',0dh,0ah
+    db 0ah,'$'
+
+@start:
+    push ds
+    mov ax,0900h
+    lea dx,@message
+    mov bx,cs
+    mov ds,bx
+    int 21h
+    pop ds
+  end;
+  halt(255);
+end;
+
 procedure TDL_Init;
 {
 Initialize TDL, first with defaults and the refine using the config file.
@@ -125,8 +154,10 @@ var
   sf,sd:string;
   w:word;
 begin
-  RecordDOSScreen;
+  {If user requested help, then print it and exit}
+  if is_param('?') or is_param('h') then PrintHelp;
 
+  RecordDOSScreen;
 
   {determine TDL base directory and configuration file to use}
   if non_flag_count>0 then sf:=non_flag_param(1) else sf:='tdl.ini';
@@ -137,6 +168,7 @@ begin
   config:=new(pconfig,init(sf,sd));
   if config=nil
     then fatalerror(1,'Error while configuring; check '+sd+'\'+sf);
+
   {attempt TDL handlers init}
   writeln('Registering handlers from handlers.ini...');
   Handlers:=new(PHandlers,init(sd+'handlers.ini'));
@@ -153,8 +185,15 @@ begin
   titles:=new(PTitleIndex,
           init(config^.baseDir+config^.titlesIDXname,config^.preloading));
   if titles=nil then fatalerror(1,'Titles index init failed');
-  favorites:=new(PFavorites,init(sd+'\'+'cache.fav',config^.numTitles));
-  if favorites=nil then fatalerror(1,'Favorites cache init failed');
+
+  {check if user told us we were on a read-only filesystem}
+  if is_param('r') then config^.readonly:=true;
+
+  if config^.readonly then begin
+    writeln('Read-only mode: Favorites cache disabled');
+    favorites:=new(PFavorites,init('',config^.numTitles));
+  end else
+    favorites:=new(PFavorites,init(sd+'\'+'cache.fav',config^.numTitles));
 
   if config^.userlevel=power then begin
     writeln('Performing additional checks:');
@@ -187,6 +226,7 @@ begin
     getmem(TitleIDs,numTitles*2);
     for w:=0 to numTitles-1 do titleIDs^[w]:=w;
   end;
+
 
   {set up the screen}
 
@@ -259,7 +299,12 @@ begin
       LookTOT^.vMenuHiHot,LookTOT^.vMenuHiNorm,TDLStatus);
 
     {init message console now that we have our screen mode locked in}
-    MsgConsole:=new(PMConsole,init(config^.basedir+'tdl.log'));
+    if config^.readonly
+      then begin
+        MsgConsole:=new(PMConsole,init(''));
+        MsgConsole^.logmsg(warning,'Read-only filesystem: Debug log will not be written to a file!');
+      end else
+        MsgConsole:=new(PMConsole,init(config^.basedir+'tdl.log'));
     if (userlevel=power) or (logging=true) then begin
       MsgConsole^.verboseLog:=true;
     end;
@@ -487,6 +532,9 @@ const
   escapeKey:word=kEsc;
   clearBlank:boolean=false;
 
+label
+  nofavorites;
+
 var
   w,dl:word;
   b:byte;
@@ -656,6 +704,9 @@ begin
               if userChoices^[dl] then inc(w);
             end;
           end;
+          {no favorites?  Get out of here}
+          if w=0
+            then goto nofavorites; {yes, not pure pascal-elegant. So sue me.}
           {build new title set}
           inc(activeSet);
           with titleSets[activeSet] do begin
@@ -687,6 +738,7 @@ begin
         pwinloc:=0;
         opwinloc:=-1;                   {force a window refresh}
         favson:=not favson;             {toggle "favorites on" status}
+nofavorites:
       end;
       kEnter:begin {LAUNCH!}
         recordKeyState;

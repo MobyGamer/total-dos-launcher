@@ -47,6 +47,7 @@ type
     swapping:boolean;                   {swap to disk/ram when launching}
     logging:boolean;
     preloading:boolean;                 {preload indexes in ram}
+    readonly:boolean;                   {treat filesystem as read-only (ie. CDROM)}
     userlevel:userlevels;               {what level user is operating in}
     customVidMode:word;
 
@@ -89,6 +90,16 @@ var
   s:string;
   tp:PathStr;
 
+  Function isPositive(s:string):boolean;
+  begin
+    if (upstring(s)='ENABLED')
+    or (upstring(s)='TRUE')
+    or (upstring(s)='ON')
+    or (upstring(s)='YES')
+      then isPositive:=true
+      else isPositive:=false;
+  end;
+
 begin
   Inherited Init;
   {because TP cannot typecase strings, we have to do this:}
@@ -102,6 +113,7 @@ begin
   userlevel:=regular;
   swapping:=false;
   logging:=false;
+  readonly:=false;
   preloading:=true;
   progLocs:='files';
   cacheDir:='cache.dir';
@@ -162,9 +174,9 @@ begin
         if upstring(value)='REGULAR' then userlevel:=regular;
         if upstring(value)='POWER' then userlevel:=power;
       end;
-      if upstring(key)='SWAPPING' then swapping:=(upstring(value)='ENABLED');
-      if upstring(key)='FORCELOGGING' then logging:=(upstring(value)='ENABLED');
-      if upstring(key)='PRELOADING' then preloading:=(upstring(value)='ENABLED');
+      if upstring(key)='SWAPPING' then swapping:=isPositive(value);
+      if upstring(key)='FORCELOGGING' then logging:=isPositive(value);
+      if upstring(key)='PRELOADING' then preloading:=isPositive(value);
       if upstring(key)='VESA' then customvidmode:=hexStrToLong(upstring(value));
     end;
     INIResult:=ini^.ReadNextItem;
@@ -208,32 +220,6 @@ begin
   TitlesIDXLoc:=baseDir+titlesIDXname;
 end;
 
-
-
-(*
-Constructor THandler.Init;
-begin
-  Inherited Init;
-  fail;
-  fullpath:=loc+'\'+prg;
-  if not fileExists(fullpath)
-    then begin
-      THandler.Done;
-      fail;
-    end;
-  mode:=htype;
-  ext:=extension;
-  prg:=prog;
-  loc:=location;
-end;
-
-
-Constructor THandlers.init;
-begin
-  Inherited Init(maxHandlers,32);
-  fail;
-end;
-*)
 
 end.
 

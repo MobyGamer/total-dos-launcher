@@ -339,6 +339,8 @@ end;
 
 
 Constructor TFavorites.init;
+var
+  makeNewCache:boolean;
 begin
   Inherited Init;
   numEntries:=ne;
@@ -346,15 +348,22 @@ begin
   changed:=false;
   getmem(userChoices,numEntries); {no *sizeof(boolean) because we know =1byte}
   fillchar(userChoices^,numEntries,0); {byte(booleanvar)=0 = FALSE, 1=TRUE}
-  assign(fhandle,fname);
-  if not fileexists(fname) then begin
-    rewrite(fhandle,1);
-    blockwrite(fhandle,userChoices^,numEntries);
-  end else begin
-    reset(fhandle,1);
-    blockread(fhandle,userChoices^,numEntries);
+  if fname<>'' then begin {if '' then read-only filesystem, can't work with files}
+    makeNewCache:=false;
+    if not fileexists(fname)
+      then makeNewCache:=true
+      else if sizeoffile(fname)<>ne {if size doesn't match our index files, invalidate the cache}
+        then makeNewCache:=true;
+    assign(fhandle,fname);
+    if makeNewCache then begin
+      rewrite(fhandle,1);
+      blockwrite(fhandle,userChoices^,numEntries);
+    end else begin
+      reset(fhandle,1);
+      blockread(fhandle,userChoices^,numEntries);
+    end;
+    close(fhandle);
   end;
-  close(fhandle);
 end;
 
 Destructor TFavorites.done;
@@ -365,7 +374,7 @@ end;
 
 function TFavorites.Flush;
 begin
-  if changed then begin
+  if (fname<>'') and changed then begin
     assign(fhandle,fname);
     rewrite(fhandle,1);
     blockwrite(fhandle,userChoices^,numEntries);

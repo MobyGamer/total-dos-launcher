@@ -59,9 +59,18 @@ the most compatible with all systems.
 
 Q: BASIC programs are really slow on my IBM system.
 Q: BASIC programs don't seem to be running correctly on my IBM system.
+
 A: You can change the [BAS] handler in HANDLERS.INI to point to actual
 IBM BASICA for better speed and compatibility on true IBM systems
 (except the IBM PCjr).
+
+------------------------------------------------------------------------------
+
+Q: I launched a program, but it exited with an error message so quickly
+that I couldn't read it.
+
+A: Use ALT-F5 to show the DOS output screen.  This will show the
+previously-launched program's output right before the TDL came back.
 
 =============================================================================
 
