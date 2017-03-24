@@ -544,6 +544,9 @@ var
   p:pointer;
   tid:word;
 
+  bsl,bsr,bsm:word;
+  bsch:char;
+
   ttbuf:PTitleStruct;
   pcursor,opcursor:longint;             {picker cursor location(s)}
   pwheight:byte;                        {picker window height}
@@ -670,10 +673,12 @@ begin
       ord('0')..ord('9'),
       ord('A')..ord('Z'),
       ord('a')..ord('z'):begin
-        {Crude "search by letter" until we implement actual searching}
+        {Crude "search by letter" until we implement actual search-as-you-type}
         ch:=upcase(chr(key.lastkey));
         screen.writeat(jcloc.x,jcloc.y,LookTOT^.vMenuLoHot,ch);
-        showStatus(true,'Seeking, please wait');
+        {showStatus(true,'Seeking, please wait'); not necessary with binary search}
+
+        (* Slow, linear search
         for w:=0 to titleSets[activeSet].numTitles-1 do begin
           {check first character only}
           if upcase(titles^.retrieve1c(titleSets[activeSet].titleIDs^[w]))=ch then begin
@@ -683,7 +688,28 @@ begin
             break;
           end;
         end;
-        showStatus(false,'Seeking, please wait');
+        *)
+
+        {Binary search:}
+        bsm:=$ffff; bsl:=0; bsr:=titleSets[activeSet].numTitles-1;
+        while bsl<=bsr do begin
+          bsm:=(bsl+bsr) shr 1;
+          bsch:=upcase(titles^.retrieve1c(titleSets[activeSet].titleIDs^[bsm]));
+          if bsch<ch
+            then bsl:=bsm+1
+            else bsr:=bsm-1;
+        end;
+        {The above code handles duplicates, but can land on N-1, so we
+        check if that happened and adjust:}
+        bsch:=upcase(titles^.retrieve1c(titleSets[activeSet].titleIDs^[bsm]));
+        if (bsch<ch) and (bsm<titleSets[activeSet].numTitles-1)
+          then inc(bsm);
+
+        pcursor:=bsm;
+        pwinloc:=bsm;
+        opwinloc:=-1;               {force window refresh}
+
+        {showStatus(false,'Seeking, please wait'); not necessary with binary search}
       end;
       kF2:begin {Toggle favorite for where the picker cursor is on}
         with favorites^ do begin
