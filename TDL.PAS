@@ -6,8 +6,7 @@ Total DOS Launcher, main program.
 Initial author Jim Leonard, started 20170211
 
 To-Do:
-timestamps on logging, append to logfile
-Build better handling of when an extraction goes wrong and "No Files" shows up
+screensaver (figure out how totinput does idle events)
 Info screen
 Search-as-you-type
 Cache management strategy.  Move all cache management into unit so we can:
@@ -17,6 +16,7 @@ Cache management strategy.  Move all cache management into unit so we can:
 Power user file picker:  Delete a file from cache dir
 Power user title picker: Delete a title (will need to remove cache dir, file, and rewrite indexes)
 Power user title picker: Command key to switch to cache dir and then exit the program
+Power user title picker: Abillity to rewrite a title
 Ability to track what titles have been executed, how many times, and top20
 }
 
@@ -130,6 +130,8 @@ begin
     db '-r      Instructs TDL that it is on read-only media (ie. CDROM or DVDROM)',0dh,0ah
     db '        and that it should not try to write anything to its local filesystem.',0dh,0ah
     db '        This disables "favorites" as well as writing the debug log to disk.',0dh,0ah
+    db '-d      Print excessive debugging messages during initialization.',0dh,0ah
+    db '        Used for troubleshooting only.',0dh,0ah
     db 0ah,'$'
 
 @start:
@@ -381,10 +383,11 @@ begin
     msgConsole^.logmsg(info,'Flushing favorites cache');
     favorites^.flush;
   end;
-  titles^.retrieve(titleSets[activeSet].titleIDs^[tid],ttbuf);
+  {grab title so that we can determine the id needed for file}
+  titles^.retrieve(tid,ttbuf);
   msgConsole^.logmsg(info, ttbuf^.title);
   {determine cache directory}
-  if not files^.retrieve(titleSets[activeSet].titleIDs^[tid],tfbuf)
+  if not files^.retrieve(tid,tfbuf)
       then die('Could not retrieve file info');
   if tfbuf^.id<>tid then die('Wrong file retrieved');
   {extract basename and fullname}
@@ -544,7 +547,7 @@ var
   p:pointer;
   tid:word;
 
-  bsl,bsr,bsm:word;
+  bsl,bsr,bsm:integer;
   bsch:char;
 
   ttbuf:PTitleStruct;
@@ -691,7 +694,7 @@ begin
         *)
 
         {Binary search:}
-        bsm:=$ffff; bsl:=0; bsr:=titleSets[activeSet].numTitles-1;
+        bsl:=0; bsr:=titleSets[activeSet].numTitles-1; bsm:=bsr shr 1;
         while bsl<=bsr do begin
           bsm:=(bsl+bsr) shr 1;
           bsch:=upcase(titles^.retrieve1c(titleSets[activeSet].titleIDs^[bsm]));
@@ -699,9 +702,8 @@ begin
             then bsl:=bsm+1
             else bsr:=bsm-1;
         end;
-        {The above code handles duplicates, but can land on N-1, so we
-        check if that happened and adjust:}
-        bsch:=upcase(titles^.retrieve1c(titleSets[activeSet].titleIDs^[bsm]));
+        {The above code was written to handle duplicates, but can land on N-1.
+        To fix this, we check if that happened and adjust:}
         if (bsch<ch) and (bsm<titleSets[activeSet].numTitles-1)
           then inc(bsm);
 
@@ -769,8 +771,10 @@ nofavorites:
       kEnter:begin {LAUNCH!}
         recordKeyState;
         tmpScreenSave;
+        showStatus(true,'Preparing for launch...');
         Launch(titleSets[activeSet].titleids^[pcursor]);
         RestoreDOSScreen;
+        {showStatus(false,'Preparing for launch...');}
         {if we have any goofy modes set, restore them}
         if config^.customVidMode<>0 then begin
           case config^.customVidMode of

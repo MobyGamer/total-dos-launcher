@@ -48,6 +48,7 @@ type
     logging:boolean;
     preloading:boolean;                 {preload indexes in ram}
     readonly:boolean;                   {treat filesystem as read-only (ie. CDROM)}
+    edebug:boolean;                     {excessive debugging messages on startup}
     userlevel:userlevels;               {what level user is operating in}
     customVidMode:word;
 
