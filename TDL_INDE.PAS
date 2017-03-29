@@ -101,7 +101,7 @@ uses
   streams;
 
 const
-  {Leave these values alone.  Reducing these values will cause breakage.
+  {Leave these values alone.  Reducing these values may cause breakage.
   Increasing these values will not significantly speed anything up.}
   minReadSize=sizeof(TTitleStruct);  {minimum size of bytes to read from title stream}
   indexMinRAM=4096; {minimum size of RAM bytes to preload a stream}
@@ -277,24 +277,19 @@ end;
 
 Function TTitleIndex.retrieve1c(i:word):char;
 {
-Seeks are costly on slow I/O systems.  Normally we would seek to the title
-length, read it, then read only the title characters we need.  To remove
-one seek per retrieval, we are just going to read 256 bytes.  This will
-always dip into the next record, but the extra junk won't be visible
-to the calling program.
+Retrieves only the first character of the title. Used for title binary search.
 }
 const
   tcofs=2+16+1;
 var
   l:longint;
-  status:integer;
-  b:byte;
   c:char;
 begin
   {find offset in stream header, then grab the data into temporary buffer}
   if headerCached then begin
     l:=headerCache^[i];
     data^.seek(l+tcofs);
+    data^.seek(headerCache^[i]+tcofs);
   end else begin
     data^.seek(2+(longint(i)*sizeof(longint)));
     data^.read(l,sizeof(longint));
@@ -337,7 +332,7 @@ begin
   Verify:=true;
 end;
 
-
+{$DEFINE FDEBUG}
 Constructor TFavorites.init;
 var
   makeNewCache:boolean;
@@ -346,22 +341,35 @@ begin
   numEntries:=ne;
   fname:=favcache;
   changed:=false;
+  {$IFDEF FDEBUG} if config^.edebug then writeln('Cache: Allocating memory'); {$ENDIF}
   getmem(userChoices,numEntries); {no *sizeof(boolean) because we know =1byte}
+  {$IFDEF FDEBUG} if config^.edebug then writeln('Cache: Initializing array'); {$ENDIF}
   fillchar(userChoices^,numEntries,0); {byte(booleanvar)=0 = FALSE, 1=TRUE}
   if fname<>'' then begin {if '' then read-only filesystem, can't work with files}
+    {$IFDEF EDEBUG} if config^.edebug then writeln('Cache: Not making a new cache'); {$ENDIF}
     makeNewCache:=false;
     if not fileexists(fname)
-      then makeNewCache:=true
-      else if sizeoffile(fname)<>ne {if size doesn't match our index files, invalidate the cache}
-        then makeNewCache:=true;
+      then begin
+        {$IFDEF FDEBUG} if config^.edebug then writeln('Cache: Cache filename does not exist'); {$ENDIF}
+        makeNewCache:=true
+      end else begin
+        if sizeoffile(fname)<>ne {if size doesn't match our index files, invalidate the cache}
+          then makeNewCache:=true;
+      end;
+    {$IFDEF FDEBUG} if config^.edebug then writeln('Cache: Assigning file handle to ',fname); {$ENDIF}
     assign(fhandle,fname);
     if makeNewCache then begin
+      {$IFDEF FDEBUG} if config^.edebug then writeln('Cache: Rewriting cache file'); {$ENDIF}
       rewrite(fhandle,1);
+      {$IFDEF FDEBUG} if config^.edebug then writeln('Cache: Writing array to file'); {$ENDIF}
       blockwrite(fhandle,userChoices^,numEntries);
     end else begin
+      {$IFDEF FDEBUG} if config^.edebug then writeln('Cache: Resetting cache file'); {$ENDIF}
       reset(fhandle,1);
+      {$IFDEF FDEBUG} if config^.edebug then writeln('Cache: Reading cache into memory'); {$ENDIF}
       blockread(fhandle,userChoices^,numEntries);
     end;
+    {$IFDEF FDEBUG} if config^.edebug then writeln('Cache: Closing file handle'); {$ENDIF}
     close(fhandle);
   end;
 end;

@@ -6,6 +6,7 @@ Total DOS Launcher, main program.
 Initial author Jim Leonard, started 20170211
 
 To-Do:
+favorites export/import
 screensaver (figure out how totinput does idle events)
 Info screen
 Search-as-you-type
@@ -153,7 +154,7 @@ TDL never changes the initial video mode when initializing, so that
 error and status messages are always visible.
 }
 var
-  sf,sd:string;
+  sf,sd,temps:string;
   w:word;
 begin
   {If user requested help, then print it and exit}
@@ -166,10 +167,15 @@ begin
   if non_flag_count>1 then sd:=non_flag_param(2) else sd:='';
   sd:=StdPath(FExpand(sd));
   {attempt TDL config init}
-  writeln('Configuring '+TDLtitle+' using '+sf+'...');
+  writeln('Configuring '+TDLtitle+'.  Use "-h" for command-line options.');
+  writeln('Reading '+sf+'...');
   config:=new(pconfig,init(sf,sd));
   if config=nil
     then fatalerror(1,'Error while configuring; check '+sd+'\'+sf);
+
+  {set config options based on command-line options}
+  if is_param('d') then config^.edebug:=true;
+  if is_param('r') then config^.readonly:=true;
 
   {attempt TDL handlers init}
   writeln('Registering handlers from handlers.ini...');
@@ -188,16 +194,17 @@ begin
           init(config^.baseDir+config^.titlesIDXname,config^.preloading));
   if titles=nil then fatalerror(1,'Titles index init failed');
 
-  {check if user told us we were on a read-only filesystem}
-  if is_param('r') then config^.readonly:=true;
-
+  write('Title flags cache: ');
+  temps:=sd+'\'+'cache.dat';
   if config^.readonly then begin
-    writeln('Read-only mode: Favorites cache disabled');
+    writeln('Read-only mode: Cache disabled');
     favorites:=new(PFavorites,init('',config^.numTitles));
-  end else
-    favorites:=new(PFavorites,init(sd+'\'+'cache.fav',config^.numTitles));
+  end else begin
+    writeln('Initializing cache using '+temps);
+    favorites:=new(PFavorites,init(temps,config^.numTitles));
+  end;
 
-  if config^.userlevel=power then begin
+  if (config^.userlevel=power) or (config^.edebug=true) then begin
     writeln('Performing additional checks:');
     with config^ do begin
       {power users like to ensure they copied the stuff over correctly}
