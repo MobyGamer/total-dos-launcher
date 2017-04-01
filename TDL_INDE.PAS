@@ -249,12 +249,11 @@ begin
   {find offset in stream header, then grab the data into temporary buffer}
   if headerCached then begin
     l:=headerCache^[i];
-    data^.seek(l);
   end else begin
     data^.seek(2+(longint(i)*sizeof(longint)));
     data^.read(l,sizeof(longint));
-    data^.seek(l);
   end;
+  data^.seek(l);
   data^.read(tmpdata^,minReadSize);
   {Our speed optimization of reading minReadSize can go past the end of the
   stream.  If we do this, we'll fall back to slower but 100% accurate reading.}
@@ -287,8 +286,8 @@ var
 begin
   {find offset in stream header, then grab the data into temporary buffer}
   if headerCached then begin
-    l:=headerCache^[i];
-    data^.seek(l+tcofs);
+    {l:=headerCache^[i];
+    data^.seek(l+tcofs);}
     data^.seek(headerCache^[i]+tcofs);
   end else begin
     data^.seek(2+(longint(i)*sizeof(longint)));

@@ -195,7 +195,8 @@ begin
   if titles=nil then fatalerror(1,'Titles index init failed');
 
   write('Title flags cache: ');
-  temps:=sd+'\'+'cache.dat';
+  temps:=stdpath(sd)+'cache.dat';
+
   if config^.readonly then begin
     writeln('Read-only mode: Cache disabled');
     favorites:=new(PFavorites,init('',config^.numTitles));
@@ -213,11 +214,9 @@ begin
       writeln(' ',titlesIDXloc);
       write('Checking index files for correctness: ');
       write('files... ');
-      if files^.verify=false
-        then fatalerror(1,'File index inconsistent');
+      if files^.verify=false then fatalerror(1,'File index inconsistent');
       write('titles... ');
-      if titles^.verify=false
-        then fatalerror(1,'Title index inconsistent');
+      if titles^.verify=false then fatalerror(1,'Title index inconsistent');
       writeln('passed.');
 
       {power users want to know everything}
@@ -232,7 +231,7 @@ begin
   {populate the initial list of titles we're working with}
   with titleSets[activeSet] do begin
     numTitles:=config^.numTitles;
-    getmem(TitleIDs,numTitles*2);
+    getmem(TitleIDs,numTitles*sizeof(word));
     for w:=0 to numTitles-1 do titleIDs^[w]:=w;
   end;
 
