@@ -51,6 +51,7 @@ type
     edebug:boolean;                     {excessive debugging messages on startup}
     userlevel:userlevels;               {what level user is operating in}
     customVidMode:word;
+    pauseAfterRun:boolean;
 
     cacheDir:DirStr;                    {cache directory}
     baseDir:DirStr;                     {base directory (where config file is)}
@@ -97,6 +98,7 @@ var
     or (upstring(s)='TRUE')
     or (upstring(s)='ON')
     or (upstring(s)='YES')
+    or (upstring(s)='1')
       then isPositive:=true
       else isPositive:=false;
   end;
@@ -176,6 +178,7 @@ begin
         if upstring(value)='POWER' then userlevel:=power;
       end;
       if upstring(key)='SWAPPING' then swapping:=isPositive(value);
+      if upstring(key)='PAUSEAFTERRUN' then pauseAfterRun:=isPositive(value);
       if upstring(key)='FORCELOGGING' then logging:=isPositive(value);
       if upstring(key)='PRELOADING' then preloading:=isPositive(value);
       if upstring(key)='VESA' then customvidmode:=hexStrToLong(upstring(value));

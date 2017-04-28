@@ -76,6 +76,7 @@ procedure die(s:string);
 procedure recordKeyState;
 procedure restoreKeyState;
 procedure pause;
+procedure pauseForUser; {uses DOS and BIOS only}
 procedure tmpScreenSave;
 procedure tmpScreenRestore;
 function setVESA(mode:word):word;
@@ -129,6 +130,23 @@ begin
   recordKeyState;
   key.getkey;
   restoreKeyState;
+end;
+
+procedure pauseForUser; assembler;
+asm
+        push    ds
+        jmp     @startit
+@msg:
+        DB      'Press a key to return to the TDL.$'
+@startit:
+        push    cs
+        pop     ds
+        mov     dx,offset @msg
+        mov     ah,09h
+        int     21h
+        xor     ax,ax
+        int     16h
+        pop     ds
 end;
 
 {Okay, so the nil pointer stuff is to prevent if I call tmpScreenSave two or

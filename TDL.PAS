@@ -788,6 +788,7 @@ nofavorites:
         tmpScreenSave;
         showStatus(true,'Preparing for launch...');
         Launch(titleSets[activeSet].titleids^[pcursor]);
+        if config^.pauseAfterRun then pauseForUser;
         RestoreDOSScreen;
         {showStatus(false,'Preparing for launch...');}
         {if we have any goofy modes set, restore them}
