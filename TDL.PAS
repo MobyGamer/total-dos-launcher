@@ -6,6 +6,13 @@ Total DOS Launcher, main program.
 Initial author Jim Leonard, started 20170211
 
 To-Do:
+refactor?
+pause-after-execution
+power user: decompress all files (will require cache stuff first)
+when importing handlers, add a special check for command.com to check comspec
+info-box where full title and other stuff can be read
+Power user title picker: Abillity to rewrite a title
+Power user title picker: Delete a title (will need to remove cache dir, file, and rewrite indexes)
 favorites export/import
 screensaver (figure out how totinput does idle events)
 Info screen
@@ -15,9 +22,7 @@ Cache management strategy.  Move all cache management into unit so we can:
   strategy can be limited to 5 dirs for testing and then avail disk space for final
   strategy should determine exact amount of storage needed from archive header but can estimate 4*archive size 4now
 Power user file picker:  Delete a file from cache dir
-Power user title picker: Delete a title (will need to remove cache dir, file, and rewrite indexes)
 Power user title picker: Command key to switch to cache dir and then exit the program
-Power user title picker: Abillity to rewrite a title
 Ability to track what titles have been executed, how many times, and top20
 }
 
@@ -133,6 +138,8 @@ begin
     db '        This disables "favorites" as well as writing the debug log to disk.',0dh,0ah
     db '-d      Print excessive debugging messages during initialization.',0dh,0ah
     db '        Used for troubleshooting only.',0dh,0ah
+    db '-f      Always use fast display routines on all CGA systems.',0dh,0ah
+    db '        This may cause "snow" or display corruption on true CGA adapters.',0dh,0ah
     db 0ah,'$'
 
 @start:
@@ -316,6 +323,8 @@ begin
     if (userlevel=power) or (logging=true) then begin
       MsgConsole^.verboseLog:=true;
     end;
+    if is_param('f')
+      then boolean(snowprone):=false;
     if boolean(snowprone)
       then MsgConsole^.logmsg(info,'Slower display routines enabled to avoid CGA "snow"');
   end;
