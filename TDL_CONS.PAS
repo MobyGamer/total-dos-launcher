@@ -186,7 +186,7 @@ var
   c:^char;
   col:byte;
   {$IFDEF USEOVERLAYS}
-  placeholder:string[12];
+  placeholder:string[80];
   {$ENDIF}
 begin
   {This simple text wrapping algo is not smart enough to look ahead to the
@@ -198,7 +198,7 @@ begin
     LookTOT^.vmenuborder,LookTOT^.vmenutitle,LookTOT^.vmenuborder,
     6,'Total DOS Launcher Help');
   {$IFDEF USEOVERLAYS}
-  placeholder:='placeholder$';
+  placeholder:='help text not present when using overlays - complain to programmer$';
   c:=@placeholder;
   {$ELSE}
   if screen.width<80

@@ -1,6 +1,6 @@
 { Global TDL compilation directives}
 {undefine this next line if still debugging}
-{{$DEFINE FINAL}
+{$DEFINE FINAL}
 
 {Overlays are only used while trying to run and debug the program within the
 Turbo Pascal real-mode IDE.  There is NO reason to distribute the program
