@@ -34,6 +34,7 @@ uses
   totLOOK,
   totLIST,
   totKEY,
+  totMSG,
   tdl_glob,
   tdl_conf,
   tdl_inde,
@@ -41,10 +42,21 @@ uses
   tdl_hand;
 
 const
-  maxTitleSets=16;
-  activeSet:byte=0;
   favIconCol:byte=$0f;
   favsOn:boolean=false;
+
+type
+  txtcoords=record
+    x,y:byte;
+  end;
+
+var
+  jcloc:txtcoords; {jumpcursor location}
+
+{Global files, titles, titlesets, and other management info}
+const
+  maxTitleSets=16;
+  activeSet:byte=0;
 
 type
   workingTitleSet=record
@@ -52,17 +64,11 @@ type
     TitleIDs:PTitleArray;
   end;
 
-  txtcoords=record
-    x,y:byte;
-  end;
-
 var
   Files:PFileIndex;
   Titles:PTitleIndex;
   titleSets:array[0..maxTitleSets-1] of workingTitleSet;
-  jcloc:txtcoords; {jumpcursor location}
   Favorites:PFavorites;
-
 
 Procedure PrintHelp;
 begin
@@ -94,6 +100,37 @@ begin
     pop ds
   end;
   halt(255);
+end;
+
+
+Procedure PopGeneralInfo;
+var
+  foomsg:PMessageObj;
+  s:string[12];
+begin
+  new(foomsg,init(2,'TDL info and stats'));
+  with foomsg^ do begin
+    case config^.userlevel of
+      kiosk:s:='Kiosk';
+      regular:s:='Default';
+      power:s:='Power User';
+    end;
+    addline(' TDL operating mode: '+s);
+    addline(' Total Heap: '+inttostr(memavail div 1024)+' KB (largest block: '+inttostr(maxavail div 1024)+' KB)');
+    with config^ do begin
+      addline(' # of Titles: '+inttostr(numtitles)+' ('+inttostr(Favorites^.Used)+' marked as favorites) ');
+      addline(' Swapping: '+boolToStr(swapping,'ENABLED','disabled'));
+      addline(' Debug messsages logged to disk: '+boolToStr(logging,'ENABLED','disabled'));
+      addline(' Treating filesystem as read-only: '+boolToStr(readonly,'YES','no'));
+      addline(' Excessive debug messages: '+boolToStr(edebug,'ENABLED','disabled'));
+      addline(' Pause after execution: '+boolToStr(swapping,'ENABLED','disabled'));
+      addline(' ');
+      addline(' Cache directory: '+cachedir);
+    end;
+    addline(' ');
+    show;
+  end;
+  dispose(foomsg,done);
 end;
 
 procedure TDL_Init;
@@ -276,8 +313,8 @@ begin
     with config^ do begin
       logmsg(info,'Number of titles: '+inttostr(numTitles));
       logmsg(info,'Base directory: '+baseDir);
-      logmsg(info,'Swapping enabled: '+boolToStr(swapping));
-      logmsg(info,'Preloading enabled: '+boolToStr(preloading));
+      logmsg(info,'Swapping enabled: '+boolToStr(swapping,'',''));
+      logmsg(info,'Preloading enabled: '+boolToStr(preloading,'',''));
       logmsg(info,'Cache Directory: '+cacheDir);
     end;
   end;
@@ -751,6 +788,11 @@ nofavorites:
       kF10:begin {show About This Program window}
         recordKeyState;
         popAbout;
+        restoreKeyState;
+      end;
+      kF9:begin {show program info dialog}
+        recordKeyState;
+        popGeneralInfo;
         restoreKeyState;
       end;
       kF1:begin {show help screen}

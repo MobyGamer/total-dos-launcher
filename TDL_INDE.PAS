@@ -88,6 +88,7 @@ type
     (*Procedure FileExport(fname:PathStr);
     Procedure FileImport(fname:PathStr);*)
     function Flush:boolean;
+    function Used:word; {returns how entries are in use}
 
     PRIVATE
     fname:string;
@@ -377,6 +378,17 @@ Destructor TFavorites.done;
 begin
   freemem(userChoices,numEntries);
   Inherited Done;
+end;
+
+function TFavorites.Used;
+var
+  w,count:word;
+begin
+  count:=0;
+  for w:=0 to numEntries-1 do
+    if userChoices^[w]
+      then inc(count);
+  Used:=count;
 end;
 
 function TFavorites.Flush;

@@ -398,14 +398,6 @@ begin
   new(foomsg,init(2,TDLTitleFull));
   with foomsg^ do begin
     for loop:=0 to numAboutLines-1 do AddLine(strpas(AboutText[loop]));
-    case config^.userlevel of
-      kiosk:s:='Kiosk';
-      regular:s:='Default';
-      power:s:='Power User';
-    end;
-    addline(' TDL operating mode: '+s);
-    addline(' Memory free: '+inttostr(memavail div 1024)+' KB (largest: '+inttostr(maxavail div 1024)+' KB)');
-    addline(' ');
     show;
   end;
   dispose(foomsg,done);
