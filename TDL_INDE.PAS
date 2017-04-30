@@ -332,7 +332,7 @@ begin
   Verify:=true;
 end;
 
-{$DEFINE FDEBUG}
+{{$DEFINE FDEBUG}
 Constructor TFavorites.init;
 var
   makeNewCache:boolean;

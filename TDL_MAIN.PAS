@@ -133,6 +133,27 @@ begin
   dispose(foomsg,done);
 end;
 
+Procedure PopTitleInfo(tid:word);
+var
+  foomsg:PMessageObj;
+  s:string[12];
+  tfbuf:PFileStruct;
+  ttbuf:PTitleStruct;
+
+begin
+  new(foomsg,init(2,'Information on this title'));
+  titles^.retrieve(tid,ttbuf);
+  files^.retrieve(tid,tfbuf);
+  with foomsg^ do begin
+    addline(' Title: '+ttbuf^.title);
+    addline(' Filename: '+tfbuf^.name);
+    addline(' Cache Directory: '+config^.cachedir+basename(tfbuf^.name));
+    addline(' ');
+    show;
+  end;
+  dispose(foomsg,done);
+end;
+
 procedure TDL_Init;
 {
 Initialize TDL, first with defaults and the refine using the config file.
@@ -793,6 +814,11 @@ nofavorites:
       kF9:begin {show program info dialog}
         recordKeyState;
         popGeneralInfo;
+        restoreKeyState;
+      end;
+      kCtlI:begin {show title info dialog}
+        recordKeyState;
+        popTitleInfo(titleSets[activeSet].titleids^[pcursor]);
         restoreKeyState;
       end;
       kF1:begin {show help screen}

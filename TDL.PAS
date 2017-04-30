@@ -13,8 +13,7 @@ Power user title picker: Abillity to rewrite a title
 Power user title picker: Delete a title (will need to remove cache dir, file, and rewrite indexes)
 favorites export/import
 screensaver (figure out how totinput does idle events)
-Info screen for all general items?
-Info screen for highlighted title?
+Info screen for highlighted title
 Search-as-you-type
 Cache management strategy.  Move all cache management into unit so we can:
   come up with cache purge strategy.
