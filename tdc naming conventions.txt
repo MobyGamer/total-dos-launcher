@@ -1,0 +1,376 @@
+Total DOS Collection naming convention.
+
+Originally based off what TOSEC is doing here: http://www.tosecdev.org/tosec-naming-convention
+Although some things were modified and a few new tags/flags were added into the mix to properly represent DOS gaming.
+
+
+The basic format for the naming convention is as such:
+
+
+Game Name, The (Year)(Publisher) [Genre].zip
+
+
+You'll notice that it looks a lot like this list from mobygames:
+http://www.mobygames.com/browse/games/dos/list-games/
+This is no coincidence.  TDC attempts to tie game titles, year of release, publisher, and genre to mobygames.  Tying this data to
+the mobygames database allows 1:1 lookups for game info, which can assist in fleshing out the overall TDC archive (screenshots, tech info, etc)
+
+
+The full title is mandatory for all games.  
+
+"Quest for Glory 2" <-- No!
+"Quest for Glory II- Trial By Fire" <-- Yes!
+
+
+
+
+The full publisher name is manditory for all games.  This includes all punctuation and trailing signifiers.
+
+3-D Helicopter Simulator (1987)(Sierra) [Action, Simulation].zip <-- No!
+3-D Helicopter Simulator (1987)(Sierra On-Line, Inc.) [Action, Simulation].zip <-- Yes!
+
+
+
+
+Sometimes a game is published in a different country by a different publisher, possibly with language changes.
+We prefer to track this information as accurately as possible.
+
+Maniac Mansion- Day of the Tentacle v1.1 (Es) (1993)(Erbe Software, S.A.) [Adventure].zip    <-- Published in Spain
+Maniac Mansion- Day of the Tentacle v1.5 (1993)(LucasArts Entertainment Company LLC) [Adventure].zip <-- Published in USA
+
+
+
+Colons.  Anytime a colon is used in the game title, it must be represented as a "- " (see above for an example).
+Since a colon cannot be represented in a DOS/Windows platform, this representation allows a colon to be symbolicaly placed at that location.
+On platforms that do support a colon in a filename, a search/replace could restore the proper naming convention.
+
+If a dash is used in the title, then it shall be represented as " - ".
+4D Sports - Boxing (1991)(Mindscape International Ltd.) [Action, Strategy, Sports].zip 
+
+
+
+
+
+Version and Release numbers:
+
+The version number presented in the game is very important for TDC to distinguish between the various releases.  TDC's goal is to
+track and archive *every* game, and that means every version of every game too.
+
+The version number, or in the case of Infocom games, the Release number is always included immediately following the game name.
+
+Links 386 Pro v1.30 (1994)(Access Software, Inc.) [Sports].zip
+Infidel r22 (1983)(Infocom, Inc.) [Adventure, Interactive Fiction].zip
+Many Faces of Go, The v8.03 (1992)(Ishi Press International) [Simulation, Strategy].zip  
+Zork II- The Wizard of Frobozz r48 (1983)(Infocom, Inc.) [Adventure, Interactive Fiction].zip 
+
+
+Version 1.0 of a title is not specified in the zip name, it is assumed.  
+Even if a game reports v1.0, it is not specified in the zip name, as it would be redundant.  
+Something to consider: If a game only has 1 release, and does not report version 1.0 on the title screen, what version is it?
+
+
+
+---Flags---
+
+Flags are used to identify a particular type or feature of a game.  Flags are helpful for identification purposes as well as denoting the game's
+"Type".  Eg, a Korean version of a game instead of a Chinese, or a demo of a game instead of the full release.
+
+
+
+Languages are tracked by the language presented in the game, not the country of the game's origin.  There's nothing stopping someone
+in Germany from making an English language game.  If not specified in the zip filename, the language is English.
+
+
+(Hu)	Hungarian
+(Kr)	Korean
+(Id)	Indonesian
+(Hw)	Hebrew
+(Zh)	Chinese
+(De)	German
+(Es)	Spanish
+(It)	Italian
+(Fr)	French
+(Ru)	Russian
+(Jp)	Japanese
+(Fi)	Finnish
+(Sl)	Slovenian
+(Sr)	Serbian
+(Cz)	Czech
+(Pl)	Polish
+(No)	Norwegian
+(Nl)	Dutch
+(En)	English
+(Da)	Danish
+(Ua)	Ukranian
+(Pt)	Portuguese
+(Se)	Swedish
+(Be)	Belarusian
+(Ar)	Arabic
+(Multi-x) Where x is the number of languages supported. We are trying to depricate this field for better overall accuracy, 
+	  although there are some games that support 12+ languages, so it gets a little out of hand to have all 
+	  those individual language flags in the filename.
+
+
+Rasende Reporter, Der (De) (1994)(Promotion Software) [Adventure].zip
+Reon-Ui Moheom (Kr) (1994)(Family Productions) [Action].zip
+
+
+Languages may be "stacked" to denote multiple languages supported.
+
+Rise of the Robots (En)(De)(Fr)(It)(Es) (1994)(Time Warner Interactive, Inc.) [Action].zip
+
+It is important to keep one space between the last language flag and the start of the Year/Publisher data.
+
+
+
+
+(demo)		Self explanitory, however, if the title of the game contains the word "demo", then there is no reason to include it again as a flag.
+		
+
+Beetris (demo) (1992)(Simsalabim Software) [Strategy, Action].zip    
+Blues Brothers, The (demo) (1991)(Titus France SA) [Action].zip    
+ChessBase KnightStalker Demo v1.01 (En)(De) (1992)(ChessBase USA) [Strategy, Chess].zip    <-- Yes!
+ChessBase KnightStalker Demo (demo) v1.01 (En)(De) (1992)(ChessBase USA) [Strategy, Chess].zip    <-- No!
+
+
+
+
+(CGA)		A version of the game which only supports 1 graphics mode.  Often grouped together with other copies of the same game which
+(VGA)		support different graphics modes.
+
+Arkanoid (CGA) (1988)(Taito Corporation) [Action].zip    
+Aspar GP Master (CGA) (Es) (1989)(Dinamic Software) [Racing - Driving].zip    
+F40 Interceptor (CGA) (1989)(Titus Interactive S.A.) [Action].zip    
+F40 Interceptor (EGA) (1989)(Titus Interactive S.A.) [Action].zip    
+
+
+
+
+(Tandy) 	Similar to the above. A game that supports a specific platform.  Tandy and PCjr are the most common, as these machines had 
+(PCjr)		hardware that differed from a standard IBM PC.
+
+
+Drakkhen (Tandy) (1990)(Infogrames) [Action, Adventure, Role-Playing (RPG)].zip    
+Mr. Cool (PCjr) [DC] (1984)(Sierra On-Line, Inc.) [Action].zip    
+
+
+
+(Installer)	A version of a game in a pre-installed (not immediately runnable) format.  These are included in TDC for multiple purposes.
+		Sometimes a game has different options that can be changed at install time, such as sound drivers or graphics modes. If TDC
+		only included post-installed games, there may be no ability to have a CGA version of a game.  Installers often identify themselves
+		differently as installed games, such as a game in its pre-installed form may be a multiple of compressed files which will have
+		different CRCs and filenames than the game in its post-installed form.
+		
+
+1942- The Pacific Air War (Installer) (1994)(MicroProse Software, Inc.) [Simulation].zip
+3D Cyber Puck v1.1 (Installer) (1995)(Homebrew Software) [Action].zip    
+
+
+
+Flags are not as restrictive as tags in what data they represent- anything that helps with identification to know what type of game 
+is included in the zip file can be used.
+
+A320 Airbus (Edition Europa) (1991)(Thalion Software) [Simulation].zip    
+A320 Airbus v1.46 (Edition USA) (1993)(Thalion Software) [Simulation].zip    
+688 Attack Sub (Maxell Special Edition) (demo) (1988)(Electronic Arts, Inc.) [Simulation].zip    
+
+
+
+
+
+--Tags--
+
+Tags are specific in the type of information they represent.  These typically do not represent the type of game included in the zip.
+
+
+[DC]	DOS Conversion.  Typically a "booter" game that was originally released on floppy disk or PCjr cartridge.  Converted 
+	to run in a DOS environment.  These are technically hacks and even more technically don't belong in a true DOS archive,
+	but there's they are still games that we can't ignore!  
+
+Adventure in Serenia [DC] (1982)(IBM) [Adventure, Interactive Fiction].zip    
+Agent U.S.A. [DC] (1984)(Scholastic Wizware) [Adventure, Educational, Strategy].zip    
+
+
+
+[h1]	Hacked version 1
+[h2]	Hacked version 2, etc - These are games where the game has been altered in some way, typically by the pirate/release group.
+	The most common form of hack is a "Cracked by mr. cooldude" type message, often replacing the actual game's credits/copyright.
+	Other forms of hacked files are using a loader to start the game, sometimes to show an ad for the pirate group before the
+	game starts.  The loader is sometimes a TSR which patches the game and therefore cannot be removed from the final release.
+	
+	An eventual goal of TDC is to repair hacked versions of games if none exist.
+	All hacked tags should have an a corresponding entry in the notes wiki describing why this tag was applied to this title.
+
+Airborne Ranger v441.01 [h1] (1988)(MicroProse Software, Inc.) [Action, Simulation].zip    
+Ancient Art of War at Sea, The [h1] (1987)(Broderbund Software, Inc.) [Strategy].zip    
+
+	Some hacks include changing the name of the original title, such as Sopwith getting changed to "Red Baron".
+	Since "Red Baron" is at its core still the game Sopwith, the original title is retained, and only a note is provided in the wiki.
+	In other words, if a hacker simply changed some text in a file, they don't get credit for creating a new game.  The year of release
+	shall still be set to the original date of the game's release, not the year the hack was performed.
+
+
+[a1]	Alternate version 1
+[a2]	Alternate version 2, etc - Some portion of the game is different enough that it has been included in TDC.  Some examples:
+	1) A data file in the game is different - not a config, high score, or save game file, but something substantial.  
+	   Files may change due to simply playing the game, so some discretion is adviced before blindly adding anything.
+	2) The game may be cracked differently.  Someday we can go back through these and using unchanged bytes from multiple version
+	   an *uncracked* version of the game may be reproduced.
+	3) Sometimes authors forget to change the version number when something is changed.  A game may say v1.2 on two completely
+	   different versions (the .exe files might be vastly different) of the game.
+	4) Corruption.  Game files might vary for unknown differences not related to cracking.  The a file might then be corrupt, but
+	   until at least a 3rd copy of the game is available, we may never know which version is the correct one.
+	5) The same game released on 360k floppies as well as 720k and files differ. Sierra games do this.  
+	   Resource.001 may be twice the size on the same game released on 720k diskettes. This should(?) be represented as a flag instead. (360k)(720k)
+	6) Compression.  Occasionally an alternate version of a game is traced to compression differences.  Once decompressed, if the
+	   files match exactly, then the compressed version is not included in TDC, but tracked as a compressed duplicate.
+	   Unfortunately decompression can sometimes create a completely different .exe file, which cannot be verified as identical.
+	   These files must be tracked as alternate versions even though gameplay is identical.
+
+	All alternate tags should have an a corresponding entry in the notes wiki describing why this tag was applied to this title.
+
+
+3-D Helicopter Simulator [a1] (1987)(Sierra On-Line, Inc.) [Action, Simulation].zip    
+3-D Helicopter Simulator v1.10 [a1] (1987)(Sierra On-Line, Inc.) [Action, Simulation].zip    
+3-D Helicopter Simulator v1.10 [a2] (1987)(Sierra On-Line, Inc.) [Action, Simulation].zip    
+
+
+
+
+[f1]	Fixed version 1
+[f2]	Fixed version 2, etc - Something in the game has been patched slightly to make it run either in DOSBox or otherwise in a more
+	user friendly way.  An example would be removing the requirement for a game to run off a certain drive or subdirectory.
+	This does not include simply cracking a game.  Cracked games are the default for all games in TDC.
+
+	All fixed tags should have an a corresponding entry in the notes wiki describing why this tag was applied to this title.
+	
+
+Balance Of Power (Installer) [f1] (1985)(Mindscape, Inc.) [Simulation, Strategy].zip    
+Bruce Lee Lives- The Fall of Hong Kong Palace v1.02 [f1] (1989)(Software Toolworks, Inc., The) [Action].zip    
+
+
+
+
+[o1]	Overdump version 1
+[o2]	Overdump version 2, etc.
+	Typically only seen in very early software, occasionally a file contains garbage data at the end of the executable portion
+	which doesn't alter gameplay at all, but does alter a game's CRC.  These are technically useless, but tracked in TDC for 
+	identification purposes.  Since these titles are often only a few k in size, these are physically in the TDC archive.
+	Overdumps may eventually be removed out of the archive and only tracked as duplicates.
+
+
+3D Tic-Tac-Toe [o1] (1982)(Reza Beheshti) [Strategy].zip    
+3D Tic-Tac-Toe [o2] (1982)(Reza Beheshti) [Strategy].zip    
+
+
+[b1]	Bad version 1
+[b2]	Bad version 2, etc - Known incorrect/incomplete copy.  Some examples of when this is used:
+	1) The most common form of this is a CD-RiP game, where intro movies, sounds, etc, have been removed from the game to reduce the 
+	   size for distribution.  CD-RiPs are usually completely playable, even in their bad state.  As the project progresses, and full
+	   copies of CD games are discovered and identified, these games will be restored/replaced with complete versions and hopefully
+	   the [b1] copies will be deleted.
+	2) Sometimes a game is incredibly rare, and a known bad copy is the only is the only one that can be located.  
+	   It will be included in TDC for identification purposes, even though the game is not playable.
+	3) A defect is discovered in a game and a better copy replaces it.  An example might be a DOS converted game where the loader uses 386
+	   instructions.  When a better conversion of the game is available, the previous copy in TDC will be "downgraded" to [b1].  In this
+	   instance, there is technically no reason to include the game in TDC outside of identification purposes so it can be avoided.           
+
+	All bad tags should have an a corresponding entry in the notes wiki describing why this tag was applied to this title.
+
+	
+Barney Bear Goes To School [b1] (1990)(Free Spirit Software, Inc.) [Educational].zip    
+Beneath Apple Manor [DC][b1] (1983)(Quality Software) [Role-Playing (RPG)].zip    
+
+
+
+[SW]	Shareware
+[SWR]	Registered Shareware
+[FW]	Freeware
+
+	Shareware, Registered Shareware, and Freeware are methods to denote the various methods certain games are distributed under.
+	This tag can also be used to help track revisions of a game; for example a shareware game from 1997 may later be re-released by
+	the author as freeware in 2005 without any other version identification.  A tag of [SW] does not neccessarily mean a registered
+	version of that game exists, or that it would be any different if it did exist.  [SW] simply means the author has mentioned the
+	distribution method the title was released under, which is often accompanied with a request for money.  This tag was introduced 
+	as a quick way to sort and filter "safe" titles which can be redistributed without worry of copyright infringement.
+	
+	SW/SWR/FW tags are not encapsulated inside parethesis to avoid confusion with language flags.
+
+Bio Menace- Episode One- Dr. Mangle's Lab [SW] (1993)(Apogee Software, Ltd.) [Action].zip    
+Bio Menace- Episode One to Three [SWR] (1993)(Apogee Software, Ltd.) [Compilation].zip    
+Akiko and Minami [FW] (2004)(Roland Kunz) [Action].zip    
+
+
+
+
+[!]	Known good dump.  This zip archive contains files that have been validated against a 2nd independently sourced copy.  
+	This is the highest status of any file in TDC, as it ensures that the game has been dumped identically from two (or more) sources
+	and the CRCs of all the files match on both copies.  This tag is appended to the *end* of the filename.
+	It is important that proper care in obtaining two independent copies for comparison is observed.  Getting one copy from a torrent
+	and a second copy from an abandonware site is not reliable enough to ensure the two copies came from different source material.
+
+$100,000 Pyramid, The v1.3 (1988)(Box Office) [Trivia][!].zip    
+Awesome Earl in SkateRock (1988)(ShareData, Inc.) [Action, Sports][!].zip    
+Box Ranger (Kr)(En) (1992)(SKC Soft Land) [Action][!].zip    
+
+
+
+Translated
+
+[tr No]	Translated into Norwegian
+[tr En] Translated into English 
+[tr Es] Translated into Spanish
+[tr Cz] Translated into Czech
+etc.
+
+	A title modified to change the native language.  This is most always an unofficial change in the game's data and typically done 
+	by simply changing ASCII text embedded in the game.  Technically these are hacked, but more useful than simply changing the 
+	credits on a game or advertising one's cracking skills, so they are tagged seperately.
+
+
+Alley Cat [tr No] (1984)(IBM) [Action].zip    
+Bomb'X [tr En] (1993)(Mediagogo) [Strategy, Adult].zip    
+California Games v1.01 [tr Es][h1] (1988)(Epyx, Inc.) [Sports].zip    
+Cyrus [tr Ru] (1985)(Intelligent Chess Software) [Strategy, Chess].zip    
+Dizzy- Prince of the Yolkfolk [tr Cz] (1993)(Codemasters Software Company Limited, The) [Action].zip    
+
+Like hacks, some translations are done at a significantly later year than when the game was first released.
+The year should still reflect of the game's original release, not when the translation was done.
+Quest for Glory II - Trial by Fire v1.105 [tr Sp] (1990)(Sierra On-Line, Inc.) [Aventure, Role-Playing (RPG)].zip
+
+-------------------
+RFC: potentially new tag?
+[.]	Mostly good dump.  This zip file has been compared against an independently sourced copy, but one or more files do not CRC-match.  
+	An example here would be where all .exe and data files match exactly, but a save game or config file has been written to and a 
+	virgin copy has not yet been located.  
+-------------------
+
+
+Tags may of course be "stacked" to denote several variants at once.
+
+Adventures of Captain Comic Episode 1, The - Planet of Death [SW][h1] (1988)(Michael A. Denio) [Action].zip    
+Alien Carnage (Installer) [SW][a2] (1994)(Apogee Software, Ltd.) [Action].zip    
+BC's Quest for Tires [DC][b1][a1] (1984)(Sierra On-Line, Inc.) [Action].zip   
+
+It is important to keep tags in the same sequence, so they list nicely.
+Archon- The Light and the Dark [DC] (1984)(Electronic Arts, Inc.) [Action, Strategy].zip    
+Archon- The Light and the Dark [h1][DC] (1984)(Electronic Arts, Inc.) [Action, Strategy].zip    <-- No!
+Archon- The Light and the Dark [DC][h1] (1984)(Electronic Arts, Inc.) [Action, Strategy].zip    <-- Yes!
+
+
+
+
+Putting it all together:
+
+Title version (Flags) (Languages) [Tags] (Year)(Publisher) [Genre][!].zip
+
+	Dune II- The Battle for Arrakis v1.07 (Installer) (Fr)(En)(De) (1992)(Virgin Games, Inc.) [Strategy].zip 
+	Fantasy Worlds of Tamrak, The v1.30 (Installer) [SW][a1] (1993)(Ray Johnson) [Adventure, Role-Playing (RPG)].zip  
+	Fields of Glory (Installer) (En)(Fr)(De) (1993)(MicroProse Software, Inc.) [Strategy][!].zip 
+	Pole Chudes v4.1 (demo) (Ru) (1994)(Dice Soft) [Strategy, Educational].zip  
+	Diamonds v2.0 (En)(De) [SW][a1] (1996)(Ralf Zwanziger) [Action].zip  
+
+
+
+There are lots of naming errors in the current archive. Discipline has improved over the years, but errors remain.  
+Feel free to file a bug report against them.  

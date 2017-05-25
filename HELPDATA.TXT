@@ -2,7 +2,7 @@ The ~Total DOS Launcher~ (TDL) can launch tens of thousands of programs on any v
 
 Common Keys:                              Miscellaneous functions:
   ~//PgUp/PgDn/Home/End~:   Navigate        ~F9~:             Program status
-  ~ENTER~: Launch the selected program        ~F10~:             About the TDL
+  ~ENTER~:              Launch program        ~F10~:             About the TDL
   ~Esc~:                  Quit the TDL        ~Ctrl-I~:      Title Information
 
 Marking your favorite titles:

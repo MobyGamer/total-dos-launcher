@@ -6,6 +6,8 @@ Total DOS Launcher, main program.
 Initial author Jim Leonard, started 20170211
 
 To-Do:
+formalize favorites to be a bit flag in cache.dat and rewrite that whole system into its own unit
+color schemes in tdl.ini -- do cga remapping as well as vga palette stuff
 power user: decompress all files (will require cache stuff first)
 when importing handlers, add a special check for command.com to check comspec
 info-box where full title and other stuff can be read
