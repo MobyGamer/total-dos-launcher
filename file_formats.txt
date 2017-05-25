@@ -134,7 +134,7 @@ Contains the list of games the user has "favorited".
 
 Implementation Notes:
 
-The actual favorites list is just an array of bytes (booleans) that, if
+The actual favorites list is just an array of bitflags that, if
 modified, is saved to disk before each handle() call.  However, a user
 may want to reload the list of files in the future while still retaining
 their favorites.  Since the titleids will change if this happens, and
@@ -144,3 +144,53 @@ way to export their favorites and then later import them.
 One future improvement is to eliminate the need for export/import by
 storing the titleids in a block before the titlehashes; that way, the
 titleid could be updated whenever a new index load is detected.
+
+=====================================================================
+
+Flags cache:
+
+        numEntries:     16-bit word of how many bitflags are in the file
+REPEAT  (This structure repeats numEntries times)
+        flags:          1 byte containing 8 bits acting as true/false flags
+END
+
+Flags contained in each byte (values in hex):
+00000001: Title is marked as a Favorite
+00000010: An attempt was made to unpack Title
+00000100: Title returned from unpacking phase successfully
+00001000: An attempt was made to execute Title
+00010000: Title returned from execution successfully
+00100000: Reserved for future expansion
+01000000: Reserved for future expansion
+10000000: Reserved for future expansion
+
+Purpose:
+Contains flags pertinent to each Title, such as whether or not it is
+marked as a "favorite".
+
+Implementation Notes:
+
+Flags are OR'd into a byte or AND'd out of a byte as necessary.
+Flags are stored in CACHE.DAT which is flushed to disk before every
+execution operation, or at normal program exit.
+
+=====================================================================
+
+Colors cache:
+
+Array of unsigned 8-bit byte values, each of which have the following
+structure:
+76543210
+bbbb     - background text color
+    ffff - foreground text color
+
+UI attributes to be specified at a later date.
+
+Purpose:
+Allows custom remapping of text colors to TDL UI attributes.
+
+Implementation Notes:
+
+Colors are stored in order as bytes in a file called COLORSCH.EME.
+If the user wants to reset the color scheme they created, they can
+remove the file at any time and TDL will revert to default behavior.
