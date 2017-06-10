@@ -5,25 +5,7 @@ program tdl;
 Total DOS Launcher, main program.
 Initial author Jim Leonard, started 20170211
 
-To-Do:
-formalize favorites to be a bit flag in cache.dat and rewrite that whole system into its own unit
-color schemes in tdl.ini -- do cga remapping as well as vga palette stuff
-power user: decompress all files (will require cache stuff first)
-when importing handlers, add a special check for command.com to check comspec
-info-box where full title and other stuff can be read
-Power user title picker: Abillity to rewrite a title
-Power user title picker: Delete a title (will need to remove cache dir, file, and rewrite indexes)
-favorites export/import
-screensaver (figure out how totinput does idle events)
-Info screen for highlighted title
-Search-as-you-type
-Cache management strategy.  Move all cache management into unit so we can:
-  come up with cache purge strategy.
-  strategy can be limited to 5 dirs for testing and then avail disk space for final
-  strategy should determine exact amount of storage needed from archive header but can estimate 4*archive size 4now
-Power user file picker:  Delete a file from cache dir
-Power user title picker: Command key to switch to cache dir and then exit the program
-Ability to track what titles have been executed, how many times, and top20
+See "todo.txt" for a list of features that are planned but not yet implemented.
 }
 
 uses

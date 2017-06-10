@@ -42,7 +42,6 @@ uses
   tdl_hand;
 
 const
-  favIconCol:byte=$0f;
   favsOn:boolean=false;
 
 type

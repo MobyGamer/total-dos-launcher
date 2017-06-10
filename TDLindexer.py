@@ -15,8 +15,9 @@ directed to trixter@oldskool.org, although it would be more helpful
 to the project if you could fix my novice coding and make this program better.
 
 TODO:
-- import argparse and accept multiple source arguments
-- enforce only one output target
+- import argparse and accept multiple source arguments properly
+- search-as-you-type index generation
+- "fill to xxMB or xxGB" option, either via alpha, random, or best-fit
 - remove duplicate filenames (ie. same file exists in multiple input paths)
 """
 import sys, os, shutil, glob, struct, hashlib, string, unicodedata

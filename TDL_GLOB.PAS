@@ -31,6 +31,7 @@ const
   );
 
   favicon=#03;
+  favIconCol:byte=$0f;
 
 type
   PTitleArray=^TTitleArray;
