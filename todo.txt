@@ -1,0 +1,135 @@
+To-Do list of planned but current unimplemented features
+
+[User Interface]=============================================================
+
+- Search-as-you-type.  (Implementation to be determined via interpretation of
+file_formats.txt.)
+
+- Add Screensaver.  Might be able to be implemented via TOTINPUT idle events.
+
+- Simple color scheme support.  Create colors.ini and add into it both a color
+and a mono scheme.  Clearly define what user interface elements are changed,
+and list the default text colors in the ini for convenience.
+
+- Complex color scheme support.  Modify colors.ini to accept palette remapping
+for a specific color.  Ensure that the default palette on program entry is
+saved and restored as necessary so that text colors in launched programs
+aren't goofy.  
+
+- Font support.  Modify colors.ini to accept a font file for various text
+modes.  INI could look something like:
+8x8=8x8cour.fnt
+8x16=16couri.fnt
+...etc.
+Save and restore font so that launched programs don't look weird.
+
+- Allow mouse click to start game.  (Nobody has asked for this year, but you
+know they're going to)
+
+[Title storage, file handling, caching]======================================
+
+- When importing handlers, add a special check for command.com to check to see
+if COMSPEC is set to something that resolves.
+
+- Cache management strategy for when the cache doesn't have enough space to
+decompress a title.  Move all cache management into unit so we can: 
+  . come up with cache purge strategy (multiple strategies in the future, but
+    for now can just trash the first one, then next one, etc. until enough
+    space is available)
+  . strategy can be limited to 5 dirs for testing and then avail disk space
+    for final code
+  . strategy should determine exact amount of storage needed from archive
+    header but can estimate 4*archive size for 
+
+- A power user command to decompress every title.  This is useful for prepping
+a show system for the public (so that they won't have to sit through the
+decompress stage).  Can probably be implemented as a command-line option.
+
+- Catch result code from handler extraction spawn and do something with it if
+there is an error.  (For example, if a pkunzip fails)
+
+- Add file_id.diz detection to python processing script and set flag based on
+whether a title has one.  Then in the launcher, indicate there is additional
+info per title using "i" and allow the user to view just the file_id.diz.
+Will have to extract just file_id.diz to cache so that entire file isn't
+unpacked just to read file_id.diz.
+
+[Title Customization and Execution]==========================================
+
+- Ability for power user to chdir to the cache directory for a title and then
+exit the TDL.  Useful if the user wants to manually examine or perform
+operations on files in the cache.
+
+- Ability for power user to rewrite the title string in-place in the index,
+maybe with ctrl-t.  Will require ability to flush title index back to disk.
+
+- Ability for power user to delete a title in the titles and files index.
+(This is to remove something that cannot possibly run on the system its on,
+like a VGA game on a CGA system, or a 386+ game on a 286.)
+
+- Ability for regular user to "hide" a title, with the ability to "show
+hidden" (and during "show hidden" can choose to un-hide).  Can be implemented
+roughly the same way favorites are, with a flag to indicate hidden and a
+working title set generated without hiddens in it.
+
+- The ability for a user to add custom notes to each title that show up
+directly before title is launched.  Notes should probably persist in their
+own file (files?) and be identified using the hash.  Maybe something like a
+notes\ dir that is created using a dir specified by tdl.ini, and falling back
+to cache\notes if unset.  Note files can start with a hash, and a flag can
+exist that indicates title has a note file, to not only assist in finding them
+but allowing them to persist across new index loads.  How best to find a note
+file other than brute search has yet to be determined and requires further
+thought.
+
+- Launch with custom arguments, most likely with ctrl-enter.  Can provide a
+single-line editable field, which is automatically remembered.  Command-line
+should persist across index reloads.  Arguments can be stored in their own
+index file as a fixed-length field and identified with both an id (for fast
+lookup) and hash (for future index reloads).  Seeks will be O(N) but that's
+not terrible because only ctrl-enter will trigger that.
+
+- Remember a user's launch choice for next time.  For multiple executables in
+a title, prompt user "Remember this choice?" window title with more
+descriptive text in window body and a [Y]es [N]o.  Create "default executable"
+flag and a means to store the default executable filename (can piggyback on
+"custom arguments" file format).  Do not offer this dialog in KIOSK mode, but
+allow default choices to be honored in all modes.
+
+
+[Program Design and Internals]===============================================
+
+- Title sets should be their own unit, and should have unit tests before
+putting into main TDL.
+
+- Formalize favorites to be a bit flag in cache.dat and rewrite that whole
+system into its own unit.  Various flags already defined in file_formats.txt.
+
+- All user customizations should have an export and import format, with each
+user datum identified by the hash.  This goes for flags, notes, custom
+command-lines, etc.  Can be implemented as command-line.  User customizations
+export/import allows customizations to be preserved across index loads.
+Although this will be a PITA, it should probably be pure ASCII so that it can
+parsed by humans, and possibly edited/created as a way to enhance loads before
+users fire up TDL.  JSON a pipe dream, more likely custom format.
+
+- Allow power user editing of bitflags with a custom dialog.
+
+- Create a "meta handler" framework that can do things before the title is
+even checked for existence.  Have a way to set up a pre-handler to run before
+the regular handling.  Specific use case:  Being able to set up a sort of
+meta-handler that uses mTCP's HTGET to download the zip file off a local media
+server.  This allows a modern system to store multiple gigs and gigs, way more
+than a local filesystem could.  foone in twitter had suggestions on how to
+proceed.
+
+- Ability to track what titles have been executed, how many times, and provide
+some sort of report.  This will require a title count file (counts.dat?) of
+16-bit words.  Counts can be saved across index loads by export/import
+mechanism previously described.
+
+
+
+==========================================================================
+Implemented features go here, with the date they were added:
+

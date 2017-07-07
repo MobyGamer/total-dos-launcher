@@ -1,0 +1,16 @@
+The ~Total DOS Launcher~ (TDL) can launch tens of thousands of games and programs on any vintage DOS PC.  Simply navigate to the program you want to run and hit Enter, and this program will unpack and launch it for you.
+
+Common Keys:
+  ~//PgUp/PgDn/Home/End~:   Navigate
+  ~ENTER~: Launch the selected program
+  ~Esc~:                  Quit the TDL
+
+Marking your favorite titles:
+  ~F2~:              Mark/Unmark Title
+  ~Ctrl-F~:    Show Favorites/Show All
+
+Other Keys:
+  ~Alt-F5~:            Show DOS output
+  ~Ctrl-F3~:         Debugging console
+  ~F10~:                 About the TDL
+$
