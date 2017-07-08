@@ -102,6 +102,11 @@ allow default choices to be honored in all modes.
 - Title sets should be their own unit, and should have unit tests before
 putting into main TDL.
 
+- There should be a special way to run utils\FREERAM.COM without including it
+in a distro.  Actually, it might be best to just run it as part of the startup
+so that the swapping mechanism can be tested, and then the value can be
+stored and displayed in the infobox.
+
 - Formalize favorites to be a bit flag in cache.dat and rewrite that whole
 system into its own unit.  Various flags already defined in file_formats.txt.
 
