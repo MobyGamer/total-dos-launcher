@@ -1,13 +1,25 @@
 ; Print free DOS ram in bytes and KB.
+; For utility use, stores amount of free ram in paragraphs in the ICA
+; as a word at location 40:F0:
+;        40:F0  16bytes  Intra-Applications Communications Area (IBM Technical
+;                        Reference incorrectly locates this at 50:F0-50:FF)
+
 ; trixter@oldskool.org, with dwtoa routine ideas from Ernst Jan Plug
+
+
 
 .8086
 
+        push    es
+        mov     ax,40h
+        mov     es,ax                   ;es=40:
         mov     ax,ds:word ptr [2]      ;Segment of the first byte beyond the
                                         ;memory allocated to the program (PSP)
         mov     dx,cs
         sub     ax,dx                   ;adjust for our own segment
                                         ;ax = dos free RAM in paragraphs
+        mov     word ptr es:[0f0h],ax   ;Store into ICA at 40:f0
+        pop     es
         mov     dx,16
         mul     dx                      ;dx:ax = dos free ram in bytes
         mov     di,offset strbuf
