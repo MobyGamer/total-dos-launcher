@@ -134,7 +134,3 @@ some sort of report.  This will require a title count file (counts.dat?) of
 mechanism previously described.
 
 
-
-==========================================================================
-Implemented features go here, with the date they were added:
-
