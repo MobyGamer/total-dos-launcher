@@ -139,13 +139,19 @@ locations=utils;distro\utils;c:\utils\common
           system.delete(util,pos(' ',util),length(util));
           {remove it from the template string}
           system.delete(t.template,1,length(util));
-          {fully-qualify the utilty}
+          {Section: Fully-qualify the utilty by searching for it and recording full path to it}
           s:=util;
+          {System-set COMSPEC is always valid, so use if appropriate}
           if upstring(util)='COMMAND.COM'
-            then util:=FSearch(util,GetEnv('PATH'))
-            else util:=FSearch(util,upath);
-          if util=''
-            then fatalerror(5,s+' handler helper util not found in '+upath);
+            then util:=GetEnv('COMSPEC')
+            else begin
+              {Go looking for utility in system path}
+              util:=FSearch(s,GetEnv('PATH'));
+              {If not found, go looking in user-supplied path in TDL.INI}
+              if util=''
+                then util:=FSearch(s,upath);
+            end;
+          if util='' then fatalerror(5,s+' handler not found in '+upath);
           {add drive letter to convert relative path to absolute path}
           if pos(':',util)=0 then begin
             getdir(0,s);
@@ -158,6 +164,7 @@ locations=utils;distro\utils;c:\utils\common
           if util='%s'
             then t.fullpath:=''
             else t.fullpath:=util;
+          if config^.edebug then writeln('Assuming handler ',t.extension,' is at ',t.fullpath);
           h:=new(PHandler,init(t.extension,t.category,t.template,t.fullpath,t.description,t.usermessage));
           Insert(h);
           system.delete(section,1,4); {remove "XXX;" and do it again}
@@ -184,6 +191,10 @@ locations=utils;distro\utils;c:\utils\common
     end;
   end;
   dispose(ini,done);
+  if config^.edebug then begin
+    writeln('Handler registration finished, hit ENTER to continue.');
+    readln;
+  end;
 
   {Now that we have our handlers, look for the ??? handler and set that to
   the default.}
