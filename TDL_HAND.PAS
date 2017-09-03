@@ -354,8 +354,21 @@ begin
     result:=(retval=0);
     if result=false
       then if retval=-1
-        then msgConsole^.logmsg(tdl_cons.error,'Swapping'+spawnErrorTail+inttostr(spawno_error))
-        else msgConsole^.logmsg(tdl_cons.error,'EXEC'+spawnErrorTail+inttostr(retval));
+        then begin
+          msgConsole^.logmsg(tdl_cons.error,'Swapping'+spawnErrorTail+inttostr(spawno_error));
+          case spawno_error of
+            enotfound  :temps:='file not found';
+            enopath    :temps:='path not found';
+            eaccess    :temps:='access denied';
+            enomem     :temps:='out of memory';
+            e2big      :temps:='environment too big';
+            ewritefault:temps:='write error';
+          end;
+          msgConsole^.logmsg(tdl_cons.error,temps);
+        end else begin
+          msgConsole^.logmsg(tdl_cons.error,'EXEC'+spawnErrorTail+inttostr(retval));
+        end;
+
   end else begin
     result:=(DOSError=0);
     if result=false
