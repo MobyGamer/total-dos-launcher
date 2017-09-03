@@ -114,11 +114,16 @@ begin
       regular:s:='Default';
       power:s:='Power User';
     end;
-    addline(' TDL operating mode: '+s);
-    addline(' Total Heap: '+inttostr(memavail div 1024)+' KB (largest block: '+inttostr(maxavail div 1024)+' KB)');
     with config^ do begin
-      addline(' # of Titles: '+inttostr(numtitles)+' ('+inttostr(Favorites^.Used)+' marked as favorites) ');
       addline(' Swapping: '+boolToStr(swapping,'ENABLED','disabled'));
+      if freeLowDOSRAM <> 0 then begin
+        addline(' '+inttostr((longint(freeLowDOSRAM) * longint(16)) div 1024)
+                   +' KB DOS RAM availble to launched programs ');
+        addline(' ');
+      end;
+      addline(' TDL operating mode: '+s);
+      addline(' TDL Heap: '+inttostr(memavail div 1024)+' KB (largest block: '+inttostr(maxavail div 1024)+' KB)');
+      addline(' # of Titles: '+inttostr(numtitles)+' ('+inttostr(Favorites^.Used)+' marked as favorites) ');
       addline(' Debug messsages logged to disk: '+boolToStr(logging,'ENABLED','disabled'));
       addline(' Treating filesystem as read-only: '+boolToStr(readonly,'YES','no'));
       addline(' Excessive debug messages: '+boolToStr(edebug,'ENABLED','disabled'));
@@ -161,6 +166,12 @@ error and status messages are always visible.
 }
 var
   sf,sd,temps:string;
+  base:nameStr;
+  full:string[12];
+  ext:extStr;
+  dir:dirStr;
+  filepath:PathStr;
+
   w:word;
 begin
   {If user requested help, then print it and exit}
@@ -190,6 +201,20 @@ begin
   more handlers than that, switch to power user mode so that we only have
   to use one mask (*.*).}
   if Handlers^.Count>42 then config^.userlevel:=power;
+
+  {Now that we have our handlers, let's try to use our swapping mechanism
+  to determine how much memory is available for programs by running
+  FREERAM (if it's available) and storing the result to show the user.
+  config^.freeLowDOSRAM = 0 unless we change it.}
+  filepath:=fsearch('FREERAM.COM','utils;distro\utils');
+  if filepath<>'' then begin
+    {determine extension so we know which handler to use}
+    fsplit(filepath,dir,base,ext);
+    delete(ext,1,1); {remove period}
+    Handlers^.handle(ext,filepath,dir);
+    config^.freeLowDOSRAM:=word(ptr($40,$f0)^);
+  end;
+
   {attempt initializing indexes}
   writeln('Initializing files index...');
   files:=new(PFileIndex,
@@ -383,7 +408,7 @@ var
   b:byte;
   p:pointer;
 
-  procedure prepExec;
+  procedure prepScreenForExec;
   begin
     screen.clear($07,' ');
     screen.writeCenter(1,$0f,'Executing:');
@@ -430,7 +455,7 @@ begin
   If so, launch it; if not, it is an archive that needs extraction.}
   if Handlers^.Exists(ext)=execution
     then begin
-      prepExec;
+      prepScreenForExec;
       Handlers^.handle(ext,filepath,dir);
     end else begin
       if Handlers^.Exists(ext)=extraction then begin
@@ -522,7 +547,9 @@ begin
         filepath:=s;
         fsplit(filepath,dir,base,ext);
         delete(ext,1,1); {remove period}
-        prepExec;
+        prepScreenForExec;
+        {if we have an execution handler for this, use it,
+        otherwise we use the default (fallback) handler}
         if Handlers^.Exists(ext)=execution
           then Handlers^.handle(ext,filepath,dir)
           else Handlers^.handle('???',filepath,dir);

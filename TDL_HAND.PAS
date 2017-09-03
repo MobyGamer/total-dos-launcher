@@ -240,6 +240,11 @@ Execution handlers do this:
     - if %f present, chdir to where helper program is and run template
 
 %f is for helper "programs" that are really batch files that run many progs.
+
+Note:  There is a lot fo "if msgConsole<>nil then" checking because we have
+to call this before the message console is set up.  This is irritating, but
+it's a lot less irritating than having to resolve the circular dependency
+between the message console and the screen driver.
 }
 const
   spawnErrorTail:string[23]=' failure; Error code = ';
@@ -259,7 +264,7 @@ var
   mError:Integer;
 
 begin
-  msgConsole^.logmsg(info,'Entering handler framework: '+ext);
+  if msgConsole<>nil then msgConsole^.logmsg(info,'Entering handler framework: '+ext);
   result:=false;
   src.p:=_src; dst.p:=stdPath(_dst);
   with src do fsplit(p,d,n,e);
@@ -308,10 +313,10 @@ begin
       wrkDir:=src.d;
     end;
   end;
-  msgConsole^.logmsg(info,'Execution template: '+execParm);
+  if msgConsole<>nil then msgConsole^.logmsg(info,'Execution template: '+execParm);
   GetDir(0,oldDir);
   temps:='Switching to '+wrkDir+' to execute '+execHead+execParm;
-  msgConsole^.logmsg(info,temps);
+  if msgConsole<>nil then msgConsole^.logmsg(info,temps);
 
   {TP's CHDIR can't handle subdirectories with trailing slashes; weird.
   It requires them on root dirs though, like "c:\".  Dumb fix:}
@@ -355,7 +360,7 @@ begin
     if result=false
       then if retval=-1
         then begin
-          msgConsole^.logmsg(tdl_cons.error,'Swapping'+spawnErrorTail+inttostr(spawno_error));
+          if msgConsole<>nil then msgConsole^.logmsg(tdl_cons.error,'Swapping'+spawnErrorTail+inttostr(spawno_error));
           case spawno_error of
             enotfound  :temps:='file not found';
             enopath    :temps:='path not found';
@@ -364,23 +369,22 @@ begin
             e2big      :temps:='environment too big';
             ewritefault:temps:='write error';
           end;
-          msgConsole^.logmsg(tdl_cons.error,temps);
+          if msgConsole<>nil then msgConsole^.logmsg(tdl_cons.error,temps);
         end else begin
-          msgConsole^.logmsg(tdl_cons.error,'EXEC'+spawnErrorTail+inttostr(retval));
+          if msgConsole<>nil then msgConsole^.logmsg(tdl_cons.error,'EXEC'+spawnErrorTail+inttostr(retval));
         end;
 
   end else begin
     result:=(DOSError=0);
     if result=false
-      then msgConsole^.logmsg(tdl_cons.error,'EXEC'+spawnErrorTail+inttostr(DOSError))
+      then if msgConsole<>nil then msgConsole^.logmsg(tdl_cons.error,'EXEC'+spawnErrorTail+inttostr(DOSError))
   end;
 
-  msgConsole^.logmsg(info,'Switching back to '+wrkdir);
+  if msgConsole<>nil then msgConsole^.logmsg(info,'Switching back to '+wrkdir);
   chdir(oldDir);
-  msgConsole^.logmsg(info,'Saving DOS screen contents');
-  DOSScreen^.Save;
+  if msgConsole<>nil then msgConsole^.logmsg(info,'Saving DOS screen contents');
+  if DOSScreen<>nil then DOSScreen^.Save;
   handle:=result;
-  {msgConsole^.logmsg(info,'Exiting handler framework.');}
 end;
 
 

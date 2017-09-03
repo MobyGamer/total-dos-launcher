@@ -63,6 +63,8 @@ type
     tPos:windowposition;                {titles picker dimensions}
     {colors:colorchoices;}
 
+    freeLowDOSRam:word;                 {in paragraphs; 0 if we couldn't determine}
+
     Constructor Init(cfile,bdir:PathStr);
 
     Function FilesIDXLoc:PathStr;
