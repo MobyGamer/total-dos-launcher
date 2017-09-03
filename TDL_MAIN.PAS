@@ -205,14 +205,21 @@ begin
   {Now that we have our handlers, let's try to use our swapping mechanism
   to determine how much memory is available for programs by running
   FREERAM (if it's available) and storing the result to show the user.
-  config^.freeLowDOSRAM = 0 unless we change it.}
+  config^.freeLowDOSRAM is 0 unless we change it in this code.}
   filepath:=fsearch('FREERAM.COM','utils;distro\utils');
   if filepath<>'' then begin
     {determine extension so we know which handler to use}
     fsplit(filepath,dir,base,ext);
     delete(ext,1,1); {remove period}
-    Handlers^.handle(ext,filepath,dir);
-    config^.freeLowDOSRAM:=word(ptr($40,$f0)^);
+    if not Handlers^.handle(ext,filepath,dir)
+      then begin
+        Writeln('WARNING: Launch mechanism initial testing failed.');
+        writeln('It is unlikely the TDL will operate correctly.');
+        writeln('Hit ENTER to attempt to continue anyway.');
+        readln;
+      end
+      else
+        config^.freeLowDOSRAM:=word(ptr($40,$f0)^);
   end;
 
   {attempt initializing indexes}
