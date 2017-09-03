@@ -241,6 +241,9 @@ Execution handlers do this:
 
 %f is for helper "programs" that are really batch files that run many progs.
 }
+const
+  spawnErrorTail:string[23]=' failure; Error code = ';
+
 var
   tmpsplit,src,dst:fSplitRec;
   execParm:string; {execution template}
@@ -345,15 +348,18 @@ begin
 @EXIT:
   end; {asm}
 
-  {handle error codes}
+  {Handle error codes:
+  -1 means a SPAWNO error, and 1..255 is error returned from the callee}
   if config^.swapping then begin
-    result:=(retval<>-1);
+    result:=(retval=0);
     if result=false
-      then msgConsole^.logmsg(tdl_cons.error,'Spawn failure; Error code = '+inttostr(spawno_error));
+      then if retval=-1
+        then msgConsole^.logmsg(tdl_cons.error,'Swapping'+spawnErrorTail+inttostr(spawno_error))
+        else msgConsole^.logmsg(tdl_cons.error,'EXEC'+spawnErrorTail+inttostr(retval));
   end else begin
     result:=(DOSError=0);
     if result=false
-      then msgConsole^.logmsg(tdl_cons.error,'EXEC failure; Error code = '+inttostr(DOSError))
+      then msgConsole^.logmsg(tdl_cons.error,'EXEC'+spawnErrorTail+inttostr(DOSError))
   end;
 
   msgConsole^.logmsg(info,'Switching back to '+wrkdir);
