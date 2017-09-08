@@ -127,7 +127,7 @@ begin
       addline(' Debug messsages logged to disk: '+boolToStr(logging,'ENABLED','disabled'));
       addline(' Treating filesystem as read-only: '+boolToStr(readonly,'YES','no'));
       addline(' Excessive debug messages: '+boolToStr(edebug,'ENABLED','disabled'));
-      addline(' Pause after execution: '+boolToStr(swapping,'ENABLED','disabled'));
+      addline(' Pause after execution: '+boolToStr(pauseAfterRun,'ENABLED','disabled'));
       addline(' ');
       addline(' Cache directory: '+cachedir);
     end;
