@@ -373,7 +373,7 @@ begin
         end else begin
           if msgConsole<>nil then msgConsole^.logmsg(tdl_cons.error,'EXEC'+spawnErrorTail+inttostr(retval));
         end;
-
+  {not swapping, pass along error}
   end else begin
     result:=(DOSError=0);
     if result=false

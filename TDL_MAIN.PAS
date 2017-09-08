@@ -402,6 +402,7 @@ var
   ext:extStr;
   dir:dirStr;
   wrkDir:string;
+  temps:string;
   tcachedir:PathStr;                    {title cache directory}
   filepath:PathStr;                     {fully-qualified path to source file}
 
@@ -478,8 +479,17 @@ begin
           screen.writeCenter(1,$0f,s);
           screen.writeCenter(2,$87,'Please wait...');
           screen.gotoxy(1,3);
-          if not Handlers^.handle(ext,filepath,tcachedir)
-            then die('Failed to extract '+filepath+' to '+tcachedir);
+          {Perform extraction.
+          If extraction didn't go well, warn the user, but keep going.}
+          if not Handlers^.handle(ext,filepath,tcachedir) then begin
+            msgConsole^.logmsg(tdl_cons.error,'Error code received during extraction');
+            PopUserMessage(warning,
+              'There was an error trying to unpack your program.  TDL will '+
+              'attempt to continue.  If your progam doesn''t work, '+
+              'consult tdl.log to see the exact command-line that failed, '+
+              'then exit TDL and run it yourself to determine the exact error.'
+            );
+          end;
         end;
 
         {Switch to unpacked cache dir and obtain list of files we have
