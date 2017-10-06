@@ -1,4 +1,3 @@
-call c tdl
 cd output
 tdl -d
 cd ..
