@@ -63,6 +63,10 @@ type
     tPos:windowposition;                {titles picker dimensions}
     {colors:colorchoices;}
 
+    {exec/spawno trashes the PSP, so if we want to retain command-line
+    arguments, we should grab them first, then use them later}
+    wantCondensed,
+    wantSnow:boolean;
     freeLowDOSRam:word;                 {in paragraphs; 0 if we couldn't determine}
 
     Constructor Init(cfile,bdir:PathStr);

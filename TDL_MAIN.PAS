@@ -171,11 +171,12 @@ var
   ext:extStr;
   dir:dirStr;
   filepath:PathStr;
-
   w:word;
+
 begin
   {If user requested help, then print it and exit}
-  if is_param('?') or is_param('h') then PrintHelp;
+  if is_param('?') or is_param('h')
+    then PrintHelp;
 
   RecordDOSScreen;
 
@@ -193,6 +194,9 @@ begin
   {set config options based on command-line options}
   if is_param('d') then config^.edebug:=true;
   if is_param('r') then config^.readonly:=true;
+  if is_param('c') then config^.wantCondensed:=true;
+  if is_param('f') then config^.wantSnow:=true;
+
 
   {attempt TDL handlers init}
   writeln('Registering handlers from handlers.ini...');
@@ -273,12 +277,11 @@ begin
     for w:=0 to numTitles-1 do titleIDs^[w]:=w;
   end;
 
-
   {set up the screen}
 
   {If changing screen mode, we need to re-enable the screen. construct to
   pick up the new dimensions.}
-  if is_param('c') then begin
+  if config^.wantCondensed then begin
     Monitor^.SetCondensed;
     config^.customvidmode:=3;
   end;
@@ -354,10 +357,11 @@ begin
     if (userlevel=power) or (logging=true) then begin
       MsgConsole^.verboseLog:=true;
     end;
-    if is_param('f')
+    if config^.wantSnow
       then boolean(snowprone):=false;
     if boolean(snowprone)
-      then MsgConsole^.logmsg(info,'Slower display routines enabled to avoid CGA "snow"');
+      then MsgConsole^.logmsg(info,'Slower display routines enabled to avoid CGA "snow"')
+      else MsgConsole^.logmsg(info,'No CGA "snow" checking will be performed when writing to screen RAM.');
   end;
 
   {power users want to know everything}

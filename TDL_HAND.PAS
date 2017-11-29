@@ -264,7 +264,8 @@ var
   mError:Integer;
 
 begin
-  if msgConsole<>nil then msgConsole^.logmsg(info,'Entering handler framework: '+ext);
+  if msgConsole<>nil
+    then msgConsole^.logmsg(info,'Entering handler framework: '+ext);
   result:=false;
   src.p:=_src; dst.p:=stdPath(_dst);
   with src do fsplit(p,d,n,e);
@@ -277,7 +278,6 @@ begin
     if PHandler(at(hid))^.extension=ext
       then break;
   end;
-
   if PHandler(at(hid))^.userMessage<>''
     then popUserMessage(info,PHandler(at(hid))^.userMessage);
 
