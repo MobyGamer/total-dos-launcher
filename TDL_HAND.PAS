@@ -362,12 +362,18 @@ begin
         then begin
           if msgConsole<>nil then msgConsole^.logmsg(tdl_cons.error,'Swapping'+spawnErrorTail+inttostr(spawno_error));
           case spawno_error of
-            enotfound  :temps:='file not found';
-            enopath    :temps:='path not found';
-            eaccess    :temps:='access denied';
-            enomem     :temps:='out of memory';
-            e2big      :temps:='environment too big';
-            ewritefault:temps:='write error';
+            enotfound  :temps:=enotfoundErrmsg;
+            enopath    :temps:=enopathErrmsg;
+            emfile     :temps:=emfileErrmsg;
+            eaccess    :temps:=eaccessErrmsg;
+            ebadf      :temps:=ebadfErrmsg;
+            econtr     :temps:=econtrErrmsg;
+            enomem     :temps:=enomemErrmsg;
+            einvdat    :temps:=einvdatErrmsg;
+            enodev     :temps:=enodevErrmsg;
+            einval     :temps:=einvalErrmsg;
+            e2big      :temps:=e2bigErrmsg;
+            ewritefault:temps:=ewritefaultErrmsg;
           end;
           if msgConsole<>nil then msgConsole^.logmsg(tdl_cons.error,temps);
         end else begin
