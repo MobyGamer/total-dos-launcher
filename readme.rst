@@ -26,4 +26,4 @@ Borland Pascal 7.0, which includes both Turbo Pascal as well as Turbo Assembler/
 
 Compiler/Assembler restrictions
 -------------------------------
-You must always ensure that the code you write will execute on any x86 system, including the 8088.  Don't use 80186+ instructions such as `PUSHA`, `POPA`, `ENTER`, `LEAVE`, etc.  In Turbo Pascal, always ensure `$G-,N-,E-` to turn off 80286 code generation, 8087 code generation, and 8087 emulation respectively.  One of TDL's design goals is the ability to work on any IBM PC or compatible.
+You must always ensure that the code you write will execute on any x86 system, including the 8088.  Don't use 80186+ instructions such as ``PUSHA``, ``POPA``, ``ENTER``, ``LEAVE``, etc.  In Turbo Pascal, always ensure ``$G-,N-,E-`` to turn off 80286 code generation, 8087 code generation, and 8087 emulation respectively.  One of TDL's design goals is the ability to work on any IBM PC or compatible.
