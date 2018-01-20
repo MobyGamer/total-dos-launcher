@@ -101,7 +101,7 @@ var
 
 begin
   if config^.swapping
-    then init_spawno(config^.cacheDir,swap_all,32,0);
+    then init_spawno(fileCache^.path,swap_all,32,0);
   {Init the collection with 32 to start and 256 max.
   Anyone needing >256 handlers needs to consider a change of lifestyle.}
   Inherited Init(32,256);

@@ -356,6 +356,9 @@ begin
     wrapped[0]:=s;
   end else begin
     for numlines:=0 to maxlines-1 do begin
+      {Trim leading spaces from any wrapped line.
+      Two attempts is enough, for those who space twice after punctuation.}
+      if s[1]=#32 then delete(s,1,1);
       if s[1]=#32 then delete(s,1,1);
       if length(s)<margin then begin
         wrapped[numlines]:=s;

@@ -17,6 +17,7 @@ uses
   DOS,
   objects,
   support,
+  tdl_cach,
   tdl_glob;
 
 const
@@ -53,7 +54,7 @@ type
     customVidMode:word;
     pauseAfterRun:boolean;
 
-    cacheDir:DirStr;                    {cache directory}
+    datacacheDir:DirStr;                {cache directory}
     baseDir:DirStr;                     {base directory (where config file is)}
     swapDir:DirStr;                     {directory to hold the swap file}
     progLocs:PathStr;                   {paths to look for source files}
@@ -80,6 +81,7 @@ type
 
 var
   Config:PConfig; {global configuration object for the TDL}
+  fileCache:PFileCache; {global uncompressed file cache object (we init it here)}
 
 implementation
 
@@ -125,7 +127,7 @@ begin
   readonly:=false;
   preloading:=true;
   progLocs:='files';
-  cacheDir:='cache.dir';
+  datacacheDir:='cache.dir';
   swapDir:='.';
   {set initial title list to start one row down}
   {assume 80x25 screen; can change later}
@@ -177,7 +179,7 @@ begin
     {populate user preferences}
     with INIResult^ do begin
       if upstring(key)='PROGLOCATIONS' then progLocs:=value;
-      if upstring(key)='CACHELOCATION' then cacheDir:=value;
+      if upstring(key)='CACHELOCATION' then datacacheDir:=value;
       if upstring(key)='USERLEVEL' then begin
         if upstring(value)='KIOSK' then userlevel:=kiosk;
         if upstring(value)='REGULAR' then userlevel:=regular;
@@ -201,15 +203,7 @@ begin
   swapping:=false;
   {$ENDIF}
 
-  {Create the cache dir if it doesn't exist}
-  if not DirExists(cacheDir)
-    then begin
-      MkDirCDir(cacheDir);
-      if not DirExists(cacheDir)
-        then fatalerror(2,'Creation of '+cacheDir+' failed');
-    end;
-  {ensure cachedir is fully qualified and sanitized (ends with "\")}
-  cacheDir:=StdPath(FExpand(cacheDir));
+  fileCache:=new(PFileCache,init(datacacheDir));
 
   {Initialize data structures/indexes}
   titlesIDXname:='titles.idx';

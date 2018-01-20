@@ -16,7 +16,7 @@ supporting code) in its own unit allows us to:
 interface
 
 Procedure PrintHelp;
-procedure Launch(tid:word);
+Function Launch(tid:word):boolean;
 procedure TDL_Init;
 procedure TDL_EventLoop;
 procedure TDL_Done;
@@ -36,6 +36,7 @@ uses
   totKEY,
   totMSG,
   tdl_glob,
+  tdl_cach,
   tdl_conf,
   tdl_inde,
   tdl_cons,
@@ -87,6 +88,8 @@ begin
     db '        Used for troubleshooting only.',0dh,0ah
     db '-f      Always use fast display routines on all CGA systems.',0dh,0ah
     db '        This may cause "snow" or display corruption on true CGA adapters.',0dh,0ah
+(*  db '-nXX    Override screen detection and force XX lines onscreen.',0dh,0ah
+    db '        Debugging option; submit an issue if you''re forced to use this.',0dh,0ah*)
     db 0ah,'$'
 
 @start:
@@ -110,8 +113,8 @@ begin
   new(foomsg,init(2,'TDL info and stats'));
   with foomsg^ do begin
     case config^.userlevel of
-      kiosk:s:='Kiosk';
-      regular:s:='Default';
+      kiosk:s:='KIOSK';
+      regular:s:='default';
       power:s:='Power User';
     end;
     with config^ do begin
@@ -129,7 +132,10 @@ begin
       addline(' Excessive debug messages: '+boolToStr(edebug,'ENABLED','disabled'));
       addline(' Pause after execution: '+boolToStr(pauseAfterRun,'ENABLED','disabled'));
       addline(' ');
-      addline(' Cache directory: '+cachedir);
+      if fileCache^.bytesfree > (1024*1024)
+        then s:=inttostr(fileCache^.megsFree)+' MB free)'
+        else s:=inttostr(fileCache^.bytesFree div 1024)+' KB free)';
+      addline(' Cache directory: '+fileCache^.path+' ('+s);
     end;
     addline(' ');
     show;
@@ -151,7 +157,7 @@ begin
   with foomsg^ do begin
     addline(' Title: '+ttbuf^.title);
     addline(' Filename: '+tfbuf^.name);
-    addline(' Cache Directory: '+config^.cachedir+basename(tfbuf^.name));
+    addline(' Cache Directory: '+fileCache^.path+basename(tfbuf^.name));
     addline(' ');
     show;
   end;
@@ -172,6 +178,7 @@ var
   dir:dirStr;
   filepath:PathStr;
   w:word;
+  {wantNlines:byte;}
 
 begin
   {If user requested help, then print it and exit}
@@ -196,7 +203,9 @@ begin
   if is_param('r') then config^.readonly:=true;
   if is_param('c') then config^.wantCondensed:=true;
   if is_param('f') then config^.wantSnow:=true;
-
+  (*if is_param('n')
+    then wantNlines:=param_int('n')
+    else wantNlines:=0;*)
 
   {attempt TDL handlers init}
   writeln('Registering handlers from handlers.ini...');
@@ -216,15 +225,15 @@ begin
     fsplit(filepath,dir,base,ext);
     delete(ext,1,1); {remove period}
     if not Handlers^.handle(ext,filepath,dir)
-      then begin
-        Writeln('WARNING: Launch mechanism initial testing failed.');
-        writeln('It is unlikely the TDL will operate correctly.');
-        writeln('Hit ENTER to attempt to continue anyway.');
-        readln;
-      end
-      else
-        config^.freeLowDOSRAM:=word(ptr($40,$f0)^);
+      then fatalerror(2,'Couldn''t launch '+filepath +' -- Try swapping=disabled in TDL.INI')
+      else config^.freeLowDOSRAM:=word(ptr($40,$f0)^);
+  end else begin
+    {if we couldn't find freeram, then fake it with an estimate}
+    config^.freeLowDOSRAM:=memavail;
   end;
+
+  {If we used SWAPPO, our PSP is gone, so all command-line parameters after
+  this point are now empty!  Hope you got what you needed before this line!}
 
   {attempt initializing indexes}
   writeln('Initializing files index...');
@@ -236,16 +245,21 @@ begin
           init(config^.baseDir+config^.titlesIDXname,config^.preloading));
   if titles=nil then fatalerror(1,'Titles index init failed');
 
-  write('Title flags cache: ');
-  temps:=stdpath(sd)+'cache.dat';
+  write('Title metadata: ');
+  temps:=stdpath(sd)+'titles.dat';
 
   if config^.readonly then begin
-    writeln('Read-only mode: Cache disabled');
+    writeln('Read-only mode: disabled');
     favorites:=new(PFavorites,init('',config^.numTitles));
   end else begin
-    writeln('Initializing cache using '+temps);
+    writeln('Initializing using '+temps);
     favorites:=new(PFavorites,init(temps,config^.numTitles));
   end;
+
+  {Ensure cache size is known before continuing}
+  writeln('Inspecting file cache at ',fileCache^.path);
+  fileCache^.Remaining;
+  writeln(fileCache^.megsfree,' MB available for cache use.');
 
   if (config^.userlevel=power) or (config^.edebug=true) then begin
     writeln('Performing additional checks:');
@@ -266,7 +280,12 @@ begin
       writeln('Base directory: ',baseDir);
       writeln('Swapping enabled: ',swapping);
       writeln('Preloading enabled: ',preloading);
-      writeln('Cache Directory: ',cacheDir);
+      writeln('Cache Directory: ',fileCache^.path);
+    end;
+    writeln('Hit a key to continue TDL startup.');
+    asm
+        xor     ax,ax
+        int     16h
     end;
   end;
 
@@ -281,6 +300,10 @@ begin
 
   {If changing screen mode, we need to re-enable the screen. construct to
   pick up the new dimensions.}
+  {Also: If we noticed we're already in a condensed mode coming in, make
+  sure we record that fact so that restores go correctly.}
+  if (oldScreenParams.videorows=43) or (oldScreenParams.videorows=50)
+    then config^.wantCondensed:=true;
   if config^.wantCondensed then begin
     Monitor^.SetCondensed;
     config^.customvidmode:=3;
@@ -371,12 +394,13 @@ begin
       logmsg(info,'Base directory: '+baseDir);
       logmsg(info,'Swapping enabled: '+boolToStr(swapping,'',''));
       logmsg(info,'Preloading enabled: '+boolToStr(preloading,'',''));
-      logmsg(info,'Cache Directory: '+cacheDir);
+      logmsg(info,'Data Cache Directory: '+fileCache^.path);
     end;
   end;
+
 end;
 
-procedure Launch(tid:word);
+function Launch(tid:word):boolean;
 {
 Execution flow:
 
@@ -407,8 +431,9 @@ var
   dir:dirStr;
   wrkDir:string;
   temps:string;
-  tcachedir:PathStr;                    {title cache directory}
   filepath:PathStr;                     {fully-qualified path to source file}
+  tcachedir:PathStr;
+  unpackEstimate:longint;
 
   tfbuf:PFileStruct;
   ttbuf:PTitleStruct;
@@ -429,6 +454,8 @@ var
   end;
 
 begin
+  {assume everything will go ok}
+  Launch:=true;
   msgConsole^.logmsg(info,'Attempting to Launch title #'+inttostr(titleSets[activeSet].titleids^[tid])+':');
   if favorites^.changed then begin
     msgConsole^.logmsg(info,'Flushing favorites cache');
@@ -453,16 +480,33 @@ begin
       then full:=full+tfbuf^.name[b]
       else break;
   {determine our operating environment}
-  tcachedir:=config^.cachedir+base;
+  tcachedir:=fileCache^.path+base;
   {files can be in multiple drives/paths; find where we put our file}
   filepath:=fsearch(full,config^.ProgLocs);
   if filepath='' then begin
     popUserMessage(error,'PATH "'+config^.ProgLocs+'" did not contain "'+full+'".  Did you delete it?');
+    Launch:=false;
     exit;
   end;
   {determine extension so we know which handler to use}
   fsplit(filepath,dir,base,ext);
   delete(ext,1,1); {remove period}
+
+  {Diskspace check: Do we have the disk space to handle this?}
+  unpackEstimate:=fileCache^.EstimateCacheUsage(ext,filepath);
+  if fileCache^.bytesfree < unpackEstimate then begin
+    s:='This title could require up to '
+      +inttostr(unpackEstimate div 1024)
+      +' KB of disk space to run properly, but your cache only has '
+      +inttostr(fileCache^.bytesfree div 1024)
+      +' KB free.  Please remove files from '
+      +fileCache^.path
+      +' to free up enough disk space.';
+    popUserMessage(error,s);
+    Launch:=false;
+    exit;
+  end;
+
   {Is the file directly launchable?  (ie. .txt, .gif, etc.)
   If so, launch it; if not, it is an archive that needs extraction.}
   if Handlers^.Exists(ext)=execution
@@ -488,13 +532,17 @@ begin
           if not Handlers^.handle(ext,filepath,tcachedir) then begin
             msgConsole^.logmsg(tdl_cons.error,'Error code received during extraction');
             PopUserMessage(warning,
-              'There was an error trying to unpack your program.  TDL will '+
+              'There was an error reported while unpacking this title.  TDL will '+
               'attempt to continue.  If your progam doesn''t work, '+
               'consult tdl.log to see the exact command-line that failed, '+
               'then exit TDL and run it yourself to determine the exact error.'
             );
           end;
         end;
+
+        {If we got here, then the unpack did "something" and we should update
+        our cache stats:}
+        fileCache^.Remaining;
 
         {Switch to unpacked cache dir and obtain list of files we have
          registered execution handlers for.  Helper logic ensues:
@@ -561,6 +609,7 @@ begin
         if s='ABORTED*' then begin
           chdir(WrkDir);
           MsgConsole^.logmsg(info,'User declined to choose a program');
+          Launch:=false;
           exit; {get out of Launch()}
         end;
 
@@ -834,15 +883,16 @@ nofavorites:
         recordKeyState;
         tmpScreenSave;
         showStatus(true,'Preparing for launch...');
-        Launch(titleSets[activeSet].titleids^[pcursor]);
-        if config^.pauseAfterRun then pauseForUser;
-        RestoreDOSScreen;
-        {showStatus(false,'Preparing for launch...');}
-        {if we have any goofy modes set, restore them}
-        if config^.customVidMode<>0 then begin
-          case config^.customVidMode of
-            3:Monitor^.SetCondensed;
-            $100..$110:setVESA(config^.customVidMode);
+        {Launch it!  If launch was successful, clean up:}
+        if Launch(titleSets[activeSet].titleids^[pcursor]) then begin
+          if config^.pauseAfterRun then pauseForUser;
+          RestoreDOSScreen;
+          {if we have any goofy modes set, restore them}
+          if config^.customVidMode<>0 then begin
+            case config^.customVidMode of
+              3:Monitor^.SetCondensed;
+              $100..$110:setVESA(config^.customVidMode);
+            end;
           end;
         end;
         tmpScreenRestore;
@@ -924,6 +974,7 @@ begin
   dispose(files,done);
   dispose(titles,done);
   dispose(handlers,done);
+  dispose(fileCache,done);
   dispose(config,done);
   dispose(DOSScreen,done);
   tmpScreenRestore; {this will also deallocate it}
