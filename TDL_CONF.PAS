@@ -69,6 +69,8 @@ type
     wantCondensed,
     wantSnow:boolean;
     freeLowDOSRam:word;                 {in paragraphs; 0 if we couldn't determine}
+    EMSatStartup,
+    XMSatStartup:longint;
 
     Constructor Init(cfile,bdir:PathStr);
 

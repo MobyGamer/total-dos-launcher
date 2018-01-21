@@ -35,6 +35,7 @@ uses
   totLIST,
   totKEY,
   totMSG,
+  streams,
   tdl_glob,
   tdl_cach,
   tdl_conf,
@@ -109,6 +110,7 @@ Procedure PopGeneralInfo;
 var
   foomsg:PMessageObj;
   s:string[12];
+  s2:string;
 begin
   new(foomsg,init(2,'TDL info and stats'));
   with foomsg^ do begin
@@ -125,11 +127,25 @@ begin
         addline(' ');
       end;
       addline(' TDL operating mode: '+s);
-      addline(' TDL Heap: '+inttostr(memavail div 1024)+' KB (largest block: '+inttostr(maxavail div 1024)+' KB)');
+      addline(' TDL Heap remaining: '+inttostr(memavail div 1024)+' KB');
+
+      {Report how much EMS or XMS we're using.  The logic below accounts
+      for QEMM, DOSBox, and others reporting the same amount of EMS and XMS
+      always available (they both draw EMS and XMS from an internal pool
+      of managed RAM).  This code favors EMS use over XMS (because it's
+      faster) so we favor reporting on EMS in a dual EMS/XMS situation.}
+      s2:='';
+      if config^.XMSatStartup > xms_memavail
+        then s2:=inttostr((config^.XMSatStartup - xms_memavail) div 1024)+' KB of XMS';
+      if config^.EMSatStartup > ems_memavail
+        then s2:=inttostr((config^.EMSatStartup - ems_memavail) div 1024)+' KB of EMS';
+      if s2<>''
+        then addline(' TDL is using '+s2+' to accelerate index operations');
+
       addline(' # of Titles: '+inttostr(numtitles)+' ('+inttostr(Favorites^.Used)+' marked as favorites) ');
       addline(' Debug messsages logged to disk: '+boolToStr(logging,'ENABLED','disabled'));
       addline(' Treating filesystem as read-only: '+boolToStr(readonly,'YES','no'));
-      addline(' Excessive debug messages: '+boolToStr(edebug,'ENABLED','disabled'));
+      {addline(' Excessive debug messages: '+boolToStr(edebug,'ENABLED','disabled'));}
       addline(' Pause after execution: '+boolToStr(pauseAfterRun,'ENABLED','disabled'));
       addline(' ');
       if fileCache^.bytesfree > (1024*1024)
@@ -234,6 +250,10 @@ begin
 
   {If we used SWAPPO, our PSP is gone, so all command-line parameters after
   this point are now empty!  Hope you got what you needed before this line!}
+
+  {Track our EMS and XMS usage}
+  config^.EMSatStartup:=ems_memavail;
+  config^.XMSatStartup:=xms_memavail;
 
   {attempt initializing indexes}
   writeln('Initializing files index...');

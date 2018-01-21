@@ -147,36 +147,34 @@ titleid could be updated whenever a new index load is detected.
 
 =====================================================================
 
-Flags cache:
+Metadata cache:
 
         numEntries:     16-bit word of how many bitflags are in the file
 REPEAT  (This structure repeats numEntries times)
-        flags:          1 byte containing 8 bits acting as true/false flags
+        flags:          1 word containing flags and counters
 END
 
 Flags contained in each byte (values in hex):
-00000001: Title is marked as a Favorite
-00000010: An attempt was made to unpack Title
-00000100: Title returned from unpacking phase successfully
-00001000: An attempt was made to execute Title
-00010000: Title returned from execution successfully
-00100000: Reserved for future expansion
-01000000: Reserved for future expansion
-10000000: Reserved for future expansion
+FEDCBA98 76543210
+
+00000000 0000000x: Title is marked as a Favorite
+00000000 000000x0: Title was unpacked into data cache at some point
+00000000 xxxxxx00: Reserved for future expansion
+xxxxxxxx 00000000: # of times we attempted to launch this title
 
 Purpose:
-Contains flags pertinent to each Title, such as whether or not it is
-marked as a "favorite".
+Contains metadata pertinent to each Title, such as whether or not it is
+marked as a "favorite", or how many times it has been run.
 
 Implementation Notes:
 
-Flags are OR'd into a byte or AND'd out of a byte as necessary.
-Flags are stored in CACHE.DAT which is flushed to disk before every
-execution operation, or at normal program exit.
+Metadata is OR'd into a byte or AND'd out of a byte as necessary.  Data is
+stored in TITLES.DAT which is flushed to disk before every execution operation,
+or at normal program exit.
 
 =====================================================================
 
-Colors cache:
+Colors spefication:
 
 Array of unsigned 8-bit byte values, each of which have the following
 structure:
@@ -186,11 +184,3 @@ bbbb     - background text color
 
 UI attributes to be specified at a later date.
 
-Purpose:
-Allows custom remapping of text colors to TDL UI attributes.
-
-Implementation Notes:
-
-Colors are stored in order as bytes in a file called COLORSCH.EME.
-If the user wants to reset the color scheme they created, they can
-remove the file at any time and TDL will revert to default behavior.
