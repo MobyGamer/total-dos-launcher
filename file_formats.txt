@@ -149,18 +149,17 @@ titleid could be updated whenever a new index load is detected.
 
 Metadata cache:
 
-        numEntries:     16-bit word of how many bitflags are in the file
+        numEntries:     16-bit byte of how many bitflags are in the file
 REPEAT  (This structure repeats numEntries times)
-        flags:          1 word containing flags and counters
+        flags:          1 byte containing flags
 END
 
 Flags contained in each byte (values in hex):
-FEDCBA98 76543210
+76543210
 
-00000000 0000000x: Title is marked as a Favorite
-00000000 000000x0: Title was unpacked into data cache at some point
-00000000 xxxxxx00: Reserved for future expansion
-xxxxxxxx 00000000: # of times we attempted to launch this title
+0000000x: Title is marked as a Favorite
+000000x0: Title was unpacked into data cache at some point
+xxxxxx00: Reserved for future expansion
 
 Purpose:
 Contains metadata pertinent to each Title, such as whether or not it is
@@ -184,3 +183,29 @@ bbbb     - background text color
 
 UI attributes to be specified at a later date.
 
+=====================================================================
+
+Title audit log (issue #27):
+
+        numEntries:     16-bit word of how many titles are present in the file
+REPEAT  (This structure repeats numEntries times)
+        launchCount:	16-bit word of how many times title was launched
+	TotalPlaytime:  16-bit word of how many minutes title was in play
+END
+
+Purpose:
+Ability to track what titles have been executed, how many times, and provide
+some sort of report. The obvious use case is to generate a report after a
+festival/convention ends and see what people were playing, how often, and for
+how long.
+
+Implementation Notes:
+
+Audit log is to be kept on disk because it's low-priority data.  This also
+allows for atomic updates to the file, which is useful in case people remove
+power to the system, reboot, etc.
+
+Counts should be incremented right before a title is launched.
+TotalPlaytime should be incremented when *returning* from a launched title.
+This will miss playtime minutes if the user reboots or the game cannot be
+exited, but at least any minutes recorded will be legitimate.
