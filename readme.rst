@@ -22,18 +22,7 @@ In a nutshell, the TDL takes all of your zipped-up long-filename archives:
 | California Games v1.01 (1988)(Epyx, Inc.) [Sports].zip
 | Centipede [DC] (1983)(Atarisoft) [Action].zip
 | Chessmaster 2000, The (1986)(Software Toolworks, Inc., The) [Strategy, Chess].zip
-| Computer Baseball v1.2 (1985)(Strategic Simulations, Inc.) [Sports].zip
-| Computer Trivia (1984)(Avalon Hill) [Trivia].zip
-| Congo Bongo [DC] (1984)(SEGA Enterprises Ltd.) [Action].zip
-| Creative Contraptions (1985)(Bantam Electronic Publishing) [Action, Educational].zip
-| CROBOTS v1.1 [SW] (1985)(Tom Poindexter) [Strategy].zip
-| Cubic Tic Tac Toe (1985)(Silver Bullet Systems) [Strategy].zip
-| Defender [DC] (1983)(Atarisoft) [Action].zip
-| Dig Dug r7 [DC] (1983)(Atarisoft) [Action].zip
-| Digger [DC] (1983)(Windmill Software) [Action].zip
-| Donkey Kong [DC] (1983)(Atarisoft) [Action].zip
-| Doppleganger (1985)(MindImage Software, Inc.) [Adventure, Interactive Fiction].zip
-| DOS Trivia Game v3.0 [SW] (1990)(Generic Brand Software) [Strategy].zip
+
 
 ...and copies them to files that can be copied over to any DOS system, even those without long-filename support::
 
@@ -50,18 +39,6 @@ BOUNCYBE.ZIP
 CALIFORN.ZIP
 CENTIPED.ZIP
 CHESSMAS.ZIP
-COMPUTEA.ZIP
-COMPUTER.ZIP
-CONGOBON.ZIP
-CREATIVE.ZIP
-CROBOTSV.ZIP
-CUBICTIC.ZIP
-DEFENDER.ZIP
-DIGDUGR7.ZIP
-DIGGERDC.ZIP
-DONKEYKO.ZIP
-DOPPLEGA.ZIP
-DOSTRIVI.ZIP
 
 ...along with a menu program that easily launches them without requiring them to be unzipped beforehand:
 
