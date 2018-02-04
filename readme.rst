@@ -7,6 +7,68 @@ console "flash multicarts" that allow you to load hundreds of games onto a
 single console, that's what this is:  Think of the TDL as "console multicart"
 software for DOS.
 
+In a nutshell, the TDL takes all of your zipped-up long-filename archives:
+
+A Mind Forever Voyaging r77 (1985)(Infocom, Inc.) [Adventure, Interactive Fiction].zip
+Adventure (1987)(Willie Crowther, Kevin B. Black) [Adventure, Interactive Fiction].zip
+Adventure in Serenia [DC] (1982)(IBM) [Adventure, Interactive Fiction].zip
+Adventures of Buckaroo Banzai Across the Eighth Dimension, The v3.87 (1985)(Adventure International) [Adventure, Interactive Fiction].zip
+Alley Cat [DC] (1984)(IBM) [Action].zip
+Archon- The Light and the Dark [DC] (1984)(Electronic Arts, Inc.) [Action, Strategy].zip
+Arcticfox (1986)(Electronic Arts, Inc.) [Action, Simulation].zip
+Battlezone [DC] (1983)(Atarisoft) [Action, Simulation].zip
+Borrowed Time [DC] (1985)(Activision, Inc.) [Adventure].img.zip
+Bouncy Bee Learns Letters v1.01 (1985)(IBM) [Educational].zip
+California Games v1.01 (1988)(Epyx, Inc.) [Sports].zip
+Centipede [DC] (1983)(Atarisoft) [Action].zip
+Chessmaster 2000, The (1986)(Software Toolworks, Inc., The) [Strategy, Chess].zip
+Computer Baseball v1.2 (1985)(Strategic Simulations, Inc.) [Sports].zip
+Computer Trivia (1984)(Avalon Hill) [Trivia].zip
+Congo Bongo [DC] (1984)(SEGA Enterprises Ltd.) [Action].zip
+Creative Contraptions (1985)(Bantam Electronic Publishing) [Action, Educational].zip
+CROBOTS v1.1 [SW] (1985)(Tom Poindexter) [Strategy].zip
+Cubic Tic Tac Toe (1985)(Silver Bullet Systems) [Strategy].zip
+Defender [DC] (1983)(Atarisoft) [Action].zip
+Dig Dug r7 [DC] (1983)(Atarisoft) [Action].zip
+Digger [DC] (1983)(Windmill Software) [Action].zip
+Donkey Kong [DC] (1983)(Atarisoft) [Action].zip
+Doppleganger (1985)(MindImage Software, Inc.) [Adventure, Interactive Fiction].zip
+DOS Trivia Game v3.0 [SW] (1990)(Generic Brand Software) [Strategy].zip
+
+...and copies them to files that can be copied over to any DOS system, even those without long-filename support:
+
+ADVENTUA.ZIP
+ADVENTUB.ZIP
+ADVENTUR.ZIP
+ALLEYCAT.ZIP
+AMINDFOR.ZIP
+ARCHON-T.ZIP
+ARCTICFO.ZIP
+BATTLEZO.ZIP
+BORROWED.ZIP
+BOUNCYBE.ZIP
+CALIFORN.ZIP
+CENTIPED.ZIP
+CHESSMAS.ZIP
+COMPUTEA.ZIP
+COMPUTER.ZIP
+CONGOBON.ZIP
+CREATIVE.ZIP
+CROBOTSV.ZIP
+CUBICTIC.ZIP
+DEFENDER.ZIP
+DIGDUGR7.ZIP
+DIGGERDC.ZIP
+DONKEYKO.ZIP
+DOPPLEGA.ZIP
+DOSTRIVI.ZIP
+
+...along with a menu program that easily launches them without requiring them to be unzipped beforehand:
+
+x
+
+It can do this with a few hundred programs, or thousands, or tens of thousands.  Your only limitation is how much storage space you have on your target DOS system.
+
 Currently, the TDL is not ready for prime time; this paragraph will be removed when it is.  If you are testing TDL for the purpose of providing feedback, please consult "readme_a.txt" for instructions.  Also, feel free to .. _contribute an issue via github project.: https://github.com/MobyGamer/total-dos-launcher/issues
 
 .. contents::
@@ -19,28 +81,43 @@ Using TDL
 Overview
 --------
 
-The Total DOS Launcher consists of two programs:  An indexer, and a menu system.  You use the indexer to prepare your files for copying over to the vintage DOS system, and you use the menu program on the DOS system to navigate what you copied over and launch the programs.
+The Total DOS Launcher consists of two programs:  An indexer, and a menu system.  You use the indexer to prepare your files for copying over to the vintage DOS system, and you use the menu program on the DOS system to navigate and launch the programs you copied over.
 
 
 Prerequisites
 -------------
 
+Indexer:  Currently a python script, so you'll need to install python 3.6 or higher on your system if it isn't already there.  (When this project is past the beta stage, native binaries will be provided for Windows, Mac, and Linux.)
+
+Menu program:  The menu program runs on any IBM PC or compatible running DOS 3.1 or higher, with a minimum of 256KB RAM.
+
 
 Step one: The Indexer
 ---------------------
 
-x
-
+C:\DOS\D\PROJECTS\TDL>TDLindexer.py ..\dos_program_sources\small.generic.4example output
+Gathering list of files...
+Found 96 files to copy.
+Converting to DOS-friendly 8.3 filenames...
+Generating files index...
+Generating titles index...
+Copying files from ..\dos_program_sources\small.generic.4example to output ...
+Done.
 
 Step two: Copy to the vintage system
 ------------------------------------
 
 x
 
+Step three: Launch the menu program
+-----------------------------------
+
 
 
 Building TDL
 ============
+
+If you'd like to work on the code and contribute back to the project, that's great -- however, be prepared to get (re)acquainted with DOS compilers and tools!
 
 
 Languages
