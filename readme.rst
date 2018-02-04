@@ -7,7 +7,7 @@ console "flash multicarts" that allow you to load hundreds of games onto a
 single console, that's what this is:  Think of the TDL as "console multicart"
 software for DOS.
 
-In a nutshell, the TDL takes all of your zipped-up long-filename archives::
+In a nutshell, the TDL takes all of your zipped-up long-filename archives:
 
 | A Mind Forever Voyaging r77 (1985)(Infocom, Inc.) [Adventure, Interactive Fiction].zip
 | Adventure (1987)(Willie Crowther, Kevin B. Black) [Adventure, Interactive Fiction].zip
