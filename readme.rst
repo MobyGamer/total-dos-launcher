@@ -7,12 +7,37 @@ console "flash multicarts" that allow you to load hundreds of games onto a
 single console, that's what this is:  Think of the TDL as "console multicart"
 software for DOS.
 
-Currently, the TDL is not ready for prime time; this documentation will change
-when it is.  If you are testing TDL, please consult "readme_a.txt" for
-instructions.
+Currently, the TDL is not ready for prime time; this paragraph will be removed when it is.  If you are testing TDL for the purpose of providing feedback, please consult "readme_a.txt" for instructions.  Also, feel free to .. _contribute an issue via github project.: https://github.com/MobyGamer/total-dos-launcher/issues
 
 .. contents::
 .. section-numbering::
+
+
+Using TDL
+=========
+
+Overview
+--------
+
+The Total DOS Launcher consists of two programs:  An indexer, and a menu system.  You use the indexer to prepare your files for copying over to the vintage DOS system, and you use the menu program on the DOS system to navigate what you copied over and launch the programs.
+
+
+Prerequisites
+-------------
+
+
+Step one: The Indexer
+---------------------
+
+x
+
+
+Step two: Copy to the vintage system
+------------------------------------
+
+x
+
+
 
 Building TDL
 ============
