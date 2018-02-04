@@ -40,7 +40,7 @@ In a nutshell, the TDL takes all of your zipped-up long-filename archives:
  CENTIPED.ZIP
  CHESSMAS.ZIP
 
-along with a menu program that easily launches them without requiring them to be unzipped beforehand:
+...along with a menu program that easily launches them without requiring them to be unzipped beforehand:
 
 x
 
