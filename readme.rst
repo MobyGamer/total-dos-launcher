@@ -9,31 +9,31 @@ software for DOS.
 
 In a nutshell, the TDL takes all of your zipped-up long-filename archives::
 
-A Mind Forever Voyaging r77 (1985)(Infocom, Inc.) [Adventure, Interactive Fiction].zip
-Adventure (1987)(Willie Crowther, Kevin B. Black) [Adventure, Interactive Fiction].zip
-Adventure in Serenia [DC] (1982)(IBM) [Adventure, Interactive Fiction].zip
-Adventures of Buckaroo Banzai Across the Eighth Dimension, The v3.87 (1985)(Adventure International) [Adventure, Interactive Fiction].zip
-Alley Cat [DC] (1984)(IBM) [Action].zip
-Archon- The Light and the Dark [DC] (1984)(Electronic Arts, Inc.) [Action, Strategy].zip
-Arcticfox (1986)(Electronic Arts, Inc.) [Action, Simulation].zip
-Battlezone [DC] (1983)(Atarisoft) [Action, Simulation].zip
-Borrowed Time [DC] (1985)(Activision, Inc.) [Adventure].img.zip
-Bouncy Bee Learns Letters v1.01 (1985)(IBM) [Educational].zip
-California Games v1.01 (1988)(Epyx, Inc.) [Sports].zip
-Centipede [DC] (1983)(Atarisoft) [Action].zip
-Chessmaster 2000, The (1986)(Software Toolworks, Inc., The) [Strategy, Chess].zip
-Computer Baseball v1.2 (1985)(Strategic Simulations, Inc.) [Sports].zip
-Computer Trivia (1984)(Avalon Hill) [Trivia].zip
-Congo Bongo [DC] (1984)(SEGA Enterprises Ltd.) [Action].zip
-Creative Contraptions (1985)(Bantam Electronic Publishing) [Action, Educational].zip
-CROBOTS v1.1 [SW] (1985)(Tom Poindexter) [Strategy].zip
-Cubic Tic Tac Toe (1985)(Silver Bullet Systems) [Strategy].zip
-Defender [DC] (1983)(Atarisoft) [Action].zip
-Dig Dug r7 [DC] (1983)(Atarisoft) [Action].zip
-Digger [DC] (1983)(Windmill Software) [Action].zip
-Donkey Kong [DC] (1983)(Atarisoft) [Action].zip
-Doppleganger (1985)(MindImage Software, Inc.) [Adventure, Interactive Fiction].zip
-DOS Trivia Game v3.0 [SW] (1990)(Generic Brand Software) [Strategy].zip
+ A Mind Forever Voyaging r77 (1985)(Infocom, Inc.) [Adventure, Interactive Fiction].zip
+ Adventure (1987)(Willie Crowther, Kevin B. Black) [Adventure, Interactive Fiction].zip
+ Adventure in Serenia [DC] (1982)(IBM) [Adventure, Interactive Fiction].zip
+ Adventures of Buckaroo Banzai Across the Eighth Dimension, The v3.87 (1985)(Adventure International) [Adventure, Interactive Fiction].zip
+ Alley Cat [DC] (1984)(IBM) [Action].zip
+ Archon- The Light and the Dark [DC] (1984)(Electronic Arts, Inc.) [Action, Strategy].zip
+ Arcticfox (1986)(Electronic Arts, Inc.) [Action, Simulation].zip
+ Battlezone [DC] (1983)(Atarisoft) [Action, Simulation].zip
+ Borrowed Time [DC] (1985)(Activision, Inc.) [Adventure].img.zip
+ Bouncy Bee Learns Letters v1.01 (1985)(IBM) [Educational].zip
+ California Games v1.01 (1988)(Epyx, Inc.) [Sports].zip
+ Centipede [DC] (1983)(Atarisoft) [Action].zip
+ Chessmaster 2000, The (1986)(Software Toolworks, Inc., The) [Strategy, Chess].zip
+ Computer Baseball v1.2 (1985)(Strategic Simulations, Inc.) [Sports].zip
+ Computer Trivia (1984)(Avalon Hill) [Trivia].zip
+ Congo Bongo [DC] (1984)(SEGA Enterprises Ltd.) [Action].zip
+ Creative Contraptions (1985)(Bantam Electronic Publishing) [Action, Educational].zip
+ CROBOTS v1.1 [SW] (1985)(Tom Poindexter) [Strategy].zip
+ Cubic Tic Tac Toe (1985)(Silver Bullet Systems) [Strategy].zip
+ Defender [DC] (1983)(Atarisoft) [Action].zip
+ Dig Dug r7 [DC] (1983)(Atarisoft) [Action].zip
+ Digger [DC] (1983)(Windmill Software) [Action].zip
+ Donkey Kong [DC] (1983)(Atarisoft) [Action].zip
+ Doppleganger (1985)(MindImage Software, Inc.) [Adventure, Interactive Fiction].zip
+ DOS Trivia Game v3.0 [SW] (1990)(Generic Brand Software) [Strategy].zip
 
 ...and copies them to files that can be copied over to any DOS system, even those without long-filename support::
 
