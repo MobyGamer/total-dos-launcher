@@ -158,19 +158,19 @@ system is beyond the scope of this documentation, but here are a few
 pointers to get you started:
 
 - Removable hard drives:  You can use a Compact Flash card instead of a
-physical IDE drive with a cheap CF-to-IDE adapter; then all you need to
-do is insert it into your modern system with a CF card reader to do the
-copy.  For very old systems that can't use IDE drives, there are
-homebrew ISA hard drive adapters that use CF cards directly; search the
-internet for "XTIDE Compact Flash" to find a few examples.
+  physical IDE drive with a cheap CF-to-IDE adapter; then all you need to
+  do is insert it into your modern system with a CF card reader to do the
+  copy.  For very old systems that can't use IDE drives, there are
+  homebrew ISA hard drive adapters that use CF cards directly; search the
+  internet for "XTIDE Compact Flash" to find a few examples.
 
 - TCP/IP: Install a network card that has a supported DOS packet driver,
-then install and use some sort of transport to copy the files over.
-This can be Microsoft LAN Manager, Novel Netware, etc., or a simpler and
-faster option like Mike Brutman's mTCP suite.  If your system can load
-programs into upper memory, you can also get away with running MS LANMAN
-resident, and just access your files as a driver letter over the
-network.
+  then install and use some sort of transport to copy the files over.
+  This can be Microsoft LAN Manager, Novel Netware, etc., or a simpler and
+  faster option like Mike Brutman's mTCP suite.  If your system can load
+  programs into upper memory, you can also get away with running MS LANMAN
+  resident, and just access your files as a driver letter over the
+  network.
 
 - CD or DVD: Burn everything to a CD or DVD and just run from there.
 
