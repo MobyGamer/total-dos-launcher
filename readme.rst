@@ -79,23 +79,48 @@ Menu program:  The menu program runs on any IBM PC or compatible running DOS 3.1
 Step one: The Indexer
 ---------------------
 
-C:\DOS\D\PROJECTS\TDL>TDLindexer.py ..\dos_program_sources\small.generic.4example output
-Gathering list of files...
-Found 96 files to copy.
-Converting to DOS-friendly 8.3 filenames...
-Generating files index...
-Generating titles index...
-Copying files from ..\dos_program_sources\small.generic.4example to output ...
-Done.
+To prepare your files for copying over, run TDLIndexer.py with these arguments::
+
+ .. code-block:: bash
+ 
+   TDLIndexer.py <source directory> <destination directory>
+   
+The TDLIndexer.py program MUST be run in the same directory that contains the ``distro`` subdirectory.  This contains all of the menu program elements that will get copied over with your files.
+
+
+Example::
+
+ C:\DOS\D\PROJECTS\TDL>TDLindexer.py ..\dos_program_sources\small.generic.4example output
+ Gathering list of files...
+ Found 96 files to copy.
+ Converting to DOS-friendly 8.3 filenames...
+ Generating files index...
+ Generating titles index...
+ Copying files from ..\dos_program_sources\small.generic.4example to output ...
+ Done.
 
 Step two: Copy to the vintage system
 ------------------------------------
 
-x
+Using any method you feel comfortable with, copy the entire contents of the output directory you specified over to your vintage DOS system, being careful to preserve the directory structure.  
+
+Instructing the user on copying files from a modern system to a vintage system is beyond the scope of this documentation, but here are a few pointers to get you started:
+
+- Removable hard drives:  You can use a Compact Flash card instead of an IDE drive with a simple cheap adapter; then all you need to do is insert it into your modern system to do the copy.
+- TCP/IP: Install a network card that has a supported DOS packet driver, then install and use some sort of transport to copy the files over.  This can be Microsoft LAN Manager, Novel Netware, etc., or a simpler and faster option like Mike Brutman's mTCP suite.
+- CD or DVD: Burn everything to a CD or DVD and just run from there.
+
 
 Step three: Launch the menu program
 -----------------------------------
 
+
+Configuring TDL
+==============
+
+TDL, out of the box, does not need to be configured.  If you want to configure it to your liking, such as specifying multiple source directories (to get past the DOS 2G partition limit), forcing a specific location for the cache directory, using a high-res VESA text mode, etc. then edit the ``TDL.INI`` and ``HANDLERS.INI`` files.
+
+(The above documentation is a placeholder; more will be added later.)
 
 
 Building TDL
