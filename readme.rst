@@ -22,7 +22,7 @@ In a nutshell, the TDL takes all of your zipped-up long-filename archives:
 | California Games v1.01 (1988)(Epyx, Inc.) [Sports].zip
 | Centipede [DC] (1983)(Atarisoft) [Action].zip
 | Chessmaster 2000, The (1986)(Software Toolworks, Inc., The) [Strategy, Chess].zip
-
+.
 
 and copies them to files that can be copied over to any DOS system, even those without long-filename support::
 
