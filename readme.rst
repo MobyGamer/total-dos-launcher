@@ -79,11 +79,11 @@ Menu program:  The menu program runs on any IBM PC or compatible running DOS 3.1
 Step one: The Indexer
 ---------------------
 
-To prepare your files for copying over, run TDLIndexer.py with these arguments::
+To prepare your files for copying over, run TDLIndexer.py with these arguments:
 
- .. code-block:: bash
+.. code-block:: bash
  
-   TDLIndexer.py <source directory> <destination directory>
+  TDLIndexer.py <source directory> <destination directory>
    
 The TDLIndexer.py program MUST be run in the same directory that contains the ``distro`` subdirectory.  This contains all of the menu program elements that will get copied over with your files.
 
