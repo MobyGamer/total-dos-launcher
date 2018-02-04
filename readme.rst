@@ -109,6 +109,16 @@ Example Usage::
  Generating titles index...
  Copying files from ..\dos_program_sources\small.generic.4example to output ...
  Done.
+ 
+This results in a complete distribution ready to copy over to your DOS system.  It consists of the menu program, some index files, and your original source files in a ``files`` subdirectory::
+
+ 02/03/2018  11:17 PM    <DIR>          files
+ 01/18/2018  11:00 PM    <DIR>          utils
+ 01/20/2018  06:22 PM           139,712 TDL.EXE
+ 02/03/2018  11:17 PM             8,481 TITLES.IDX
+ 02/03/2018  11:17 PM             1,346 FILES.IDX
+ 07/07/2017  03:36 PM             2,988 TDL.INI
+ 07/07/2017  03:36 PM             4,169 HANDLERS.INI
 
 Step two: Copy to the vintage system
 ------------------------------------
