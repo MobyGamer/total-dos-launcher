@@ -1,6 +1,3 @@
-.. contents::
-.. section-numbering::
-
 
 Total DOS Launcher
 ##################
@@ -10,6 +7,13 @@ DOS programs on vintage hardware.  If you're familiar with vintage gaming
 console "flash multicarts" that allow you to load hundreds of games onto a
 single console, that's what this is:  Think of the TDL as "console multicart"
 software for DOS.
+
+.. contents::
+.. section-numbering::
+
+
+Introduction
+============
 
 In a nutshell, the TDL takes all of your zipped-up long-filename archives:
 
