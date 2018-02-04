@@ -71,10 +71,13 @@ The Total DOS Launcher consists of two programs:  An indexer, and a menu system.
 Prerequisites
 -------------
 
-Indexer:  Currently a python script, so you'll need to install python 3.6 or higher on your system if it isn't already there.  (When this project is past the beta stage, native binaries will be provided for Windows, Mac, and Linux.)
+Indexer:
+  Currently a python script, so you'll need to install python 3.6 or higher on your system if it isn't already there.  (When this project is past the beta stage, native binaries will be provided for Windows, Mac, and Linux.)
 
-Menu program:  The menu program runs on any IBM PC or 100% compatible running DOS 2.10 or higher, with a minimum of 256KB RAM.
+Menu program:
+  The menu program runs on any IBM PC or 100% compatible running DOS 2.10 or higher, with 384 KB RAM or higher.
 
+The menu program takes advantage of EMS or XMS to speed operation, if either are available.
 
 Step one: The Indexer
 ---------------------
