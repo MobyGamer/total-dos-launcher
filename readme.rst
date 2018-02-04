@@ -10,7 +10,9 @@ software for DOS.
 In a nutshell, the TDL takes all of your zipped-up long-filename archives:
 
 A Mind Forever Voyaging r77 (1985)(Infocom, Inc.) [Adventure, Interactive Fiction].zip
+
 Adventure (1987)(Willie Crowther, Kevin B. Black) [Adventure, Interactive Fiction].zip
+
 Adventure in Serenia [DC] (1982)(IBM) [Adventure, Interactive Fiction].zip
 Adventures of Buckaroo Banzai Across the Eighth Dimension, The v3.87 (1985)(Adventure International) [Adventure, Interactive Fiction].zip
 Alley Cat [DC] (1984)(IBM) [Action].zip
