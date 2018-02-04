@@ -26,11 +26,11 @@ In a nutshell, the TDL takes all of your zipped-up long-filename archives:
 
 ...and copies them to files that can be copied over to any DOS system, even those without long-filename support::
 
+ AMINDFOR.ZIP
+ ADVENTUR.ZIP
  ADVENTUA.ZIP
  ADVENTUB.ZIP
- ADVENTUR.ZIP
  ALLEYCAT.ZIP
- AMINDFOR.ZIP
  ARCHON-T.ZIP
  ARCTICFO.ZIP
  BATTLEZO.ZIP
