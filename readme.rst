@@ -153,11 +153,11 @@ Configuring TDL
 
 ``TDL.EXE`` also has some command-line options to control how it operates:
 
--?, -h  Print a summary the most current set of command-line options.
--c      Set 43-line (EGA) or 50-line (VGA) mode.  (If you need more lines than that, see TDL.INI for VESA options.)
--r      Instructs TDL that it is on read-only media (ie. CDROM or DVDROM)' and that it should not try to write anything to its local filesystem.  This disables "favorites" as well as writing the debug log to disk.
--d      Print excessive debugging messages during initialization.  Used for troubleshooting only.'
--f      Always use fast display routines on all CGA systems.  This may cause "snow" or display corruption on true CGA adapters.',0dh,0ah
+/?, /h  Print a summary the most current set of command-line options.
+/c      Set 43-line (EGA) or 50-line (VGA) mode.  (If you need more lines than that, see TDL.INI for VESA options.)
+/r      Instructs TDL that it is on read-only media (ie. CDROM or DVDROM)' and that it should not try to write anything to its local filesystem.  This disables "favorites" as well as writing the debug log to disk.
+/d      Print excessive debugging messages during initialization.  Used for troubleshooting only.'
+/f      Always use fast display routines on all CGA systems.  This may cause "snow" or display corruption on true CGA adapters.',0dh,0ah
 
 
 
