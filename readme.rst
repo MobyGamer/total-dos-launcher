@@ -73,7 +73,7 @@ Prerequisites
 
 Indexer:  Currently a python script, so you'll need to install python 3.6 or higher on your system if it isn't already there.  (When this project is past the beta stage, native binaries will be provided for Windows, Mac, and Linux.)
 
-Menu program:  The menu program runs on any IBM PC or compatible running DOS 3.1 or higher, with a minimum of 256KB RAM.
+Menu program:  The menu program runs on any IBM PC or 100% compatible running DOS 2.10 or higher, with a minimum of 256KB RAM.
 
 
 Step one: The Indexer
@@ -85,18 +85,8 @@ To prepare your files for copying over, run TDLIndexer.py with these arguments:
  
   TDLIndexer.py <source directory> <destination directory>
    
-The TDLIndexer.py program MUST be run in the same directory that contains the ``distro`` subdirectory.  This contains all of the menu program elements that will get copied over with your files.
+The TDLIndexer.py program *MUST* be run in the same directory that contains the ``distro`` subdirectory, which contains all of the menu program elements that will get copied over with your files.
 
-The indexer recurses through subdirectories.  So if your menu structure looks like this::
-
- DOS Games\
-   Adventure\
-     1981\
-     1982\
-     1983\
-     
-...they will all get picked up by the indexer as long as you specify ``DOS Games`` as the source directory.     
-     
 
 
 Example Usage::
@@ -119,6 +109,19 @@ This results in a complete distribution ready to copy over to your DOS system.  
  02/03/2018  11:17 PM             1,346 FILES.IDX
  07/07/2017  03:36 PM             2,988 TDL.INI
  07/07/2017  03:36 PM             4,169 HANDLERS.INI
+ 
+ 
+The indexer recurses through subdirectories.  So if your menu structure looks like this::
+
+ DOS Games\
+   Adventure\
+     1981\
+     1982\
+     1983\
+     
+...they will all get picked up by the indexer as long as you specify ``DOS Games`` as the source directory.     
+     
+
 
 Step two: Copy to the vintage system
 ------------------------------------
@@ -131,6 +134,8 @@ Instructing the user on copying files from a modern system to a vintage system i
 - TCP/IP: Install a network card that has a supported DOS packet driver, then install and use some sort of transport to copy the files over.  This can be Microsoft LAN Manager, Novel Netware, etc., or a simpler and faster option like Mike Brutman's mTCP suite.  If your system can load programs into upper memory, you can also get away with running MS LANMAN resident, and just access your files as a driver letter over the network.
 - CD or DVD: Burn everything to a CD or DVD and just run from there.
 
+While a serial or parallel cable can also work to copy files over (like LapLink, FastLynx, INTERLNK/INTERSVR, etc), the speed of a serial or parallel cable is extremely slow compared to the above methods and is generally not recommended unless you have no other choice.
+
 
 Step three: Launch the menu program
 -----------------------------------
@@ -141,7 +146,7 @@ Type ``TDL`` from the directory where it is installed.
 Configuring TDL
 ==============
 
-TDL, out of the box, does not need to be configured.  If you want to configure it to your liking, such as specifying multiple source directories (to get past the DOS 2G partition limit), forcing a specific location for the cache directory, using a high-res VESA text mode, etc. then edit the ``TDL.INI`` and ``HANDLERS.INI`` files.  Both .INI files contain a description of what each option does.
+*TDL, out of the box, does not need to be configured.*  If you want to configure it to your liking, such as specifying multiple source directories (to get past the DOS 2G partition limit), forcing a specific location for the cache directory, using a high-res VESA text mode, etc. then edit the ``TDL.INI`` and ``HANDLERS.INI`` files.  Both .INI files contain a description of what each option does.
 
 ``TDL.EXE`` also has some command-line options to control how it operates:
 
@@ -168,7 +173,7 @@ Libraries
 ---------
 TDL is not 100% self-contained; it uses some support libraries and units to
 provide functionality like CUI/TUI primitives, userspace swapping, and stream
-extensions.  Ensure you have a copy of both https://github.com/MobyGamer/TPLibs
+extensions.  Ensure you have both https://github.com/MobyGamer/TPLibs
 and https://github.com/MobyGamer/UNITS available in your source path.
 
 Compilers and Tools
