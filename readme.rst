@@ -24,7 +24,7 @@ In a nutshell, the TDL takes all of your zipped-up long-filename archives:
 | Chessmaster 2000, The (1986)(Software Toolworks, Inc., The) [Strategy, Chess].zip
 .
 
-and copies them to files that can be copied over to any DOS system, even those without long-filename support::
+...and copies them to files that can be copied over to any DOS system, even those without long-filename support::
 
  ADVENTUA.ZIP
  ADVENTUB.ZIP
