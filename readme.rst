@@ -153,27 +153,19 @@ Configuring TDL
 
 ``TDL.EXE`` also has some command-line options to control how it operates:
 
-=================   =====================================================
-``--headers, -h``   Only the response headers are printed.
-``--body, -b``      Only the response body is printed.
-``--verbose, -v``   Print the whole HTTP exchange (request and response).
-                    This option also enables ``--all`` (see below).
-``--print, -p``     Selects parts of the HTTP exchange.
-=================   =====================================================
-
-======  =====
--?, -h  Print a summary the most current set of command-line options.
--c      Set 43-line (EGA) or 50-line (VGA) mode.  (If you need more lines than that, see TDL.INI for VESA options.)
--r      Instructs TDL that it is on read-only media (ie. CDROM or DVDROM)' and that it should not try to write anything to its local filesystem.  This disables "favorites" as well as writing the debug log to disk.
--d      Print excessive debugging messages during initialization.  Used for troubleshooting only.'
--f      Always use fast display routines on all CGA systems.  This may cause "snow" or display corruption on true CGA adapters.',0dh,0ah
-======  =====
+==========  =====
+``-?, -h``  Print a summary the most current set of command-line options.
+``-c``      Set 43-line (EGA) or 50-line (VGA) mode.  (If you need more lines than that, see TDL.INI for VESA options.)
+``-r``      Instructs TDL that it is on read-only media (ie. CDROM or DVDROM) and that it should not try to write anything to its local filesystem.  This disables "favorites" as well as writing the debug log to disk.
+``-d``      Print excessive debugging messages during initialization.  Used for troubleshooting only.
+``-f``      Always use fast display routines on all CGA systems.  This may cause "snow" or display corruption on true CGA adapters.
+======      =====
 
 
 Building TDL
 ============
 
-*Building the TDL is not required to use it.*  This section is only for those who want to hack on the code and contribute back to the project  -- however, be prepared to get (re)acquainted with DOS compilers and tools!
+*Building the TDL is not required to use it!*  This section is only for those who want to hack on the code and contribute back to the project -- however, be prepared to get (re)acquainted with DOS compilers and tools!
 
 
 Languages
@@ -203,3 +195,11 @@ including the 8088.  Don't use 80186+ instructions such as ``PUSHA``, ``POPA``,
 turn off 80286 code generation, 8087 code generation, and 8087 emulation
 respectively.  One of TDL's design goals is the ability to work on any IBM PC
 or compatible.
+
+
+Frequently-Asked Questions
+==========================
+
+*Can I use this with emulators such as DOSBox?*  Yes, but if you are using an emulator, there are much better launchers and front-ends you can use, such as `Metropolis Launcher <https://metropolis-launcher.net/>`_ .  TDL was developed to be run directly on vintage DOS computers, and as such, doesn't have as many features as modern emulator front-ends.
+
+*Where can I find collections of DOS games to run on my vintage system?*  Any internet search can help you.  As of this writing, "DOS game collection" produced 3.2 million hits in google.
