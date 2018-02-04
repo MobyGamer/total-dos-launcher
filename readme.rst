@@ -42,7 +42,9 @@ In a nutshell, the TDL takes all of your zipped-up long-filename archives:
 
 ...along with a menu program that easily launches them without requiring them to be unzipped beforehand:
 
-x
+.. image:: docs/menu_example.png
+   :alt: A sample TDL menu
+   :align: center
 
 It can do this with a few hundred programs, or thousands, or tens of thousands.  Your only limitation is how much storage space you have on your target DOS system.
 
