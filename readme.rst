@@ -7,12 +7,10 @@ console "flash multicarts" that allow you to load hundreds of games onto a
 single console, that's what this is:  Think of the TDL as "console multicart"
 software for DOS.
 
-In a nutshell, the TDL takes all of your zipped-up long-filename archives:
+In a nutshell, the TDL takes all of your zipped-up long-filename archives::
 
 A Mind Forever Voyaging r77 (1985)(Infocom, Inc.) [Adventure, Interactive Fiction].zip
-
 Adventure (1987)(Willie Crowther, Kevin B. Black) [Adventure, Interactive Fiction].zip
-
 Adventure in Serenia [DC] (1982)(IBM) [Adventure, Interactive Fiction].zip
 Adventures of Buckaroo Banzai Across the Eighth Dimension, The v3.87 (1985)(Adventure International) [Adventure, Interactive Fiction].zip
 Alley Cat [DC] (1984)(IBM) [Action].zip
@@ -37,7 +35,7 @@ Donkey Kong [DC] (1983)(Atarisoft) [Action].zip
 Doppleganger (1985)(MindImage Software, Inc.) [Adventure, Interactive Fiction].zip
 DOS Trivia Game v3.0 [SW] (1990)(Generic Brand Software) [Strategy].zip
 
-...and copies them to files that can be copied over to any DOS system, even those without long-filename support:
+...and copies them to files that can be copied over to any DOS system, even those without long-filename support::
 
 ADVENTUA.ZIP
 ADVENTUB.ZIP
