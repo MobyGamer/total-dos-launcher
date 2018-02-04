@@ -56,7 +56,7 @@ In a nutshell, the TDL takes all of your zipped-up long-filename archives:
 
 It can do this with a few hundred programs, or thousands, or *tens of thousands*.  Your only limitation is how much storage space you have on your target DOS system.
 
-The TDL is currently in developer and not quite ready for prime time; this paragraph will be removed when it is.  If you are testing TDL for the purpose of providing feedback, please consult "readme_a.txt" for instructions.  Also, feel free to `contribute an issue via the github project. <https://github.com/MobyGamer/total-dos-launcher/issues>`_
+The TDL is currently in development and not quite ready for prime time; this paragraph will be removed when it is.  If you are testing TDL for the purpose of providing feedback, please consult "readme_a.txt" for instructions.  Also, feel free to `contribute an issue via the github project. <https://github.com/MobyGamer/total-dos-launcher/issues>`_
 
 
 Using TDL
@@ -87,8 +87,19 @@ To prepare your files for copying over, run TDLIndexer.py with these arguments::
    
 The TDLIndexer.py program MUST be run in the same directory that contains the ``distro`` subdirectory.  This contains all of the menu program elements that will get copied over with your files.
 
+The indexer recurses through subdirectories.  So if your menu structure looks like this::
 
-Example::
+ DOS Games\
+   Adventure\
+     1981\
+     1982\
+     1983\
+     
+...they will all get picked up by the indexer as long as you specify ``DOS Games`` as the source directory.     
+     
+
+
+Example Usage::
 
  C:\DOS\D\PROJECTS\TDL>TDLindexer.py ..\dos_program_sources\small.generic.4example output
  Gathering list of files...
@@ -106,27 +117,36 @@ Using any method you feel comfortable with, copy the entire contents of the outp
 
 Instructing the user on copying files from a modern system to a vintage system is beyond the scope of this documentation, but here are a few pointers to get you started:
 
-- Removable hard drives:  You can use a Compact Flash card instead of an IDE drive with a simple cheap adapter; then all you need to do is insert it into your modern system to do the copy.
-- TCP/IP: Install a network card that has a supported DOS packet driver, then install and use some sort of transport to copy the files over.  This can be Microsoft LAN Manager, Novel Netware, etc., or a simpler and faster option like Mike Brutman's mTCP suite.
+- Removable hard drives:  You can use a Compact Flash card instead of a physical IDE drive with a cheap CF-to-IDE adapter; then all you need to do is insert it into your modern system with a CF card reader to do the copy.  For very old systems that can't use IDE drives, there are homebrew ISA hard drive adapters that use CF cards directly; search the internet for "XTIDE Compact Flash" to find a few examples.
+- TCP/IP: Install a network card that has a supported DOS packet driver, then install and use some sort of transport to copy the files over.  This can be Microsoft LAN Manager, Novel Netware, etc., or a simpler and faster option like Mike Brutman's mTCP suite.  If your system can load programs into upper memory, you can also get away with running MS LANMAN resident, and just access your files as a driver letter over the network.
 - CD or DVD: Burn everything to a CD or DVD and just run from there.
 
 
 Step three: Launch the menu program
 -----------------------------------
 
+Type ``TDL`` from the directory where it is installed.
+
 
 Configuring TDL
 ==============
 
-TDL, out of the box, does not need to be configured.  If you want to configure it to your liking, such as specifying multiple source directories (to get past the DOS 2G partition limit), forcing a specific location for the cache directory, using a high-res VESA text mode, etc. then edit the ``TDL.INI`` and ``HANDLERS.INI`` files.
+TDL, out of the box, does not need to be configured.  If you want to configure it to your liking, such as specifying multiple source directories (to get past the DOS 2G partition limit), forcing a specific location for the cache directory, using a high-res VESA text mode, etc. then edit the ``TDL.INI`` and ``HANDLERS.INI`` files.  Both .INI files contain a description of what each option does.
 
-(The above documentation is a placeholder; more will be added later.)
+``TDL.EXE`` also has some command-line options to control how it operates:
+
+-?, -h  Print a summary the most current set of command-line options.
+-c      Set 43-line (EGA) or 50-line (VGA) mode.  (If you need more lines than that, see TDL.INI for VESA options.)
+-r      Instructs TDL that it is on read-only media (ie. CDROM or DVDROM)' and that it should not try to write anything to its local filesystem.  This disables "favorites" as well as writing the debug log to disk.
+-d      Print excessive debugging messages during initialization.  Used for troubleshooting only.'
+-f      Always use fast display routines on all CGA systems.  This may cause "snow" or display corruption on true CGA adapters.',0dh,0ah
+
 
 
 Building TDL
 ============
 
-If you'd like to work on the code and contribute back to the project, that's great -- however, be prepared to get (re)acquainted with DOS compilers and tools!
+*Building the TDL is not required to use it.*  This section is only for those who want to hack on the code and contribute back to the project  -- however, be prepared to get (re)acquainted with DOS compilers and tools!
 
 
 Languages
