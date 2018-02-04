@@ -1,3 +1,7 @@
+.. contents::
+.. section-numbering::
+
+
 Total DOS Launcher
 ##################
 
@@ -49,9 +53,6 @@ In a nutshell, the TDL takes all of your zipped-up long-filename archives:
 It can do this with a few hundred programs, or thousands, or tens of thousands.  Your only limitation is how much storage space you have on your target DOS system.
 
 Currently, the TDL is not ready for prime time; this paragraph will be removed when it is.  If you are testing TDL for the purpose of providing feedback, please consult "readme_a.txt" for instructions.  Also, feel free to `contribute an issue via the github project. <https://github.com/MobyGamer/total-dos-launcher/issues>`_
-
-.. contents::
-.. section-numbering::
 
 
 Using TDL
