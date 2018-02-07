@@ -260,6 +260,9 @@ is the ability to work on any IBM PC or compatible.
 Frequently-Asked Questions
 ==========================
 
+Usage
+-----
+
 *Can I use this with emulators such as DOSBox?*  Yes, but if you are
 using an emulator, there are much better launchers and front-ends you
 can use, such as `Metropolis Launcher
@@ -270,3 +273,12 @@ features as modern emulator front-ends.
 *Where can I find collections of DOS games to run on my vintage system?*
 Any internet search can help you.  As of this writing, "DOS game
 collection" produced 3.2 million hits in google.
+
+Extending the code
+------------------
+
+*Why was this written in Pascal and assembler, instead of something more popular like C?*
+Turbo Pascal 7 was deliberately chosen because the Turbo Pascal IDE is an extremely powerful development environment for those who want to perform complex programming directly on early 1980s-era systems.  For example, an 8088-based IBM PC with 640KB can perform symbolic debugging with conditional breakpoints, watch/inspect/change variables at runtime, and even watch CPU registers change line by line, all inside the same Turbo Pascal 7 IDE.  The dialect of Pascal used by TP7 supports some modern-for-the-1990s OOP features such as classes and inheritance.  Finally, it is very easy to speed up sections by either inlineing assembler, or linking to external assembler objects (which can also be traced and debugged within the IDE).
+
+*Turbo Pascal 7 isn't free; will you switch to FreePascal at some point?*
+The formal commit of 8086 code generation in FreePascal in 2017 now makes this possible, so it is possible the project will move to FreePascal once all proposed features have been added.
