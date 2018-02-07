@@ -260,6 +260,9 @@ is the ability to work on any IBM PC or compatible.
 Frequently-Asked Questions
 ==========================
 
+
+
+
 Usage
 -----
 
@@ -282,3 +285,10 @@ Turbo Pascal 7 was deliberately chosen because the Turbo Pascal IDE is an extrem
 
 *Turbo Pascal 7 isn't free; will you switch to FreePascal at some point?*
 The formal commit of 8086 code generation in FreePascal in 2017 now makes this possible, so it is conceivable the project will move to FreePascal once all proposed features have been added.
+
+
+Philosophy
+----------
+
+*Emulators are much easier to use than maintaining original hardware.  Why not just use emulators?*
+Both hardware and emulators are useful for running programs for which the hardware environments are no longer sold or maintained.  Emulators are unparalleled for their accessibility.  But, as good as emulators are, the fact remains that the only way to truly research a historical work is to experience it on the hardware that work targeted.
