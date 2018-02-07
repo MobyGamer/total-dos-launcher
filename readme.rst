@@ -3,9 +3,11 @@ Total DOS Launcher
 ##################
 
 The Total DOS Launcher is a system for easily loading and running thousands of
-DOS programs on vintage hardware.  If you're familiar with vintage gaming
+DOS programs on vintage hardware.  
+
+If you're familiar with vintage gaming
 console "flash multicarts" that allow you to load hundreds of games onto a
-single console, that's what this is:  Think of the TDL as "console multicart"
+single console, that's what this is.  Think of this project as "console multicart"
 software for DOS.
 
 .. contents::
@@ -15,7 +17,7 @@ software for DOS.
 Introduction
 ============
 
-In a nutshell, the TDL takes all of your zipped-up long-filename archives:
+In a nutshell, the TDL parses all of your long-filename vintage archives on your modern system:
 
 | A Mind Forever Voyaging r77 (1985)(Infocom, Inc.) [Adventure, Interactive Fiction].zip
 | Adventure (1987)(Willie Crowther, Kevin B. Black) [Adventure, Interactive Fiction].zip
@@ -32,8 +34,8 @@ In a nutshell, the TDL takes all of your zipped-up long-filename archives:
 | Chessmaster 2000, The (1986)(Software Toolworks, Inc., The) [Strategy, Chess].zip
 .
 
-...and copies them to files that can be copied over to any DOS system,
-even those without long-filename support::
+...and copies them to a temporary directory using DOS-compatible filenames that can be copied over to any DOS system,
+even 16-bit DOS versions without long-filename support::
 
  AMINDFOR.ZIP
  ADVENTUR.ZIP
@@ -57,13 +59,11 @@ them to be unzipped beforehand:
    :align: center
 
 It can do this with a few hundred programs, or thousands, or *tens of
-thousands*.  Your only limitation is how much storage space you have on
+thousands* -- the only limitation is how much storage space you have on
 your target DOS system.
 
 The TDL is currently in development and not quite ready for prime time;
-this paragraph will be removed when it is.  If you are testing TDL for
-the purpose of providing feedback, please consult "readme_a.txt" for
-instructions.  Also, feel free to `contribute an issue via the github
+this paragraph will be removed when it is.  If you run into trouble testing the TDL, feel free to `contribute an issue via the github
 project. <https://github.com/MobyGamer/total-dos-launcher/issues>`_
 
 
@@ -183,11 +183,13 @@ generally not recommended unless you have no other choice.
 Step three: Launch the menu program
 -----------------------------------
 
-Type ``TDL`` from the directory where it is installed.
+Navigate to the directory you copied over and type ``TDL`` to launch the menu.  Once the menu appears, navigate to the software you want to launch, and hit enter.  The software will then run, and when it exits, you'll be returned to the menu to make another selection.
+
+If the software you copy over is in compressed archives (ie. .ZIP files), the menu is smart enough to decompress an archive into a cache directory before trying to launch it.  (It is also smart enough to not decompress an archive if it has already been decompressed into the cache.)
 
 
 Configuring TDL
-==============
+===============
 
 *TDL, out of the box, does not need to be configured.*  If you want to
 configure it to your liking, such as specifying multiple source
@@ -216,6 +218,7 @@ contain a description of what each option does.
 ``-f``      Always use fast display routines on all CGA systems.  This
             may cause "snow" or display corruption on true CGA adapters.
 ==========  =====
+
 
 
 Building TDL
