@@ -91,10 +91,8 @@ Indexer:
 
 Menu program:
   The menu program runs on any IBM PC or 100% compatible running DOS 2.10
-  or higher, with 384 KB RAM or higher.
-
-The menu program takes advantage of EMS or XMS to speed operation, if
-either are available.
+  or higher, with 384 KB RAM or higher.  (If EMS or XMS are available, they
+  are automatically used to speed operation.)
 
 Step one: The Indexer
 ---------------------
@@ -209,6 +207,8 @@ The TDL has some additional features that help with navigation and execution:
 
 Press ``F1`` while in TDL to display a complete list of keys and functions.
 
+The TDL takes up less than 300 bytes of DOS RAM while a launched program is executing.  It achieves this by swapping itself to EMS, XMS, extended memory, or disk before a program needs to run, and restoring itself after the program is finished executing.  Due to this swapping mechanism, the TDL does not "steal" any RAM away from programs that need to run.
+
 
 Configuring TDL
 ===============
@@ -318,6 +318,9 @@ Any internet search can help you.  As of this writing, "DOS game collection"
 produced 3.2 million hits in google.  If you'd like to support commercial
 entities that legally sell vintage games, some choice exists, with
 `Good Old Games <http://www.gog.com/`_ being the most popular.
+
+*TDL eats 300 bytes of RAM when executing programs.  Will that affect my ability to run programs in lower DOS RAM?*
+No.  If it really concerns you, reduce ``BUFFERS`` in your ``CONFIG.SYS`` by 1, and you'll gain 512 bytes back in your lower DOS RAM.
 
 Extending the code
 ------------------
