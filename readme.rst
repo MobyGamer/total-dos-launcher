@@ -206,7 +206,7 @@ The TDL has some additional features that help with navigation and execution:
 
 Press ``F1`` while in TDL to display a complete list of keys and functions.
 
-The TDL takes up less than 300 bytes of DOS RAM while a launched program is executing.  It achieves this by swapping itself to EMS, XMS, extended memory, or disk before a program needs to run, and restoring itself after the program has finished executing.  By use of this swapping mechanism, the TDL does not "steal" any low DOS RAM away from programs that need to run.
+The TDL swaps itself out of low DOS RAM before a program needs to run, and restores itself after the program has finished executing.  By use of this swapping mechanism, the TDL does not "steal" any low DOS RAM away from programs that need to run.
 
 The TDL has been successfully tested with 32-bit protected-mode programs that require a DOS extender (such as ``DOS4GW``).
 
@@ -319,9 +319,6 @@ Any internet search can help you.  As of this writing, "DOS game collection"
 produced 3.2 million hits in google.  If you'd like to support commercial
 entities that legally sell vintage games, some choice exists, with
 `Good Old Games <http://www.gog.com/`_ being the most popular.
-
-*TDL eats 300 bytes of RAM when executing programs.  Will that affect my ability to run programs in lower DOS RAM?*
-No.  If it really concerns you, reduce ``BUFFERS`` in your ``CONFIG.SYS`` by 1, and you'll gain 512 bytes back in your lower DOS RAM.
 
 Extending the code
 ------------------
