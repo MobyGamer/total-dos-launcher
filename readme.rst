@@ -205,9 +205,9 @@ Additional Features
 The TDL has some additional features that help with navigation and execution:
 
 - Pressing any letter will jump to the first title starting with that letter
-- Pressing F2 will mark/unmark a title as a "favorite", and you can use CTRL-F to toggle the title display between all titles and only favorites
+- Pressing ``F2`` will mark/unmark a title as a "favorite", and you can use ``CTRL-F`` to toggle the title display between all titles and only favorites
 
-Press F1 while in TDL to display a complete list of keys and functions.
+Press ``F1`` while in TDL to display a complete list of keys and functions.
 
 
 Configuring TDL
@@ -222,25 +222,18 @@ contain a description of what they do.
 
 ``TDL.EXE`` also has some command-line options to control how it operates:
 
-==========  =====
-``-?, -h``  Print a summary the most current set of command-line
-            options.
-
-``-c``      Set 43-line (EGA) or 50-line (VGA) mode.  (If you need more
-            lines than that, see TDL.INI for VESA options.)
-
-``-r``      Instructs TDL that it is on read-only media (ie. CDROM or
-            DVDROM) and that it should not try to write anything to its local
-            filesystem.  This disables "favorites" as well as writing the debug
-            log to disk.
-
-``-d``      Print excessive debugging messages during initialization.
-            Used for troubleshooting only.
-
-``-f``      Always use fast display routines on all CGA systems.  This
-            may cause "snow" or display corruption on true CGA adapters.
-==========  =====
-
+/h      Print a summary the most current set of command-line
+        options.
+/c      Set 43-line (EGA) or 50-line (VGA) mode.  (If you need more
+        lines than that, see TDL.INI for VESA options.)
+/r      Instructs TDL that it is on read-only media (ie. CDROM or
+        DVDROM) and that it should not try to write anything to its local
+        filesystem.  This disables "favorites" as well as writing the debug
+        log to disk.
+/d      Print excessive debugging messages during initialization.
+        Used for troubleshooting only.
+/f      Always use fast display routines on all CGA systems.  This
+        may cause "snow" or display corruption on true CGA adapters.
 
 Handling Additional File Types
 -----------------------------
