@@ -16,8 +16,7 @@ Think of this project as "console multicart" software for DOS.
 Introduction
 ============
 
-In a nutshell, the TDL parses all of your long-filename vintage archives on
-your modern system:
+In a nutshell, the TDL takes vintage archives on your modern system:
 
 | A Mind Forever Voyaging r77 (1985)(Infocom, Inc.) [Adventure, Interactive Fiction].zip
 | Adventure (1987)(Willie Crowther, Kevin B. Black) [Adventure, Interactive Fiction].zip
