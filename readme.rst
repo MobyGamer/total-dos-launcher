@@ -78,6 +78,10 @@ system.  You use the indexer to prepare your files for copying over to
 the vintage DOS system, and you use the menu program on the DOS system
 to navigate and launch the programs you copied over.
 
+Where to download
+^^^^^^^^^^^^^^^^^
+For those not familiar with how github works, you can grab the most recent release from this repository's releases tab: https://github.com/MobyGamer/total-dos-launcher/releases
+
 
 Prerequisites
 -------------
