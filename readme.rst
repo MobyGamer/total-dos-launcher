@@ -208,6 +208,8 @@ Press ``F1`` while in TDL to display a complete list of keys and functions.
 
 The TDL takes up less than 300 bytes of DOS RAM while a launched program is executing.  It achieves this by swapping itself to EMS, XMS, extended memory, or disk before a program needs to run, and restoring itself after the program has finished executing.  By use of this swapping mechanism, the TDL does not "steal" any low DOS RAM away from programs that need to run.
 
+The TDL has been successfully tested with 32-bit protected-mode programs that require a DOS extender (such as ``DOS4GW``).
+
 
 Configuring TDL
 ===============
