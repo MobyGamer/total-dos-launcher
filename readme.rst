@@ -5,8 +5,8 @@ Total DOS Launcher
 The Total DOS Launcher is a system for easily loading and running thousands of
 DOS programs on vintage hardware.  
 
-If you're familiar with vintage gaming console "flash multicarts" that allow
-you to load hundreds of games onto a single console, that's what this is.
+If you're familiar with vintage gaming console "flash multicarts" that load 
+hundreds of games onto a single console, that's what this is.
 Think of this project as "console multicart" software for DOS.
 
 .. contents::
