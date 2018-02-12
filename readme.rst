@@ -205,9 +205,9 @@ Additional Features
 The TDL has some additional features that help with navigation and execution:
 - Pressing any letter will jump to the first title starting with that letter
 - Pressing F2 will mark/unmark a title as a "favorite", and you can use CTRL-F
-  to toggle the title display between all titles and only favorites
+to toggle the title display between all titles and only favorites
 
-Press F1 to display a complete list of keys and functions.
+Press F1 while in TDL to display a complete list of keys and functions.
 
 
 Configuring TDL
