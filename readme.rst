@@ -5,10 +5,9 @@ Total DOS Launcher
 The Total DOS Launcher is a system for easily loading and running thousands of
 DOS programs on vintage hardware.  
 
-If you're familiar with vintage gaming
-console "flash multicarts" that allow you to load hundreds of games onto a
-single console, that's what this is.  Think of this project as "console multicart"
-software for DOS.
+If you're familiar with vintage gaming console "flash multicarts" that allow
+you to load hundreds of games onto a single console, that's what this is.
+Think of this project as "console multicart" software for DOS.
 
 .. contents::
 .. section-numbering::
@@ -17,7 +16,8 @@ software for DOS.
 Introduction
 ============
 
-In a nutshell, the TDL parses all of your long-filename vintage archives on your modern system:
+In a nutshell, the TDL parses all of your long-filename vintage archives on
+your modern system:
 
 | A Mind Forever Voyaging r77 (1985)(Infocom, Inc.) [Adventure, Interactive Fiction].zip
 | Adventure (1987)(Willie Crowther, Kevin B. Black) [Adventure, Interactive Fiction].zip
@@ -34,8 +34,9 @@ In a nutshell, the TDL parses all of your long-filename vintage archives on your
 | Chessmaster 2000, The (1986)(Software Toolworks, Inc., The) [Strategy, Chess].zip
 .
 
-...and copies them to a temporary directory using DOS-compatible filenames that can be copied over to any DOS system,
-even 16-bit DOS versions without long-filename support::
+...and copies them to a temporary directory using DOS-compatible filenames that
+can be copied over to any DOS system, even 16-bit DOS versions without
+long-filename support::
 
  AMINDFOR.ZIP
  ADVENTUR.ZIP
@@ -144,7 +145,12 @@ looks like this::
 ...they will all get picked up by the indexer as long as you specify
 ``DOS Games`` as the source directory.
 
+Acceptable File Types
+^^^^^^^^^^^^^^^^^^^^^
 
+It is not required for everything to be encapsulated in .zip archives.  You
+can point the indexer to any file.  The launcher is smart enough to launch
+.exe and .com files directly without trying to "decompress" them.
 
 Step two: Copy to the vintage system
 ------------------------------------
@@ -183,9 +189,25 @@ generally not recommended unless you have no other choice.
 Step three: Launch the menu program
 -----------------------------------
 
-Navigate to the directory you copied over and type ``TDL`` to launch the menu.  Once the menu appears, navigate to the software you want to launch, and hit enter.  The software will then run, and when it exits, you'll be returned to the menu to make another selection.
+Navigate to the directory you copied over and type ``TDL`` to launch the menu.
+Once the menu appears, navigate to the software you want to launch, and hit
+enter.  The software will then run, and when it exits, you'll be returned to
+the menu to make another selection.
 
-If the software you copy over is in compressed archives (ie. .ZIP files), the menu is smart enough to decompress an archive into a cache directory before trying to launch it.  (It is also smart enough to not decompress an archive if it has already been decompressed into the cache.)
+If the software you copy over is in compressed archives (ie. .ZIP files), the
+menu is smart enough to decompress an archive into a cache directory before
+trying to launch it.  (It is also smart enough to not decompress an archive if
+it has already been decompressed into the cache.)
+
+Additional Features
+^^^^^^^^^^^^^^^^^^^
+
+The TDL has some additional features that help with navigation and execution:
+- Pressing any letter will jump to the first title starting with that letter
+- Pressing F2 will mark/unmark a title as a "favorite", and you can use CTRL-F
+  to toggle the title display between all titles and only favorites
+
+Press F1 to display a complete list of keys and functions.
 
 
 Configuring TDL
@@ -196,7 +218,7 @@ configure it to your liking, such as specifying multiple source
 directories (to get past the DOS 2G partition limit), forcing a specific
 location for the cache directory, using a high-res VESA text mode, etc.
 then edit the ``TDL.INI`` and ``HANDLERS.INI`` files.  Both .INI files
-contain a description of what each option does.
+contain a description of what they do.
 
 ``TDL.EXE`` also has some command-line options to control how it operates:
 
@@ -220,6 +242,28 @@ contain a description of what each option does.
 ==========  =====
 
 
+Handling Additional File Types
+-----------------------------
+
+TDL uses a "handlers" system to determine what to do with a file when the user
+requests lauching it.  When a file is selected, TDL looks in HANDLERS.INI to
+determine what should be done with that particular file.
+
+You probably won't need to touch HANDLERS.INI.  Out of the box, it is
+configured to do the following:
+
+- Launch .EXE or .COM files
+- Decompress .ZIP and .ARC files, and launch programs inside them
+- Run BASIC .BAS files with GWBASIC or BASICA
+- Write raw image formats (.360, .720, etc.) to a blank floppy in drive A:
+- Display .TXT and .NFO files
+
+If you'd like to configure TDL to handle something less common, such as
+decompressing uncommon file types (.ARJ, etc.), viewing pictures, etc., then
+you'll need to add their file extensions and associated utility programs to
+HANDLERS.INI.  Consult HANDLERS.INI itself for documentation.
+
+
 
 Building TDL
 ============
@@ -232,7 +276,7 @@ however, be prepared to get (re)acquainted with DOS compilers and tools!
 Languages
 ---------
 TDL is written in Turbo Pascal 7.0, with a small amount of assembler
-thrown in for speed or utility.  Knowledge of Pascal is require to
+thrown in for speed or utility.  Knowledge of Pascal is required to
 extend TDL.
 
 Libraries
@@ -248,7 +292,7 @@ Compilers and Tools
 Borland Pascal 7.0, which includes both Turbo Pascal as well as Turbo
 Assembler/linker/debugger, is available via your favorite search engine.
 A full installation of it is rumored to be included in
-ftp://ftp.oldskool.org/pub/misc/xtfiles.rar.
+ftp://ftp.oldskool.org/pub/misc/xtfiles.rar but this is unconfirmed.
 
 Compiler/Assembler restrictions
 -------------------------------
@@ -260,10 +304,9 @@ generation, and 8087 emulation respectively.  One of TDL's design goals
 is the ability to work on any IBM PC or compatible.
 
 
+
 Frequently-Asked Questions
 ==========================
-
-
 
 
 Usage
@@ -271,27 +314,47 @@ Usage
 
 *Can I use this with emulators such as DOSBox?*  Yes, but if you are
 using an emulator, there are much better launchers and front-ends you
-can use, such as `Metropolis Launcher
-<https://metropolis-launcher.net/>`_ .  TDL was developed to be run
-directly on vintage DOS computers, and as such, doesn't have as many
+can use, such as 
+`Metropolis Launcher <https://metropolis-launcher.net/>`_ .  
+TDL was developed to solve issues specific to running large archives of
+software directly on vintage computers, and as such, doesn't have as many
 features as modern emulator front-ends.
 
 *Where can I find collections of DOS games to run on my vintage system?*
-Any internet search can help you.  As of this writing, "DOS game
-collection" produced 3.2 million hits in google.
+Any internet search can help you.  As of this writing, "DOS game collection"
+produced 3.2 million hits in google.  If you'd like to support commercial
+entities that legally sell vintage games, some choice exists, with
+`Good Old Games <http://www.gog.com/`_ being the most popular.
 
 Extending the code
 ------------------
 
-*Why was this written in Pascal and assembler, instead of something more popular like C?*
-Turbo Pascal 7 was deliberately chosen because the Turbo Pascal IDE is an extremely powerful development environment for those who want to perform complex programming directly on early 1980s-era systems.  For example, an 8088-based IBM PC with 640KB can perform symbolic debugging with conditional breakpoints, watch/inspect/change variables at runtime, and even watch CPU registers change line by line, all inside the same Turbo Pascal 7 IDE.  The dialect of Pascal used by TP7 supports some modern-for-the-1990s OOP features such as classes and inheritance.  Also, TP7 makes it easy to speed up sections by either writing in-line assembler in the pascal source, or linking to external assembler objects (which can also be traced and debugged within the IDE).
+*Why was this written in Pascal and assembler, instead of something more
+popular like C?*
+Turbo Pascal 7 was chosen because of the Turbo Pascal IDE, which is a powerful
+development environment for those who want to perform complex programming
+directly on early 1980s-era systems.  The TP7 IDE allows an 8088-based IBM PC
+with 640KB to perform symbolic debugging with conditional breakpoints,
+watch/inspect/change variables at runtime, and watch CPU registers change line
+by line, all without leaving the IDE.  Also, TP7 makes it easy to speed up
+sections by either writing in-line assembler directly in the pascal source, or
+linking to external assembler objects (which can also be traced and debugged
+within the IDE, with the same features previously listed).
 
 *Turbo Pascal 7 isn't free; will you switch to FreePascal at some point?*
-The formal commit of 8086 code generation in FreePascal in 2017 now makes this possible, so it is conceivable the project will move to FreePascal once all proposed features have been added.
+The formal commit of 8086 code generation in FreePascal in 2017 now makes this
+possible, so it is conceivable the project will move to FreePascal once all
+proposed features have been added and the codebase is frozen.
 
 
 Philosophy
 ----------
 
 *Emulators are much easier to use than maintaining original hardware.  Why not just use emulators?*
-Both hardware and emulators are useful for running programs for which the hardware environments are no longer sold or maintained.  Emulators are unparalleled for their accessibility.  But, as good as emulators are, the fact remains that the only way to truly research a historical work is to experience it on the hardware that work targeted.
+Both hardware and emulators are useful for running programs for which the
+hardware environments are no longer sold or maintained.  Emulators are
+unparalleled for their accessibility.  But, as good as emulators are, the fact
+remains that the only way to truly research a historical work is to experience
+it on the hardware that work targeted.  And besides, you can't write an
+emulator, or check it for correctness, unless you have access to the original
+hardware...
