@@ -64,7 +64,8 @@ your target DOS system.
 
 The DOS-based launcher currently has the following features:
 
-- Automatically unzips archive files (or other helper programs) if necessary
+- Automatically unzips archive files if necessary
+- Can create bootable diskettes from bootable disk image files
 - Uses less than 300 bytes of RAM to launch programs (smaller than a single CONFIG.SYS BUFFER)
 - Runs on any system (8088 or higher, MDA or better)
 - Supports any text mode, from 40x25 up to 132x60
