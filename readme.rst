@@ -160,9 +160,9 @@ looks like this::
 Acceptable File Types
 ^^^^^^^^^^^^^^^^^^^^^
 
-It is not required for everything to be encapsulated in .zip archives.  You
-can point the indexer to any file.  The launcher is smart enough to launch
-.exe and .com files directly without trying to "decompress" them.
+Each program you want to process with the TDL must be self-contained in a single file.  This typically means that all files that make up a single program (.EXE files, data files, etc.) be contained in a .zip file.  However, you can process individual .COM and .EXE files as long as they don't require additional files.  For example, the freeware game Flightmare (1984) only came as a single ``FLIGHT.COM`` file; it doesn't require any other files to run, so you can feed ``FLIGHT.COM`` directly to TDL without first putting it in a .zip file.
+
+You can also feed non-program files to TDL, such as .TXT text files, GIFs, whatever.  They'll be copied over as well, and if the appropriate handler exists on the target system, it will be used to "launch" those files as well.  (See "launchers" elsewhere in this documentation.)
 
 Step two: Copy to the vintage system
 ------------------------------------
