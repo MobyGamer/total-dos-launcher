@@ -16,7 +16,7 @@ Think of this project as "console multicart" software for DOS.
 Introduction
 ============
 
-In a nutshell, the Total DOS Launcher (TDL) takes vintage archives on your modern system:
+The Total DOS Launcher (TDL) was created for people who want to load their vintage systems with tons of programs and have them easily searchable and launchable without having to configure any menus by hand.  In a nutshell, the TDL takes vintage archives on your modern system:
 
 | A Mind Forever Voyaging r77 (1985)(Infocom, Inc.) [Adventure, Interactive Fiction].zip
 | Adventure (1987)(Willie Crowther, Kevin B. Black) [Adventure, Interactive Fiction].zip
@@ -67,6 +67,7 @@ The DOS-based launcher currently has the following features:
 - Automatically unzips archive files if necessary
 - Can create bootable diskettes from bootable disk image files
 - Uses less than 300 bytes of RAM to launch programs (smaller than a single CONFIG.SYS BUFFER)
+- Can cache itself to EMS, XMS, or raw extended memory to make returning to the menu instantaneous after a launched program exits
 - Runs on any system (8088 or higher, MDA or better)
 - Supports any text mode, from 40x25 up to 132x60
 
