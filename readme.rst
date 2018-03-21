@@ -62,9 +62,18 @@ It can do this with a few hundred programs, or thousands, or *tens of
 thousands* -- the only limitation is how much storage space you have on
 your target DOS system.
 
-The TDL is currently in development and not quite ready for prime time;
-this paragraph will be removed when it is.  If you run into trouble testing the TDL, feel free to `contribute an issue via the github
+The DOS-based launcher currently has the following features:
+
+- Automatically unzips archive files (or other helper programs) if necessary
+- Uses less than 300 bytes of RAM to launch programs (smaller than a single CONFIG.SYS BUFFER)
+- Runs on any system (8088 or higher, MDA or better)
+- Supports any text mode, from 40x25 up to 132x60
+
+The TDL is currently in alpha development and testing;
+this paragraph will be removed when it is ready for prime time.  If you run into trouble testing the TDL, feel free to `contribute an issue via the github
 project. <https://github.com/MobyGamer/total-dos-launcher/issues>`_
+Features planned for the near future include search-as-you-type filtering of the game list, automatic management of the game cache, and customizable color schemes.
+
 
 
 Using TDL
