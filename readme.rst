@@ -125,7 +125,7 @@ program elements that will get copied over with your files.
 
 Example Usage::
 
- C:\DOS\D\PROJECTS\TDL>TDLindexer.py ..\dos_program_sources\small.generic.4example output
+ C:\PROJECTS\TDL>TDLindexer.py ..\dos_program_sources\small.generic.4example output
  Gathering list of files...
  Found 96 files to copy.
  Converting to DOS-friendly 8.3 filenames...
