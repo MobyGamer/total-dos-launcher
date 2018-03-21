@@ -59,17 +59,18 @@ them to be unzipped beforehand:
    :align: center
 
 It can do this with a few hundred programs, or thousands, or *tens of
-thousands* -- the only limitation is how much storage space you have on
+thousands* -- the only limitation is how much addressable storage space you have on
 your target DOS system.
 
 The DOS-based launcher currently has the following features:
 
-- Automatically unzips archive files if necessary
-- Can create bootable diskettes from bootable disk image files
+- Automatically decompresses archive files if necessary
+- Creates bootable diskettes from bootable disk image files
 - Uses less than 300 bytes of RAM to launch programs (smaller than a single CONFIG.SYS BUFFER)
-- Can cache itself to EMS, XMS, or raw extended memory to make returning to the menu instantaneous after a launched program exits
+- Caches itself to EMS, XMS, or raw extended memory to make returning to the menu instantaneous after a launched program exits
 - Runs on any system (8088 or higher, MDA or better)
 - Supports any text mode, from 40x25 up to 132x60
+- Can mark/unmark titles as "favorites" and toggle the display between all programs and only favorites
 
 The TDL is currently in alpha development and testing;
 this paragraph will be removed when it is ready for prime time.  If you run into trouble testing the TDL, feel free to `contribute an issue via the github
@@ -209,7 +210,7 @@ the menu to make another selection.
 If the software you copy over is in compressed archives (ie. .ZIP files), the
 menu is smart enough to decompress an archive into a cache directory before
 trying to launch it.  (It is also smart enough to *not* decompress an archive if
-it has already been decompressed into the cache.)
+it already exists in the cache.)
 
 Additional Features
 ^^^^^^^^^^^^^^^^^^^
@@ -242,7 +243,7 @@ contain a description of what they do.
         options.
 /c      Set 43-line (EGA) or 50-line (VGA) mode.  (If you need more
         lines than that, see TDL.INI for VESA options.)
-/r      Instructs TDL that it is on read-only media (ie. CDROM or
+/r      Instructs TDL that it resides on read-only media (ie. CDROM or
         DVDROM) and that it should not try to write anything to its local
         filesystem.  This disables "favorites" as well as writing the debug
         log to disk.
@@ -286,7 +287,7 @@ Languages
 ---------
 TDL is written in Turbo Pascal 7.0, with a small amount of assembler
 thrown in for speed or utility.  Knowledge of Pascal is required to
-extend TDL.
+extend TDL.  Knowledge of assembler is helpful, but not required.
 
 Libraries
 ---------
@@ -333,16 +334,16 @@ features as modern emulator front-ends.
 Any internet search can help you.  As of this writing, "DOS game collection"
 produced 3.2 million hits in google.  If you'd like to support commercial
 entities that legally sell vintage games, some choice exists, with
-`Good Old Games <http://www.gog.com/`_ being the most popular.
+`Good Old Games <http://www.gog.com/`_ being the most popular as of 2018.
 
 Extending the code
 ------------------
 
 *Why was this written in Pascal and assembler, instead of something more
 popular like C?*
-Turbo Pascal 7 was chosen because of the Turbo Pascal IDE, which is a powerful
-development environment for those who want to perform complex programming
-directly on early 1980s-era systems.  The TP7 IDE allows an 8088-based IBM PC
+The principle developer of the TDL prefers the Turbo Pascal 7 IDE when writing code on, and for, 8088-based systems.
+The TP7 IDE is a powerful
+development environment that allows an 8088-based IBM PC
 with 640KB to perform symbolic debugging with conditional breakpoints,
 watch/inspect/change variables at runtime, and watch CPU registers change line
 by line, all without leaving the IDE.  Also, TP7 makes it easy to speed up
@@ -362,8 +363,6 @@ Philosophy
 *Emulators are much easier to use than maintaining original hardware.  Why not just use emulators?*
 Both hardware and emulators are useful for running programs for which the
 hardware environments are no longer sold or maintained.  Emulators are
-unparalleled for their accessibility.  But, as good as emulators are, the fact
-remains that the only way to truly research a historical work is to experience
-it on the hardware that work targeted.  And besides, you can't write an
-emulator, or check it for correctness, unless you have access to the original
-hardware...
+unparalleled for their accessibility.  But, as good as emulators are, 
+the only way to truly research a historical work is to experience
+it on the hardware that work targeted.
