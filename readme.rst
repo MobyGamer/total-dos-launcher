@@ -108,7 +108,7 @@ Menu program:
   or higher, with 384 KB RAM or higher.  (If EMS or XMS are available, they
   are automatically used to speed operation.)
 
-Step one: The Indexer
+Step One: The Indexer
 ---------------------
 
 To prepare your files for copying over, run TDLIndexer.py with these arguments:
@@ -162,9 +162,9 @@ Acceptable File Types
 
 Each program you want to process with the TDL must be self-contained in a single file.  This typically means that all files that make up a single program (.EXE files, data files, etc.) be contained in a .zip file.  However, you can process individual .COM and .EXE files as long as they don't require additional files.  For example, the freeware game Flightmare (1984) only came as a single ``FLIGHT.COM`` file; it doesn't require any other files to run, so you can feed ``FLIGHT.COM`` directly to TDL without first putting it in a .zip file.
 
-You can also feed non-program files to TDL, such as .TXT text files, GIFs, whatever.  They'll be copied over as well, and if the appropriate handler exists on the target system, it will be used to "launch" those files as well.  (See "launchers" elsewhere in this documentation.)
+You can also feed non-program files to TDL, such as .TXT text files, GIFs, whatever.  They'll be copied over as well, and if the appropriate handler exists on the target system, it will be used to "launch" those files as well.  (See "Handling additional file types" elsewhere in this documentation.)
 
-Step two: Copy to the vintage system
+Step Two: Copy to the vintage system
 ------------------------------------
 
 Using any method you feel comfortable with, copy the entire contents of
@@ -201,14 +201,14 @@ generally not recommended unless you have no other choice.
 Step three: Launch the menu program
 -----------------------------------
 
-Navigate to the directory you copied over and type ``TDL`` to launch the menu.
-Once the menu appears, navigate to the software you want to launch, and hit
+On your vintage system, navigate to the directory you copied over and type ``TDL`` to launch the menu.
+Once the menu appears, use the arrow keys to navigate to the software you want to launch, and hit
 enter.  The software will then run, and when it exits, you'll be returned to
 the menu to make another selection.
 
 If the software you copy over is in compressed archives (ie. .ZIP files), the
 menu is smart enough to decompress an archive into a cache directory before
-trying to launch it.  (It is also smart enough to not decompress an archive if
+trying to launch it.  (It is also smart enough to *not* decompress an archive if
 it has already been decompressed into the cache.)
 
 Additional Features
