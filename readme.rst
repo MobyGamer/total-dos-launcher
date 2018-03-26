@@ -285,6 +285,19 @@ Quick cheat-sheet for those who have never contributed to a github open-source p
 4. Push to the branch: git push origin my-new-feature
 5. Submit a pull request
 
+Design Requirements For New Features
+------------------------------------
+
+The following constraints are in place:
+
+- Any python code must be 3.x, as the indexer already uses some 3.6+ features.
+- The DOS launcher must be able to run on an 8088 system with MDA or better video
+
+If your new feature is optional and won't break the above constraints (for example, you want to add mouse support to the DOS launcher), that's fine.  Any pull request that **breaks** the above constraints will not be accepted.  
+
+If you want to add a feature that breaks compatibility with older systems, check with me before working on it, as there is likely a way to implement what you want while still staying compatible with the 8088.
+
+
 Building TDL
 ------------
 
