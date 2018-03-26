@@ -273,10 +273,20 @@ decompressing uncommon file types (.ARJ, etc.), viewing pictures, etc., then
 you'll need to add their file extensions and associated utility programs to
 HANDLERS.INI.  Consult HANDLERS.INI itself for documentation.
 
+Contributing to the TDL
+=======================
 
+The author welcomes contributions and enhancements, especially in the form of the python indexer.
+Quick cheat-sheet for those who have never contributed to a github open-source project before:
+
+1. Fork it!
+2. Create your feature branch: git checkout -b my-new-feature
+3. Commit your changes: git commit -am 'Add some feature'
+4. Push to the branch: git push origin my-new-feature
+5. Submit a pull request
 
 Building TDL
-============
+------------
 
 *Building the TDL is not required to use it!*  This section is only for
 those who want to hack on the code and contribute back to the project --
@@ -284,13 +294,13 @@ however, be prepared to get (re)acquainted with DOS compilers and tools!
 
 
 Languages
----------
+^^^^^^^^^
 TDL is written in Turbo Pascal 7.0, with a small amount of assembler
 thrown in for speed or utility.  Knowledge of Pascal is required to
 extend TDL.  Knowledge of assembler is helpful, but not required.
 
 Libraries
----------
+^^^^^^^^^
 TDL is not 100% self-contained; it uses some support libraries and units
 to provide functionality like CUI/TUI primitives, userspace swapping,
 and stream extensions.  Ensure you have both
@@ -298,14 +308,14 @@ https://github.com/MobyGamer/TPLibs and
 https://github.com/MobyGamer/UNITS available in your source path.
 
 Compilers and Tools
--------------------
+^^^^^^^^^^^^^^^^^^^
 Borland Pascal 7.0, which includes both Turbo Pascal as well as Turbo
 Assembler/linker/debugger, is available via your favorite search engine.
 A full installation of it is rumored to be included in
 ftp://ftp.oldskool.org/pub/misc/xtfiles.rar but this is unconfirmed.
 
 Compiler/Assembler restrictions
--------------------------------
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 You must always ensure that the code you write will execute on any x86
 system, including the 8088.  Don't use 80186+ instructions such as
 ``PUSHA``, ``POPA``, ``ENTER``, ``LEAVE``, etc.  In Turbo Pascal, always
