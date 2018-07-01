@@ -378,7 +378,11 @@ begin
     tpos.x2:=screen.width;
     screen.clear(LookTOT^.vMenuBorder,#0);
     {screen.PartClear(1,1,screen.width,3,LookTOT^.vMenuHiHot.pickern,' ');}
-    screen.WriteCenter(1,LookTOT^.vMenuTitle,TDLTitle);
+    {If provided a subheader in TDL.INI, use it.  Truncate if necessary.}
+    temps:=TDLTitle + config^.subheader;
+    if length(temps) > screen.width-1
+      then temps[0]:=char(screen.width-1);
+    screen.WriteCenter(1,LookTOT^.vMenuTitle,temps);
     jcloc.x:=17;
     jcloc.y:=tpos.y1-2;
     screen.WriteAt(1,tpos.y1-2,LookTOT^.vMenuLoNorm,jumplabel); screen.gotoxy(jcloc.x,jcloc.y);

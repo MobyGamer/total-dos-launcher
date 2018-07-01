@@ -58,6 +58,7 @@ type
     baseDir:DirStr;                     {base directory (where config file is)}
     swapDir:DirStr;                     {directory to hold the swap file}
     progLocs:PathStr;                   {paths to look for source files}
+    subheader:PathStr;                  {optional subheader, limited to 80 ch}
 
     titlesIDXname:baseftype;
     filesIDXname:baseftype;
@@ -192,6 +193,12 @@ begin
       if upstring(key)='FORCELOGGING' then logging:=isPositive(value);
       if upstring(key)='PRELOADING' then preloading:=isPositive(value);
       if upstring(key)='VESA' then customvidmode:=hexStrToLong(upstring(value));
+      if upstring(key)='SUBHEADER' then begin
+        {leading spaces are truncated -- we will put one back unless
+        leading char is a colon, which should not have a leading space}
+        subheader:=value;
+        if subheader[1]<>':' then insert(#32,subheader,1);
+      end;
     end;
     INIResult:=ini^.ReadNextItem;
   end;
