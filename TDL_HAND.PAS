@@ -176,6 +176,10 @@ locations=utils;distro\utils;c:\utils\common
       t.description:=''; t.usermessage:='';
       section:=INIResult^.section;
       first:=false;
+      {Now that we've read a line and committed a section, are we at
+      the end?  Do we need to keep going?  If not, abort}
+      if INIResult^.Section='END'
+        then break;
       continue;
     end;
     with INIResult^ do begin
