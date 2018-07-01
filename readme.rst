@@ -3,9 +3,9 @@ Total DOS Launcher
 ##################
 
 The Total DOS Launcher is a system for easily loading and running thousands of
-DOS programs on vintage hardware.  
+DOS programs on vintage hardware.
 
-If you're familiar with vintage gaming console "flash multicarts" that load 
+If you're familiar with vintage gaming console "flash multicarts" that load
 hundreds of games onto a single console, that's what this is.
 Think of this project as "console multicart" software for DOS.
 
@@ -16,7 +16,10 @@ Think of this project as "console multicart" software for DOS.
 Introduction
 ============
 
-The Total DOS Launcher (TDL) was created for people who want to load their vintage systems with tons of programs and have them easily searchable and launchable without having to configure any menus by hand.  In a nutshell, the TDL takes vintage archives on your modern system:
+The Total DOS Launcher (TDL) was created for people who want to load their
+vintage systems with tons of programs and have them easily searchable and
+launchable without having to configure any menus by hand.  In a nutshell, the
+TDL takes vintage archives on your modern system:
 
 | A Mind Forever Voyaging r77 (1985)(Infocom, Inc.) [Adventure, Interactive Fiction].zip
 | Adventure (1987)(Willie Crowther, Kevin B. Black) [Adventure, Interactive Fiction].zip
@@ -293,7 +296,7 @@ The following constraints are in place:
 - Any python code must be 3.x, as the indexer already uses some 3.6+ features.
 - The DOS launcher must be able to run on an 8088 system with MDA or better video
 
-If your new feature is optional and won't break the above constraints (for example, you want to add mouse support to the DOS launcher), that's fine.  Any pull request that **breaks** the above constraints will not be accepted.  
+If your new feature is optional and won't break the above constraints (for example, you want to add mouse support to the DOS launcher), that's fine.  Any pull request that **breaks** the above constraints will not be accepted.
 
 If you want to add a feature that breaks compatibility with older systems, check with me before working on it, as there is likely a way to implement what you want while still staying compatible with the 8088.
 
@@ -347,8 +350,8 @@ Usage
 
 *Can I use this with emulators such as DOSBox?*  Yes, but if you are
 using an emulator, there are much better launchers and front-ends you
-can use, such as 
-`Metropolis Launcher <https://metropolis-launcher.net/>`_ .  
+can use, such as
+`Metropolis Launcher <https://metropolis-launcher.net/>`_ .
 TDL was developed to solve issues specific to running large archives of
 software directly on vintage computers, and as such, doesn't have as many
 features as modern emulator front-ends.
@@ -386,6 +389,6 @@ Philosophy
 *Emulators are much easier to use than maintaining original hardware.  Why not just use emulators?*
 Both hardware and emulators are useful for running programs for which the
 hardware environments are no longer sold or maintained.  Emulators are
-unparalleled for their accessibility.  But, as good as emulators are, 
+unparalleled for their accessibility.  But, as good as emulators are,
 the only way to truly research a historical work is to experience
 it on the hardware that work targeted.
