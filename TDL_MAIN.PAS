@@ -225,7 +225,7 @@ begin
 
   {attempt TDL handlers init}
   writeln('Registering handlers from handlers.ini...');
-  Handlers:=new(PHandlers,init(sd+'handlers.ini'));
+  Handlers:=new(PHandlers,init(config^.basedir+'handlers.ini'));
   {We can only show files properly for up to 42 filemasks.  If we have
   more handlers than that, switch to power user mode so that we only have
   to use one mask (*.*).}
@@ -301,6 +301,7 @@ begin
       writeln('Swapping enabled: ',swapping);
       writeln('Preloading enabled: ',preloading);
       writeln('Cache Directory: ',fileCache^.path);
+      writeln('Startup Directory: ',startupDir);
     end;
     writeln('Hit a key to continue TDL startup.');
     asm
@@ -984,6 +985,8 @@ Close TDL down gracefully so we can check for programming errors
 }
 var
   w:word;
+  s,s2:string;
+  b:byte;
 begin
   Favorites^.flush;
   dispose(Favorites,done);
@@ -994,6 +997,8 @@ begin
   for w:=maxTitleSets-1 downto 0 do
     if titleSets[w].TitleIDs<>nil
       then freemem(titleSets[w].TitleIDs,titleSets[w].numTitles*2);
+
+  s:=config^.startupDir; {grab startup dir before we trash object}
 
   dispose(files,done);
   dispose(titles,done);
@@ -1006,6 +1011,14 @@ begin
 
   writeln('Exiting '+TDLtitleFull);
   writeln('Have a nice DOS!');
+
+  {$IFDEF FINAL}
+  {Switch back to the directory we started from. Massage path into a form
+  that works with CHDIR. If raw drive, preserve slash so that CHDIR does
+  what we want if the user called TDL from the root dir of any drive.}
+  if length(s)<>3 then dec(byte(s[0]));
+  CHDIR(s);
+  {$ENDIF}
 end;
 
 end.

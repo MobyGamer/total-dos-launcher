@@ -59,6 +59,8 @@ type
     swapDir:DirStr;                     {directory to hold the swap file}
     progLocs:PathStr;                   {paths to look for source files}
     subheader:PathStr;                  {optional subheader, limited to 80 ch}
+    startupDir:DirStr;                  {directory user was in at program start}
+    exePath:DirStr;                     {full path to where exe is running from}
 
     titlesIDXname:baseftype;
     filesIDXname:baseftype;
@@ -103,6 +105,9 @@ var
   s:string;
   tp:PathStr;
 
+  N: NameStr;
+  E: ExtStr;
+
   Function isPositive(s:string):boolean;
   begin
     if (upstring(s)='ENABLED')
@@ -116,11 +121,28 @@ var
 
 begin
   Inherited Init;
+  {Grab startup dir so we can chdir back to it at exit}
+  GetDir(0,startupDir);
+  startupDir:=StdPath(startupDir);
+
+  {grab the exe path}
+  FSplit(paramstr(0), exePath, N, E);
+
   {because TP cannot typecase strings, we have to do this:}
   baseDir:=StdPath(bdir);
   configFile:=baseDir+cfile;
-  if not fileexists(configFile)
-    then fatalerror(1,'Config file '+configFile+' not found');
+  if not fileexists(configFile) then begin
+    {User likely started tdl from the PATH outside its homedir.
+    Head over there and try again.}
+    s:=exePath;
+    dec(byte(s[0])); {chop trailing slash to work with CHDIR}
+    baseDir:=exePath;
+    configFile:=baseDir+cfile;
+    if not fileexists(configFile)
+      then fatalerror(1,'Config file '+configFile+' not found');
+    {if we found it, we should go over there to prevent further issues}
+    CHDIR(s);
+  end;
   {read config file for program defaults}
 
   {set some reasonable default values}
