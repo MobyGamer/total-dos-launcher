@@ -69,7 +69,7 @@ var
   Files:PFileIndex;
   Titles:PTitleIndex;
   titleSets:array[0..maxTitleSets-1] of workingTitleSet;
-  Favorites:PFavorites;
+  titleMetadata:PMetadata;
 
 Procedure PrintHelp;
 begin
@@ -142,7 +142,7 @@ begin
       if s2<>''
         then addline(' TDL is using '+s2+' to accelerate index operations');
 
-      addline(' # of Titles: '+inttostr(numtitles)+' ('+inttostr(Favorites^.Used)+' marked as favorites) ');
+      addline(' # of Titles: '+inttostr(numtitles)+' ('+inttostr(titleMetadata^.Used)+' marked as favorites) ');
       addline(' Debug messsages logged to disk: '+boolToStr(logging,'ENABLED','disabled'));
       addline(' Treating filesystem as read-only: '+boolToStr(readonly,'YES','no'));
       {addline(' Excessive debug messages: '+boolToStr(edebug,'ENABLED','disabled'));}
@@ -203,7 +203,9 @@ begin
 
   RecordDOSScreen;
 
-  {determine TDL base directory and configuration file to use}
+  {determine TDL base directory and configuration file to use:
+  sf = startup configuration file
+  sd = startup directory}
   if non_flag_count>0 then sf:=non_flag_param(1) else sf:='tdl.ini';
   if non_flag_count>1 then sd:=non_flag_param(2) else sd:='';
   sd:=StdPath(FExpand(sd));
@@ -270,10 +272,10 @@ begin
 
   if config^.readonly then begin
     writeln('Read-only mode: disabled');
-    favorites:=new(PFavorites,init('',config^.numTitles));
+    titleMetadata:=new(PMetadata,init('',config^.numTitles));
   end else begin
     writeln('Initializing using '+temps);
-    favorites:=new(PFavorites,init(temps,config^.numTitles));
+    titleMetadata:=new(PMetadata,init(temps,config^.numTitles));
   end;
 
   {Ensure cache size is known before continuing}
@@ -368,6 +370,7 @@ begin
       LookTOT^.SetMenu($1b,$1e,$7f,$31,$3f,$1e,$17,$19);
       LookTOT^.SetWindow($19,$1e,$1e,$1b);
       faviconcol:=$1c; {bright red foreground}
+      unpiconcol:=$19; {bright blue foreground}
     end else begin
       LookTOT^.SetMenu($0F,$09,$78,$78,$70,$01,$07,$07);
     end;
@@ -482,9 +485,9 @@ begin
   {assume everything will go ok}
   Launch:=true;
   msgConsole^.logmsg(info,'Attempting to Launch title #'+inttostr(titleSets[activeSet].titleids^[tid])+':');
-  if favorites^.changed then begin
-    msgConsole^.logmsg(info,'Flushing favorites cache');
-    favorites^.flush;
+  if titleMetadata^.changed then begin
+    msgConsole^.logmsg(info,'Flushing metadata cache');
+    titleMetadata^.flush;
   end;
   {grab title so that we can determine the id needed for file}
   titles^.retrieve(tid,ttbuf);
@@ -536,6 +539,9 @@ begin
   If so, launch it; if not, it is an archive that needs extraction.}
   if Handlers^.Exists(ext)=execution
     then begin
+      {This file is already "unpacked" so mark it as such}
+      titleMetadata^.setFlag(tid,m_unpacked);
+      titleMetadata^.changed:=true;
       prepScreenForExec;
       Handlers^.handle(ext,filepath,dir);
     end else begin
@@ -562,12 +568,15 @@ begin
               'consult tdl.log to see the exact command-line that failed, '+
               'then exit TDL and run it yourself to determine the exact error.'
             );
+          end else begin
+            {After successful unpack, update cache stats}
+            fileCache^.Remaining;
           end;
         end;
 
-        {If we got here, then the unpack did "something" and we should update
-        our cache stats:}
-        fileCache^.Remaining;
+        {If we are here, then this file was unpacked successfully}
+        titleMetadata^.setFlag(tid,m_unpacked);
+        titleMetadata^.changed:=true;
 
         {Switch to unpacked cache dir and obtain list of files we have
          registered execution handlers for.  Helper logic ensues:
@@ -664,10 +673,11 @@ Picker draw logic:
   sliding window only moves if pcursor moves
   if pgup/dn, window slides by one unit, leaving pcursor in same place
   home/end do exactly that, with pcursor at top and bottom of list
-  Don't repaint entire list if you don't have to!  Think of snowy 8088s!
+  Don't repaint entire list if you don't have to!  Think of the snowy CGAs!
+  (I swear to $DEITY I'm going to be the last human alive to remeber CGA snow)
 }
 const
-  iconsPad=2;                           {padding on left edge for icons}
+  iconsPad=1+numMetaFlags;                 {padding on left edge for icons}
   escapeKey:word=kEsc;
   clearBlank:boolean=false;
 
@@ -682,6 +692,7 @@ var
   ch:char;
   p:pointer;
   tid:word;
+  iconPosX,iconPosY:byte;
 
   bsl,bsr,bsm:integer;
   bsch:char;
@@ -720,7 +731,7 @@ begin
     then escapeKey:=kAltMinus;
   with config^.tpos do Screen.Box(X1,Y1,X2,Y2,LookTOT^.vMenuLoNorm,4);
   pcursor:=0; pwinloc:=0;
-  pwwidth:=config^.tpos.x2-config^.tpos.x1-iconsPad-iconsPad+1; {leave room for icon column}
+  pwwidth:=config^.tpos.x2 - config^.tpos.x1 - (iconsPad+1); {leave room for icon columns}
   p:=@s;
   updateStatusBar;
   opwinloc:=pwinloc+1;
@@ -742,7 +753,7 @@ begin
         Otherwise, 8088 systems will suffer}
         if clearblank then begin
           with config^.tpos do
-            screen.partclear(x1+iconspad-1,y1+pwheight+1,x2-1,y2-1,LookTOT^.vMenuLoNorm,#0);
+            screen.partclear(x1+iconspad-numMetaFlags,y1+pwheight+1,x2-1,y2-1,LookTOT^.vMenuLoNorm,#0);
           clearblank:=false;
         end;
       end;
@@ -766,11 +777,20 @@ begin
       if pwinloc+dl=pcursor {this is where the menu bar is}
         then b:=LookTOT^.vMenuHiNorm
         else b:=LookTOT^.vMenuLoNorm;
+      {Now draw the title line in the picker:}
       with config^.tpos do begin
-        screen.writeat(x1+iconsPad,y1+dl+1,b,s);
-        if favorites^.userChoices^[tid]
-          then screen.writeat(x1+iconspad-1,y1+dl+1,faviconcol,favicon)
-          else screen.writeat(x1+iconspad-1,y1+dl+1,LookTOT^.vMenuLoNorm,' ')
+        screen.writeat(x1+iconsPad+1,y1+dl+1,b,s);
+        iconPosX:=x1+iconspad;
+        iconPosY:=y1+dl+1;
+        {Is this title a favorite?  If so, print the "favorite" icon}
+        if titleMetadata^.getFlag(tid,m_favorite)
+          then screen.writeat(iconPosx,iconPosY,faviconcol,favicon)
+          else screen.writeat(iconPosx,iconPosY,LookTOT^.vMenuLoNorm,' ');
+        {Has this title been unpacked already?}
+        dec(iconPosX);
+        if titleMetadata^.getFlag(tid,m_unpacked)
+          then screen.writeat(iconPosx,iconPosY,unpiconcol,unpicon)
+          else screen.writeat(iconPosx,iconPosY,LookTOT^.vMenuLoNorm,' ');
       end;
     end;
     {msgConsole^.logmsg(info,'Getting input');}
@@ -850,24 +870,20 @@ begin
         {showStatus(false,'Seeking, please wait'); not necessary with binary search}
       end;
       kF2:begin {Toggle favorite for where the picker cursor is on}
-        with favorites^ do begin
+        with titleMetadata^ do begin
           {get the real full title id we are sitting on}
           w:=titlesets[activeSet].TitleIDs^[pcursor];
-          userChoices^[w] := not userChoices^[w];
+          toggleFlag(w,m_favorite);
           changed:=true;
-          if not userChoices^[w] then opwinloc:=-1 {force window refresh}
+          (* if not metaFlags^[w] then opwinloc:=-1 {force window refresh} *)
+          if not getFlag(w,m_favorite) then opwinloc:=-1 {force window refresh if not set (why are we doing this again??)}
         end;
       end;
       kCtlF:begin
         if not favson then begin
           {build a new title set out of just the favorites}
           {find how many favorites there are}
-          w:=0;
-          for dl:=0 to titleSets[activeSet].numTitles-1 do begin
-            with favorites^ do begin
-              if userChoices^[dl] then inc(w);
-            end;
-          end;
+          w:=titleMetadata^.countFlag(m_favorite);
           {no favorites?  Get out of here}
           if w=0
             then goto nofavorites; {yes, not pure pascal-elegant. So sue me.}
@@ -881,7 +897,8 @@ begin
           w:=0;
           with titleSets[activeSet-1] do begin
             for dl:=0 to numTitles-1 do begin
-              if Favorites^.userChoices^[TitleIDs^[dl]]
+              {intentionally not using getFlag here because we need the speed}
+              if (titleMetadata^.metaFlags^[TitleIDs^[dl]] AND m_favorite)=m_favorite
                 then begin
                   titleSets[activeSet].TitleIDs^[w]:=dl;
                   inc(w);
@@ -988,8 +1005,8 @@ var
   s,s2:string;
   b:byte;
 begin
-  Favorites^.flush;
-  dispose(Favorites,done);
+  titleMetadata^.flush;
+  dispose(titleMetadata,done);
   {free message console}
   dispose(MsgConsole,done);
 

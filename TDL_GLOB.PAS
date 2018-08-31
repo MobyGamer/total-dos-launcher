@@ -11,7 +11,7 @@ uses
 const
   maxTitles=maxbufsize div sizeof(word);
   maxCacheableTitles=maxbufsize div sizeof(longint);
-  TDLtitleFull='The Total DOS Launcher, v. 20180120';
+  TDLtitleFull='The Total DOS Launcher, v. 20180831';
   TDLtitle='The Total DOS Launcher';
   (*TDLstatus='F1=Help~³~'#24'/'#25'/PgUp/PgDn/Home/End = Navigate~³~Enter = START~³~ESC=exit~³~';*)
   TDLstatus='F1=Help~³~'#24'/'#25'/PgUp/PgDn/Home/End = Navigate~³~Enter = LAUNCH~³~ESC = exit~³~';
@@ -30,8 +30,11 @@ const
     ''
   );
 
-  favicon=#03;
+  {metadata bitflag icon indicators}
+  favicon=#03; {heart}
   favIconCol:byte=$0f;
+  unpicon=#18;
+  unpIconCol:byte=$0f;
 
 type
   PTitleArray=^TTitleArray;
@@ -39,9 +42,6 @@ type
 
   PTitleOffsets=^TTitleOffsets;
   TTitleOffsets=array[0..maxCacheableTitles-1] of longint;
-
-  PFavoritesArray=^TFavoritesArray;
-  TFavoritesArray=array[0..maxTitles-1] of boolean;
 
   baseftype=string[12];
   cmdlinetype=string[127-sizeof(baseftype)];
