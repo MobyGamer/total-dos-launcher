@@ -348,7 +348,6 @@ begin
   Verify:=true;
 end;
 
-{{$DEFINE FDEBUG}
 Constructor TMetadata.init;
 var
   makeNewCache:boolean;
@@ -357,35 +356,25 @@ begin
   numEntries:=ne;
   fname:=favcache;
   changed:=false;
-  {$IFDEF FDEBUG} if config^.edebug then writeln('Cache: Allocating memory'); {$ENDIF}
-  getmem(metaFlags,numEntries); {no *sizeof(boolean) because we know =1byte}
-  {$IFDEF FDEBUG} if config^.edebug then writeln('Cache: Initializing array'); {$ENDIF}
-  fillchar(metaFlags^,numEntries,0); {byte(booleanvar)=0 = FALSE, 1=TRUE}
+  getmem(metaFlags,numEntries);
+  fillchar(metaFlags^,numEntries,0);
   if fname<>'' then begin {if '' then read-only filesystem, can't work with files}
-    {$IFDEF EDEBUG} if config^.edebug then writeln('Cache: Not making a new cache'); {$ENDIF}
     makeNewCache:=false;
     if not fileexists(fname)
       then begin
-        {$IFDEF FDEBUG} if config^.edebug then writeln('Cache: Cache filename does not exist'); {$ENDIF}
         makeNewCache:=true
       end else begin
         if sizeoffile(fname)<>ne {if size doesn't match our index files, invalidate the cache}
           then makeNewCache:=true;
       end;
-    {$IFDEF FDEBUG} if config^.edebug then writeln('Cache: Assigning file handle to ',fname); {$ENDIF}
     assign(fhandle,fname);
     if makeNewCache then begin
-      {$IFDEF FDEBUG} if config^.edebug then writeln('Cache: Rewriting cache file'); {$ENDIF}
       rewrite(fhandle,1);
-      {$IFDEF FDEBUG} if config^.edebug then writeln('Cache: Writing array to file'); {$ENDIF}
       blockwrite(fhandle,metaFlags^,numEntries);
     end else begin
-      {$IFDEF FDEBUG} if config^.edebug then writeln('Cache: Resetting cache file'); {$ENDIF}
       reset(fhandle,1);
-      {$IFDEF FDEBUG} if config^.edebug then writeln('Cache: Reading cache into memory'); {$ENDIF}
       blockread(fhandle,metaFlags^,numEntries);
     end;
-    {$IFDEF FDEBUG} if config^.edebug then writeln('Cache: Closing file handle'); {$ENDIF}
     close(fhandle);
   end;
 end;

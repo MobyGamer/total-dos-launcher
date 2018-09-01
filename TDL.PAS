@@ -50,6 +50,7 @@ uses
   {$O tdl_cons}
   {$O tdl_hand}
   {$O tdl_main}
+  {{$O tdl_tset} {title sets are used in the main picker, do not overlay}
   {{$O tdl_glob} {no need to overlay global, it has no code}
   {{$O tdl_inde} {the indexing routines MUST be fast, do not overlay}
 
