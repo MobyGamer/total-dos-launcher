@@ -2,7 +2,7 @@
 unit tdl_inde;
 {
 Indexing routines for working with the files we've copied over.
-Also contains structures for working with favorites.
+Also contains structures for working with title metadata, such as favorites.
 }
 
 interface
@@ -12,6 +12,12 @@ uses
   objects,
   tdl_glob,
   tdl_conf;
+
+const
+  {Metadata bitflags:}
+  numMetaFlags=2;
+  m_favorite=1;
+  m_unpacked=2;
 
 type
   {base class for indexes in general}
@@ -76,19 +82,29 @@ type
     Mapping index (contains what titles contain which search words)
   }
 
-  PFavorites=^TFavorites;
-  TFavorites=object(TObject)
+  PMetadataArray=^TMetadataArray;
+  TMetadataArray=array[0..maxTitles-1] of byte;
+
+  PMetadata=^TMetadata;
+  TMetadata=object(TObject)
     PUBLIC
     numEntries:word;
-    userchoices:pFavoritesArray;
+    metaFlags:pMetadataArray;
     changed:boolean;
 
     Constructor Init(favcache:PathStr;ne:word);
     Destructor Done; VIRTUAL;
-    (*Procedure FileExport(fname:PathStr);
-    Procedure FileImport(fname:PathStr);*)
+    (*
+    Procedure FileExport(fname:PathStr);
+    Procedure FileImport(fname:PathStr);
+    *)
     function Flush:boolean;
     function Used:word; {returns how entries are in use}
+
+    function setFlag(tid:word;flag:byte):boolean; {sets a flag for a title}
+    function toggleFlag(tid:word;flag:byte):boolean; {flips a flag bit}
+    function getFlag(tid:word;flag:byte):boolean; {returns if a title has a certain flag set}
+    function countFlag(flag:byte):word; {counts how many titles have a certain set}
 
     PRIVATE
     fname:string;
@@ -332,8 +348,7 @@ begin
   Verify:=true;
 end;
 
-{{$DEFINE FDEBUG}
-Constructor TFavorites.init;
+Constructor TMetadata.init;
 var
   makeNewCache:boolean;
 begin
@@ -341,62 +356,97 @@ begin
   numEntries:=ne;
   fname:=favcache;
   changed:=false;
-  {$IFDEF FDEBUG} if config^.edebug then writeln('Cache: Allocating memory'); {$ENDIF}
-  getmem(userChoices,numEntries); {no *sizeof(boolean) because we know =1byte}
-  {$IFDEF FDEBUG} if config^.edebug then writeln('Cache: Initializing array'); {$ENDIF}
-  fillchar(userChoices^,numEntries,0); {byte(booleanvar)=0 = FALSE, 1=TRUE}
+  getmem(metaFlags,numEntries);
+  fillchar(metaFlags^,numEntries,0);
   if fname<>'' then begin {if '' then read-only filesystem, can't work with files}
-    {$IFDEF EDEBUG} if config^.edebug then writeln('Cache: Not making a new cache'); {$ENDIF}
     makeNewCache:=false;
     if not fileexists(fname)
       then begin
-        {$IFDEF FDEBUG} if config^.edebug then writeln('Cache: Cache filename does not exist'); {$ENDIF}
         makeNewCache:=true
       end else begin
         if sizeoffile(fname)<>ne {if size doesn't match our index files, invalidate the cache}
           then makeNewCache:=true;
       end;
-    {$IFDEF FDEBUG} if config^.edebug then writeln('Cache: Assigning file handle to ',fname); {$ENDIF}
     assign(fhandle,fname);
     if makeNewCache then begin
-      {$IFDEF FDEBUG} if config^.edebug then writeln('Cache: Rewriting cache file'); {$ENDIF}
       rewrite(fhandle,1);
-      {$IFDEF FDEBUG} if config^.edebug then writeln('Cache: Writing array to file'); {$ENDIF}
-      blockwrite(fhandle,userChoices^,numEntries);
+      blockwrite(fhandle,metaFlags^,numEntries);
     end else begin
-      {$IFDEF FDEBUG} if config^.edebug then writeln('Cache: Resetting cache file'); {$ENDIF}
       reset(fhandle,1);
-      {$IFDEF FDEBUG} if config^.edebug then writeln('Cache: Reading cache into memory'); {$ENDIF}
-      blockread(fhandle,userChoices^,numEntries);
+      blockread(fhandle,metaFlags^,numEntries);
     end;
-    {$IFDEF FDEBUG} if config^.edebug then writeln('Cache: Closing file handle'); {$ENDIF}
     close(fhandle);
   end;
 end;
 
-Destructor TFavorites.done;
+Destructor TMetadata.done;
 begin
-  freemem(userChoices,numEntries);
+  freemem(metaFlags,numEntries);
   Inherited Done;
 end;
 
-function TFavorites.Used;
+function TMetadata.Used;
 var
   w,count:word;
 begin
   count:=0;
   for w:=0 to numEntries-1 do
-    if userChoices^[w]
+    if metaFlags^[w]<>0
       then inc(count);
   Used:=count;
 end;
 
-function TFavorites.Flush;
+function TMetadata.countFlag;
+var
+  w,count:word;
+begin
+  count:=0;
+  for w:=0 to numEntries-1 do
+    if (metaFlags^[w] AND flag)=flag
+      then inc(count);
+  countFlag:=count;
+end;
+
+function TMetadata.setFlag;
+var
+  rc:boolean;
+begin
+  rc:=false;
+  if tid<numEntries then begin
+    metaFlags^[tid] := metaFlags^[tid] OR flag;
+    rc:=true;
+  end;
+  setFlag:=rc;
+end;
+
+function TMetadata.toggleFlag;
+var
+  rc:boolean;
+begin
+  rc:=false;
+  if tid<numEntries then begin
+    metaFlags^[tid] := metaFlags^[tid] XOR flag;
+    rc:=true;
+  end;
+  toggleFlag:=rc;
+end;
+
+function TMetadata.getFlag;
+var
+  rc:boolean;
+begin
+  rc:=false;
+  if (metaFlags^[tid] AND flag) = flag
+    then rc:=true;
+  getFlag:=rc;
+end;
+
+function TMetadata.Flush;
 begin
   if (fname<>'') and changed then begin
     assign(fhandle,fname);
     rewrite(fhandle,1);
-    blockwrite(fhandle,userChoices^,numEntries);
+    blockwrite(fhandle,metaFlags^,numEntries);
     close(fhandle);
     changed:=false;
   end;
