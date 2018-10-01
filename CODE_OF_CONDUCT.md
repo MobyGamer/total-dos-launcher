@@ -1,5 +1,11 @@
 # TDL Code of Conduct
 
+1. Individual characteristics, including but not limited to,
+body, sex, sexual preference, race, language, religion, nationality,
+or political preferences are irrelevant in the scope of the project and
+will not be taken into account concerning your value or that of your contribution
+to the project.  Discuss or debate the idea, not the person.
+
 1. The project creator, lead developers, core team, constitute
 the managing members of the project and have final say in every decision
 of the project, technical or otherwise, including overruling previous decisions.
@@ -18,12 +24,6 @@ will not be tolerated.
 
 6. Non technical conflicts will be discussed in a separate space. Disruption
 of the project will not be allowed.
-
-7. Individual characteristics, including but not limited to,
-body, sex, sexual preference, race, language, religion, nationality,
-or political preferences are irrelevant in the scope of the project and
-will not be taken into account concerning your value or that of your contribution
-to the project.  Discuss or debate the idea, not the person.
 
 8. There is no room for ambiguity: Ambiguity will be met with questioning;
 further ambiguity will be met with silence. It is the responsibility
