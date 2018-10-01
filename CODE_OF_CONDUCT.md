@@ -1,4 +1,4 @@
-# Code of Merit
+# TDL Code of Conduct
 
 1. The project creator, lead developers, core team, constitute
 the managing members of the project and have final say in every decision
