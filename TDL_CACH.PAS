@@ -14,6 +14,8 @@ before they can be launched.
 interface
 
 uses
+  tdl_glob,
+  strings,
   objects,
   DOS;
 
@@ -29,6 +31,10 @@ type
     Can use bytesFree and megsFree for cached referencing.}
     Function Remaining:longint;
     Function EstimateCacheUsage(filetype:ExtStr;filepath:PathStr):longint;
+
+    {title cache directory functions}
+    Function CDir(tf:PFileStruct):PathStr;
+    Function CDirExists(tf:PFileStruct):boolean;
 
     public
     path:PathStr;
@@ -170,6 +176,19 @@ begin
   end;
 
   EstimateCacheUsage:=estimate;
+end;
+
+Function TFileCache.cDir(tf:PFileStruct):PathStr;
+begin
+  {must NOT have trailing slash due to chdir() assumption/limitation}
+  cDir:=path+basename(tf^.name)
+end;
+
+Function TFileCache.cDirExists(tf:PFileStruct):boolean;
+begin
+  if dirExists(cdir(tf))
+    then cDirExists:=true
+    else cDirExists:=false;
 end;
 
 end.

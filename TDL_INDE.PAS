@@ -35,19 +35,6 @@ type
     data:PStream;
   end;
 
-  PFileStruct=^TFileStruct;
-  TFileStruct=record
-    ID:word;
-    name:array[0..12-1] of char;
-  end;
-
-  PTitleStruct=^TTitleStruct;
-  TTitleStruct=record
-    ID:word;
-    Hash:MD5hash;
-    title:titleStrType;
-  end;
-
   PFileIndex=^TFileIndex;
   TFileIndex=object(TIndex)
     Constructor Init(fpath:PathStr;caching:boolean);
@@ -101,9 +88,10 @@ type
     function Flush:boolean;
     function Used:word; {returns how entries are in use}
 
-    function setFlag(tid:word;flag:byte):boolean; {sets a flag for a title}
-    function toggleFlag(tid:word;flag:byte):boolean; {flips a flag bit}
     function getFlag(tid:word;flag:byte):boolean; {returns if a title has a certain flag set}
+    function setFlag(tid:word;flag:byte):boolean; {sets a flag for a title}
+    function clearFlag(tid:word;flag:byte):boolean; {sets a flag for a title}
+    function toggleFlag(tid:word;flag:byte):boolean; {flips a flag bit}
     function countFlag(flag:byte):word; {counts how many titles have a certain set}
 
     PRIVATE
@@ -417,6 +405,18 @@ begin
     rc:=true;
   end;
   setFlag:=rc;
+end;
+
+function TMetadata.clearFlag;
+var
+  rc:boolean;
+begin
+  rc:=false;
+  if tid<numEntries then begin
+    metaFlags^[tid] := metaFlags^[tid] AND NOT flag;
+    rc:=true;
+  end;
+  clearFlag:=rc;
 end;
 
 function TMetadata.toggleFlag;

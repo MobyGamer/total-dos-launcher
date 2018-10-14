@@ -61,115 +61,6 @@ var
   titleSets:array[0..maxTitleSets-1] of PTitleSet;
   titleMetadata:PMetadata;
 
-Procedure PrintHelp;
-begin
-  asm
-    jmp @start
-@message:
-    db 0ah,'Usage: TDL.EXE <switches>',0dh,0ah,0ah
-
-    db 'Switches:',0dh,0ah
-    db '-?, -h  This help',0dh,0ah
-    db '-c      Set 43-line (EGA) or 50-line (VGA) mode.',0dh,0ah
-    db '        (If you need more lines than that, see TDL.INI for VESA options.)',0dh,0ah
-    db '-r      Instructs TDL that it is on read-only media (ie. CDROM or DVDROM)',0dh,0ah
-    db '        and that it should not try to write anything to its local filesystem.',0dh,0ah
-    db '        This disables "favorites" as well as writing the debug log to disk.',0dh,0ah
-    db '-d      Print excessive debugging messages during initialization.',0dh,0ah
-    db '        Used for troubleshooting only.',0dh,0ah
-    db '-f      Always use fast display routines on all CGA systems.',0dh,0ah
-    db '        This may cause "snow" or display corruption on true CGA adapters.',0dh,0ah
-(*  db '-nXX    Override screen detection and force XX lines onscreen.',0dh,0ah
-    db '        Debugging option; submit an issue if you''re forced to use this.',0dh,0ah*)
-    db 0ah,'$'
-
-@start:
-    push ds
-    mov ax,0900h
-    lea dx,@message
-    mov bx,cs
-    mov ds,bx
-    int 21h
-    pop ds
-  end;
-  halt(255);
-end;
-
-
-Procedure PopGeneralInfo;
-var
-  foomsg:PMessageObj;
-  s:string[12];
-  s2:string;
-begin
-  new(foomsg,init(2,'TDL info and stats'));
-  with foomsg^ do begin
-    case config^.userlevel of
-      kiosk:s:='KIOSK';
-      regular:s:='default';
-      power:s:='Power User';
-    end;
-    with config^ do begin
-      addline(' Swapping: '+boolToStr(swapping,'ENABLED','disabled'));
-      if freeLowDOSRAM <> 0 then begin
-        addline(' '+inttostr((longint(freeLowDOSRAM) * longint(16)) div 1024)
-                   +' KB DOS RAM availble to launched programs ');
-        addline(' ');
-      end;
-      addline(' TDL operating mode: '+s);
-      addline(' TDL Heap remaining: '+inttostr(memavail div 1024)+' KB');
-
-      {Report how much EMS or XMS we're using.  The logic below accounts
-      for QEMM, DOSBox, and others reporting the same amount of EMS and XMS
-      always available (they both draw EMS and XMS from an internal pool
-      of managed RAM).  This code favors EMS use over XMS (because it's
-      faster) so we favor reporting on EMS in a dual EMS/XMS situation.}
-      s2:='';
-      if config^.XMSatStartup > xms_memavail
-        then s2:=inttostr((config^.XMSatStartup - xms_memavail) div 1024)+' KB of XMS';
-      if config^.EMSatStartup > ems_memavail
-        then s2:=inttostr((config^.EMSatStartup - ems_memavail) div 1024)+' KB of EMS';
-      if s2<>''
-        then addline(' TDL is using '+s2+' to accelerate index operations');
-
-      addline(' # of Titles: '+inttostr(numtitles)+' ('+inttostr(titleMetadata^.Used)+' marked as favorites) ');
-      addline(' Debug messsages logged to disk: '+boolToStr(logging,'ENABLED','disabled'));
-      addline(' Treating filesystem as read-only: '+boolToStr(readonly,'YES','no'));
-      {addline(' Excessive debug messages: '+boolToStr(edebug,'ENABLED','disabled'));}
-      addline(' Pause after execution: '+boolToStr(pauseAfterRun,'ENABLED','disabled'));
-      addline(' ');
-      if fileCache^.bytesfree > (1024*1024)
-        then s:=inttostr(fileCache^.megsFree)+' MB free)'
-        else s:=inttostr(fileCache^.bytesFree div 1024)+' KB free)';
-      addline(' Cache directory: '+fileCache^.path+' ('+s);
-    end;
-    addline(' ');
-    show;
-  end;
-  dispose(foomsg,done);
-end;
-
-Procedure PopTitleInfo(tid:word);
-var
-  foomsg:PMessageObj;
-  s:string[12];
-  tfbuf:PFileStruct;
-  ttbuf:PTitleStruct;
-
-begin
-  new(foomsg,init(2,'Information on this title'));
-  titles^.retrieve(tid,ttbuf);
-  files^.retrieve(tid,tfbuf);
-  with foomsg^ do begin
-    addline(' Title: '+ttbuf^.title);
-    addline(' Filename: '+tfbuf^.name);
-    addline(' Cache Directory: '+fileCache^.path+basename(tfbuf^.name));
-    addline(' ');
-    show;
-  end;
-  dispose(foomsg,done);
-end;
-
 procedure TDL_Init;
 {
 Initialize TDL, first with defaults and the refine using the config file.
@@ -185,6 +76,7 @@ var
   filepath:PathStr;
   w:word;
   {wantNlines:byte;}
+  tf:PFileStruct;
 
 begin
   {If user requested help, then print it and exit}
@@ -211,9 +103,6 @@ begin
   if is_param('r') then config^.readonly:=true;
   if is_param('c') then config^.wantCondensed:=true;
   if is_param('f') then config^.wantSnow:=true;
-  (*if is_param('n')
-    then wantNlines:=param_int('n')
-    else wantNlines:=0;*)
 
   {attempt TDL handlers init}
   writeln('Registering handlers from handlers.ini...');
@@ -272,6 +161,19 @@ begin
   writeln('Inspecting file cache at ',fileCache^.path);
   fileCache^.Remaining;
   writeln(fileCache^.megsfree,' MB available for cache use.');
+  if config^.startupCacheScan then begin
+    write('Validating cache entries...');
+    for w:=0 to config^.numtitles-1 do begin
+      if titleMetadata^.getFlag(w,m_unpacked)=true then begin
+        files^.retrieve(w,tf);
+        if fileCache^.cDirExists(tf)=false then begin
+          titleMetadata^.clearFlag(w,m_unpacked);
+          titleMetadata^.changed:=true;
+        end;
+      end;
+    end;
+    writeln('done.');
+  end;
 
   if (config^.userlevel=power) or (config^.edebug=true) then begin
     writeln('Performing additional checks:');
@@ -418,6 +320,120 @@ begin
 
 end;
 
+Procedure PrintHelp;
+begin
+  asm
+    jmp @start
+@message:
+    db 0ah,'Usage: TDL.EXE <switches>',0dh,0ah,0ah
+
+    db 'Switches:',0dh,0ah
+    db '-?, -h  This help',0dh,0ah
+    db '-c      Set 43-line (EGA) or 50-line (VGA) mode.',0dh,0ah
+    db '        (If you need more lines than that, see TDL.INI for VESA options.)',0dh,0ah
+    db '-r      Instructs TDL that it is on read-only media (ie. CDROM or DVDROM)',0dh,0ah
+    db '        and that it should not try to write anything to its local filesystem.',0dh,0ah
+    db '        This disables "favorites" as well as writing the debug log to disk.',0dh,0ah
+    db '-d      Print excessive debugging messages during initialization.',0dh,0ah
+    db '        Used for troubleshooting only.',0dh,0ah
+    db '-f      Always use fast display routines on all CGA systems.',0dh,0ah
+    db '        This may cause "snow" or display corruption on true CGA adapters.',0dh,0ah
+(*  db '-nXX    Override screen detection and force XX lines onscreen.',0dh,0ah
+    db '        Debugging option; submit an issue if you''re forced to use this.',0dh,0ah*)
+    db 0ah,'$'
+
+@start:
+    push ds
+    mov ax,0900h
+    lea dx,@message
+    mov bx,cs
+    mov ds,bx
+    int 21h
+    pop ds
+  end;
+  halt(255);
+end;
+
+
+Procedure PopGeneralInfo;
+var
+  foomsg:PMessageObj;
+  s:string[12];
+  s2:string;
+begin
+  new(foomsg,init(2,'TDL info and stats'));
+  with foomsg^ do begin
+    case config^.userlevel of
+      kiosk:s:='KIOSK';
+      regular:s:='default';
+      power:s:='Power User';
+    end;
+    with config^ do begin
+      addline(' Swapping: '+boolToStr(swapping,'ENABLED','disabled'));
+      if freeLowDOSRAM <> 0 then begin
+        addline(' '+inttostr((longint(freeLowDOSRAM) * longint(16)) div 1024)
+                   +' KB DOS RAM availble to launched programs ');
+        addline(' ');
+      end;
+      addline(' TDL operating mode: '+s);
+      addline(' TDL Heap remaining: '+inttostr(memavail div 1024)+' KB');
+
+      {Report how much EMS or XMS we're using.  The logic below accounts
+      for QEMM, DOSBox, and others reporting the same amount of EMS and XMS
+      always available (they both draw EMS and XMS from an internal pool
+      of managed RAM).  This code favors EMS use over XMS (because it's
+      faster) so we favor reporting on EMS in a dual EMS/XMS situation.}
+      s2:='';
+      if config^.XMSatStartup > xms_memavail
+        then s2:=inttostr((config^.XMSatStartup - xms_memavail) div 1024)+' KB of XMS';
+      if config^.EMSatStartup > ems_memavail
+        then s2:=inttostr((config^.EMSatStartup - ems_memavail) div 1024)+' KB of EMS';
+      if s2<>''
+        then addline(' TDL is using '+s2+' to accelerate index operations');
+
+      addline(' # of Titles: '+inttostr(numtitles)+' ('+inttostr(titleMetadata^.Used)+' marked as favorites) ');
+      addline(' Debug messsages logged to disk: '+boolToStr(logging,'ENABLED','disabled'));
+      addline(' Treating filesystem as read-only: '+boolToStr(readonly,'YES','no'));
+      {addline(' Excessive debug messages: '+boolToStr(edebug,'ENABLED','disabled'));}
+      addline(' Pause after execution: '+boolToStr(pauseAfterRun,'ENABLED','disabled'));
+      addline(' ');
+      if fileCache^.bytesfree > (1024*1024)
+        then s:=inttostr(fileCache^.megsFree)+' MB free)'
+        else s:=inttostr(fileCache^.bytesFree div 1024)+' KB free)';
+      addline(' Cache directory: '+fileCache^.path+' ('+s);
+    end;
+    addline(' ');
+    show;
+  end;
+  dispose(foomsg,done);
+end;
+
+Procedure PopTitleInfo(tid:word);
+var
+  foomsg:PMessageObj;
+  s:string[12];
+  tfbuf:PFileStruct;
+  ttbuf:PTitleStruct;
+  s2:string;
+
+begin
+  new(foomsg,init(2,'Information on this title'));
+  titles^.retrieve(tid,ttbuf);
+  files^.retrieve(tid,tfbuf);
+  with foomsg^ do begin
+    addline(' Title: '+ttbuf^.title);
+    addline(' Filename: '+tfbuf^.name);
+    s2:=' Cache Directory: ';
+    if fileCache^.cDirExists(tfbuf)
+      then s2:=s2+fileCache^.cDir(tfbuf)
+      else s2:=s2+'(not yet unpacked)';
+    addline(s2);
+    show;
+  end;
+  dispose(foomsg,done);
+end;
+
+
 function Launch(tid:word):boolean;
 {
 Execution flow:
@@ -486,20 +502,9 @@ begin
   if not files^.retrieve(tid,tfbuf)
       then die('Could not retrieve file info');
   if tfbuf^.id<>tid then die('Wrong file retrieved');
-  {extract basename and fullname}
-  base:='';
-  for b:=0 to 7 do
-    if tfbuf^.name[b]='.'
-      then break
-      else base:=base+tfbuf^.name[b];
-  full:='';
-  for b:=0 to 11 do
-    if tfbuf^.name[b]<>#0
-      then full:=full+tfbuf^.name[b]
-      else break;
-  {determine our operating environment}
-  tcachedir:=fileCache^.path+base;
+  tcachedir:=fileCache^.cDir(tfbuf);
   {files can be in multiple drives/paths; find where we put our file}
+  full:=StrPas(tfbuf^.name);
   filepath:=fsearch(full,config^.ProgLocs);
   if filepath='' then begin
     popUserMessage(error,'PATH "'+config^.ProgLocs+'" did not contain "'+full+'".  Did you delete it?');

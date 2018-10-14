@@ -53,6 +53,7 @@ type
     userlevel:userlevels;               {what level user is operating in}
     customVidMode:word;
     pauseAfterRun:boolean;
+    startupCacheScan:boolean;
 
     datacacheDir:DirStr;                {cache directory}
     baseDir:DirStr;                     {base directory (where config file is)}
@@ -214,6 +215,7 @@ begin
       if upstring(key)='PAUSEAFTERRUN' then pauseAfterRun:=isPositive(value);
       if upstring(key)='FORCELOGGING' then logging:=isPositive(value);
       if upstring(key)='PRELOADING' then preloading:=isPositive(value);
+      if upstring(key)='CACHESCAN' then startupCacheScan:=isPositive(value);
       if upstring(key)='VESA' then customvidmode:=hexStrToLong(upstring(value));
       if upstring(key)='SUBHEADER' then begin
         {leading spaces are truncated -- we will put one back unless

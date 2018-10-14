@@ -52,6 +52,21 @@ type
 
   MD5hash=array[0..15] of byte;
 
+  PFileStruct=^TFileStruct;
+  TFileStruct=record
+    ID:word;
+    name:array[0..12-1] of char;
+  end;
+
+  PTitleStruct=^TTitleStruct;
+  TTitleStruct=record
+    ID:word;
+    Hash:MD5hash;
+    title:titleStrType;
+  end;
+
+
+
 implementation
 
 end.
