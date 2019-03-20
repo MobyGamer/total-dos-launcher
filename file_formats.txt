@@ -187,25 +187,80 @@ UI attributes to be specified at a later date.
 
 Title audit log (issue #27):
 
-        numEntries:     16-bit word of how many titles are present in the file
-REPEAT  (This structure repeats numEntries times)
-        launchCount:    16-bit word of how many times title was launched
-        TotalPlaytime:  16-bit word of how many minutes title was in play
-END
+Two data files make up TDL's auditing function:
 
-Purpose:
-Ability to track what titles have been executed, how many times, and provide
-some sort of report. The obvious use case is to generate a report after a
-festival/convention ends and see what people were playing, how often, and for
-how long.
+C:\ACTIVITY.DAT:
 
-Implementation Notes:
+        activity:       One byte for every minute of sampled activity:
+                        FF = Start of file
+                        00 = no activity for that minute
+                        01 = activity detected for that minute
 
-Audit log is to be kept on disk because it's low-priority data.  This also
-allows for atomic updates to the file, which is useful in case people remove
-power to the system, reboot, etc.
+AUDIT.DAT:
+        titleID:        16-bit word
+        titleHash:      16 bytes of the MD5 hash of the title string
+                        (future use; could be used to migrate index files)
+        startTime:      4-byte (unsigned longint) packed DateTime record.
+                        To unpack:
+                        sec =   ((datetime >> 00) & 0x1f)*2      ;0..60
+                        min =   ( datetime >> 05) & 0x3f         ;0..59
+                        hour =  ( datetime >> 11) & 0x1f         ;0..23
+                        day =   ( datetime >> 16) & 0x1f         ;1..31
+                        month = ( datetime >> 21) & 0xf          ;1..12
+                        year =  ((datetime >> 25) & 0x7f) + 1980 ;1980..2108
+                        ;Seconds are even values only.
+                        ;Also: I guess that makes TDL "year-2108 compliant" ;-)
+        endTime:        (same format as startTime)
+        minsActive:     16-bit unsigned word of minutes (from ACTIVITY.DAT)
+        confirmed:      byte flag: 0=unconfirmed, 1=confirmed
 
-Counts should be incremented right before a title is launched.
-TotalPlaytime should be incremented when *returning* from a launched title.
-This will miss playtime minutes if the user reboots or the game cannot be
-exited, but at least any minutes recorded will be legitimate.
+Purpose: (From github MobyGamer/total-dos-launcher/Issue #27)
+
+TDL is in use at various vintage computing festivals and conventions.  To
+better understand the needs of the public using TDL at these settings, TDL
+should be able to provide an audit report after the event.  Auditing would
+collect the following information:
+
+- timestamp of when a program was launched
+- timestamp of when a program returned to TDL, including:
+  - Confirmed (program exited normally and returned to TDL)
+  - Unconfirmed (system was rebooted, TDL crashed)
+- Each minute the program was actively in use
+
+_(Program activity is not possible to collect reliably, but one possible
+implementation could involve hooking the system timer 18Hz interrupt to wake up
+once a minute to check keyboard buffer contents and mouse X/Y location, and if
+either are changed from the last sample, note it as active.  Joystick activity
+collection is not possible because joystick port reads are done with interrupts
+disabled.)_
+
+An audit report can then be generated after the session is over, and would
+display the following:
+
+- All programs launched, sorted by launch frequency (ie. # of times launched)
+- All programs launched, sorted by program duration in minutes
+- A human-readable log of the entire session (program, start time, end time,
+  active minutes)
+
+_Note: It is implied that TDL will be in the system's C:\AUTOEXEC.BAT for this
+to provide meaningful results.  Also, if the system date and time are not set
+properly at every system boot from a battery-backed clock, only the launch
+counts and activity duration will be accurate._
+
+Implementation:
+
+- Auditing will be enabled via AUDITING=ON in TDL.INI
+- AUDIT.DAT with titleID, titleHash, start time, end time, number of minutes
+  active, confirmed
+  - New entry added as a game is launched, and updated upon return or a new
+    start of TDL
+  - An end time equal to the start time means the end time was never recorded
+    and must be adjusted; this would be the case if the user rebooted the
+    computer instead of exiting a program cleanly.
+  - A number of minutes equal to $FFFF means program activity could not be
+    determined
+- C:\ACTIVITY.DAT with the activity log, one byte per minute
+  - Is recreated on every new program launch
+  - 0=not active, 1=active, FF=start of collection, any other value is ignored
+  - Does nothing if INDOS is set, to prevent crashes
+- TDL -s to generate a summary report of whatever is in the AUDIT.DAT
