@@ -36,6 +36,8 @@ const
   unpicon=#18;
   unpIconCol:byte=$0f;
 
+  immediateExit:boolean=false;
+
 type
   PTitleArray=^TTitleArray;
   TTitleArray=array[0..maxTitles] of word;

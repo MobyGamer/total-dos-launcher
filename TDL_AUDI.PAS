@@ -68,7 +68,7 @@ begin
   fpath:=auditLogPath;
   {register index as a stream on disk}
   if fileExists(fpath)
-    then aStream:=new(pDOSStream,init(fpath,stOpenRead))
+    then aStream:=new(pDOSStream,init(fpath,stOpen))
     else aStream:=new(pDOSStream,init(fpath,stCreate));
 
   {$IFDEF DEBUG}
@@ -107,9 +107,6 @@ var
   ttbuf:PTitleStruct;
 
 begin
-  {seek to the end}
-  aStream^.seek(aStream^.getsize);
-
   {prepare an audit log entry}
   fillchar(tmpEntry,sizeof(tmpEntry),0);
   grabTime(tDT);
@@ -121,6 +118,7 @@ begin
     titleHash:=ttbuf^.hash
   end;
 
+  {seek to the end}
   aStream^.seek(aStream^.getsize);
   aStream^.write(tmpEntry,sizeof(tmpEntry));
   newEntry:=(aStream^.status=stOK);
@@ -137,7 +135,6 @@ end;
 
 Function TAuditLog.getNext:boolean;
 begin
-  aStream^.seek(aStream^.getpos+sizeof(Entry));
   aStream^.read(Entry,sizeof(Entry));
   getNext:=(aStream^.status=stOK);
 end;
@@ -159,9 +156,10 @@ begin
   entry.endTime:=tDT;
   Entry.minsActive:=0; {this will be populated later by a call to a monitoring TSR}
   {seek to the beginning of the last entry}
-  aStream^.seek(aStream^.getsize-sizeof(TAuditRec));
+  aStream^.seek(aStream^.getsize-sizeof(Entry));
   {update the last entry}
   aStream^.write(Entry,sizeof(Entry));
+  totalEntries:=aStream^.getsize div sizeof(TAuditRec);
   closeEntry:=(aStream^.status=stOK);
 end;
 

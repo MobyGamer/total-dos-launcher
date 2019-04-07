@@ -354,6 +354,7 @@ begin
   if length(s)<margin then begin
     numlines:=1;
     wrapped[0]:=s;
+    wrapped[1]:=''; {workaround until I can fix this properly}
   end else begin
     for numlines:=0 to maxlines-1 do begin
       {Trim leading spaces from any wrapped line.

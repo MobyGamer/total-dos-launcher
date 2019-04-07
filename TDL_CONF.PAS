@@ -72,7 +72,8 @@ type
     {exec/spawno trashes the PSP, so if we want to retain command-line
     arguments, we should grab them first, then use them later}
     wantCondensed,
-    wantSnow:boolean;
+    wantSnow,
+    wantAuditExport:boolean;
     freeLowDOSRam:word;                 {in paragraphs; 0 if we couldn't determine}
     EMSatStartup,
     XMSatStartup:longint;

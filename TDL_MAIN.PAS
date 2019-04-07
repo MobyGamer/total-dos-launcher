@@ -102,6 +102,7 @@ begin
   if is_param('r') then config^.readonly:=true;
   if is_param('c') then config^.wantCondensed:=true;
   if is_param('f') then config^.wantSnow:=true;
+  if is_param('s') then config^.wantAuditExport:=true;
 
   {attempt TDL handlers init}
   writeln('Registering handlers from handlers.ini...');
@@ -174,11 +175,6 @@ begin
     writeln('done.');
   end;
 
-  {init the audit log}
-  if config^.auditing then begin
-    auditLog:=new(PAuditLog,init(config^.basedir+'AUDIT.DAT'));
-  end;
-
   if (config^.userlevel=power) or (config^.edebug=true) then begin
     writeln('Performing additional checks:');
     with config^ do begin
@@ -215,6 +211,11 @@ begin
   with titleSets[activeSet]^ do
     for w:=0 to numTitles-1 do
       titleIDs^[w]:=w;
+
+  {init the audit log}
+  if config^.auditing then begin
+    auditLog:=new(PAuditLog,init(config^.basedir+'AUDIT.DAT'));
+  end;
 
   {set up the screen}
 
@@ -344,6 +345,7 @@ begin
     db '        This may cause "snow" or display corruption on true CGA adapters.',0dh,0ah
 (*  db '-nXX    Override screen detection and force XX lines onscreen.',0dh,0ah
     db '        Debugging option; submit an issue if you''re forced to use this.',0dh,0ah*)
+    db '-s      Export the AUDIT.DAT audit log to .CSV format.',0dh,0ah
     db 0ah,'$'
 
 @start:
@@ -665,6 +667,46 @@ begin
     end;
 end;
 
+procedure exportAuditLog;
+var
+  ol:text;
+  s,ds:string;
+  w:word;
+  ttbuf:PTitleStruct;
+
+  function DTString(td:datetime):string;
+  begin
+    DTString:=inttostr(auditLog^.Entry.StartTime.month)+'/'
+             +inttostr(auditLog^.Entry.StartTime.day)+'/'
+             +inttostr(auditLog^.Entry.StartTime.year)+' '
+             +inttostr(auditLog^.Entry.StartTime.hour)+':'
+             +inttostr(auditLog^.Entry.StartTime.min);
+
+  end;
+
+  function buildASCIILine(_tid:word):string;
+  begin
+    titles^.retrieve(_tid,ttbuf);
+    buildASCIILine:=DTString(auditLog^.Entry.StartTime)+','
+      +DTString(auditLog^.Entry.EndTime)+','
+      +inttostr(auditLog^.Entry.minsActive)+','
+      +ttbuf^.title;
+  end;
+
+begin
+  assign(ol,'audit.csv');
+  rewrite(ol);
+  writeln('Start Time,End Time,Minutes Active,Title');
+
+  auditLog^.getFirst;
+  writeln(ol,buildASCIILine(auditLog^.Entry.titleID));
+  for w:=1 to auditLog^.totalEntries-1 do begin
+    auditLog^.getNext;
+    writeln(ol,buildASCIILine(auditLog^.Entry.titleID));
+  end;
+  close(ol);
+end;
+
 procedure TDL_EventLoop;
 {
 Picker draw logic:
@@ -726,6 +768,16 @@ var
   end;
 
 begin
+  {check for short-circuit operations here and avoid the entire event loop
+  if we are doing a one-off operation}
+
+  {export the audit log?}
+  if config^.wantAuditExport then begin
+    PopUserMessage(info,' Hit ENTER to export audit log to AUDIT.CSV ');
+    exportAuditLog;
+    exit;
+  end;
+
   if config^.userlevel=kiosk
     then escapeKey:=kAltMinus;
   with config^.tpos do Screen.Box(X1,Y1,X2,Y2,LookTOT^.vMenuLoNorm,4);
@@ -1016,6 +1068,7 @@ begin
 
   s:=config^.startupDir; {grab startup dir before we trash object}
 
+  if config^.auditing then dispose(auditLog,done);
   dispose(files,done);
   dispose(titles,done);
   dispose(handlers,done);
