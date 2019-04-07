@@ -65,8 +65,6 @@ type
     title:titleStrType;
   end;
 
-
-
 implementation
 
 end.

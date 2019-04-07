@@ -4,8 +4,6 @@ program tdl;
 {
 Total DOS Launcher, main program.
 Initial author Jim Leonard, started 20170211
-
-See "todo.txt" for a list of features that are planned but not yet implemented.
 }
 
 uses
@@ -17,7 +15,8 @@ uses
   tdl_conf,
   tdl_inde,
   tdl_cons,
-  tdl_hand;
+  tdl_hand,
+  tdl_audi;
 
 {$IFDEF USEOVERLAYS}
   {Note: documentation discourages overlaying TOTSYS, TOTINPUT, and TOTFAST}
@@ -50,6 +49,7 @@ uses
   {$O tdl_cons}
   {$O tdl_hand}
   {$O tdl_main}
+  {$O tdl_audi}
   {{$O tdl_tset} {title sets are used in the main picker, do not overlay}
   {{$O tdl_glob} {no need to overlay global, it has no code}
   {{$O tdl_inde} {the indexing routines MUST be fast, do not overlay}

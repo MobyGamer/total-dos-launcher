@@ -29,7 +29,8 @@ debug=0
     #print ("Usage: tdl_indexer.py <source> <destination>")
     #sys.exit(2)
     
-sourceDir = sys.argv[1] if (len(sys.argv) > 1) else 'src/1985'
+#sourceDir = sys.argv[1] if (len(sys.argv) > 1) else 'src/1985'
+sourceDir = sys.argv[1] if (len(sys.argv) > 1) else 'src'
 destDir = sys.argv[2] if (len(sys.argv) > 1) else 'output'
 distroDir = 'distro'
 filesDir = destDir+'/files/'

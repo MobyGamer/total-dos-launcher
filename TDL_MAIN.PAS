@@ -42,7 +42,8 @@ uses
   tdl_inde,
   tdl_cons,
   tdl_hand,
-  tdl_tset;
+  tdl_tset,
+  tdl_audi;
 
 const
   favsOn:boolean=false;
@@ -56,8 +57,6 @@ var
   jcloc:txtcoords; {jumpcursor location}
 
 var
-  Files:PFileIndex; {holds all fileIDs and their 8.4 filenames}
-  Titles:PTitleIndex; {holds all titleIDs and their full title strings}
   titleSets:array[0..maxTitleSets-1] of PTitleSet;
   titleMetadata:PMetadata;
 
@@ -175,6 +174,11 @@ begin
     writeln('done.');
   end;
 
+  {init the audit log}
+  if config^.auditing then begin
+    auditLog:=new(PAuditLog,init(config^.basedir+'AUDIT.DAT'));
+  end;
+
   if (config^.userlevel=power) or (config^.edebug=true) then begin
     writeln('Performing additional checks:');
     with config^ do begin
@@ -193,6 +197,7 @@ begin
       writeln('Number of titles: ',numTitles);
       writeln('Base directory: ',baseDir);
       writeln('Swapping enabled: ',swapping);
+      writeln('Auditing enabled: ',auditing);
       writeln('Preloading enabled: ',preloading);
       writeln('Cache Directory: ',fileCache^.path);
       writeln('Startup Directory: ',startupDir);
@@ -273,7 +278,6 @@ begin
     tpos.y2:=screen.depth-1;
     tpos.x2:=screen.width;
     screen.clear(LookTOT^.vMenuBorder,#0);
-    {screen.PartClear(1,1,screen.width,3,LookTOT^.vMenuHiHot.pickern,' ');}
     {If provided a subheader in TDL.INI, use it.  Truncate if necessary.}
     temps:=TDLTitle + config^.subheader;
     if length(temps) > screen.width-1
@@ -915,6 +919,8 @@ nofavorites:
         recordKeyState;
         tmpScreenSave;
         showStatus(true,'Preparing for launch...');
+        if config^.auditing
+          then auditLog^.newEntry(titleSets[activeSet]^.titleids^[pcursor]);
         {Launch it!  If launch was successful, clean up:}
         if Launch(titleSets[activeSet]^.titleids^[pcursor]) then begin
           if config^.pauseAfterRun then pauseForUser;
@@ -927,6 +933,8 @@ nofavorites:
             end;
           end;
         end;
+        if config^.auditing
+          then auditLog^.closeEntry;
         tmpScreenRestore;
         restoreKeyState;
       end;

@@ -18,6 +18,7 @@ const
   numMetaFlags=2;
   m_favorite=1;
   m_unpacked=2;
+  m_reserved=4;
 
 type
   {base class for indexes in general}
@@ -98,6 +99,12 @@ type
     fname:string;
     fhandle:file;
   end;
+
+procedure stCheck(st:PStream);
+
+var
+  Files:PFileIndex; {holds all fileIDs and their 8.4 filenames}
+  Titles:PTitleIndex; {holds all titleIDs and their full title strings}
 
 implementation
 

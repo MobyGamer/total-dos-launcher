@@ -47,6 +47,7 @@ type
     numTitles:word;                     {Total number of titles in indexes}
     swapping:boolean;                   {swap to disk/ram when launching}
     logging:boolean;
+    auditing:boolean;
     preloading:boolean;                 {preload indexes in ram}
     readonly:boolean;                   {treat filesystem as read-only (ie. CDROM)}
     edebug:boolean;                     {excessive debugging messages on startup}
@@ -150,6 +151,7 @@ begin
   userlevel:=regular;
   swapping:=false;
   logging:=false;
+  auditing:=false;
   readonly:=false;
   preloading:=true;
   progLocs:='files';
@@ -212,6 +214,7 @@ begin
         if upstring(value)='POWER' then userlevel:=power;
       end;
       if upstring(key)='SWAPPING' then swapping:=isPositive(value);
+      if upstring(key)='AUDITING' then auditing:=isPositive(value);
       if upstring(key)='PAUSEAFTERRUN' then pauseAfterRun:=isPositive(value);
       if upstring(key)='FORCELOGGING' then logging:=isPositive(value);
       if upstring(key)='PRELOADING' then preloading:=isPositive(value);

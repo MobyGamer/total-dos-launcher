@@ -1,6 +1,6 @@
 {Global TDL compilation directives}
 {undefine this next line if still debugging}
-{$DEFINE FINAL}
+{{$DEFINE FINAL}
 
 {$G-} {No 286+ instructions -- must run on every IBM PC and compatible}
 

@@ -197,22 +197,18 @@ C:\ACTIVITY.DAT:
                         01 = activity detected for that minute
 
 AUDIT.DAT:
+REPEAT  (This structure repeats for as many audit entries are in the log)
         titleID:        16-bit word
         titleHash:      16 bytes of the MD5 hash of the title string
-                        (future use; could be used to migrate index files)
-        startTime:      4-byte (unsigned longint) packed DateTime record.
-                        To unpack:
-                        sec =   ((datetime >> 00) & 0x1f)*2      ;0..60
-                        min =   ( datetime >> 05) & 0x3f         ;0..59
-                        hour =  ( datetime >> 11) & 0x1f         ;0..23
-                        day =   ( datetime >> 16) & 0x1f         ;1..31
-                        month = ( datetime >> 21) & 0xf          ;1..12
-                        year =  ((datetime >> 25) & 0x7f) + 1980 ;1980..2108
-                        ;Seconds are even values only.
-                        ;Also: I guess that makes TDL "year-2108 compliant" ;-)
+                        (future use; could be used to migrate audit entries)
+        startTime:      12-byte Pascal DateTime record (16-bit unsigned words):
+                        DateTime = record
+                          Year,Month,Day,Hour,Min,Sec: Word;
+                        end;
         endTime:        (same format as startTime)
         minsActive:     16-bit unsigned word of minutes (from ACTIVITY.DAT)
-        confirmed:      byte flag: 0=unconfirmed, 1=confirmed
+                        If 0, entry is unconfirmed; if non-zero, confirmed
+END
 
 Purpose: (From github MobyGamer/total-dos-launcher/Issue #27)
 
@@ -227,12 +223,18 @@ collect the following information:
   - Unconfirmed (system was rebooted, TDL crashed)
 - Each minute the program was actively in use
 
-_(Program activity is not possible to collect reliably, but one possible
-implementation could involve hooking the system timer 18Hz interrupt to wake up
-once a minute to check keyboard buffer contents and mouse X/Y location, and if
-either are changed from the last sample, note it as active.  Joystick activity
-collection is not possible because joystick port reads are done with interrupts
-disabled.)_
+_(Program activity will be collected by a TSR loaded before TDL.  Program
+activity is not possible to collect reliably, but one possible implementation
+could involve hooking the system timer 18Hz interrupt to wake up once a minute
+to check keyboard buffer contents and mouse X/Y location, and if either are
+changed from the last sample, note it as active.  Joystick activity collection
+is not possible because joystick port reads are done with interrupts disabled,
+although joystick buttons can be read.
+
+As for recording this information, it must be done by a TSR loaded before TDL,
+as TDL cannot install any resident code due to its use of swap.  The TSR will
+comunicate via the multiplex interrupt, and hook the keyboard and mouse
+interrupts.)_
 
 An audit report can then be generated after the session is over, and would
 display the following:
