@@ -360,7 +360,7 @@ features as modern emulator front-ends.
 Any internet search can help you.  As of this writing, "DOS game collection"
 produced 3.2 million hits in google.  If you'd like to support commercial
 entities that legally sell vintage games, some choice exists, with
-`Good Old Games <http://www.gog.com/`_ being the most popular as of 2018.
+`Good Old Games <http://www.gog.com/>` being the most popular as of 2018.
 
 Extending the code
 ------------------
