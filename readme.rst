@@ -288,6 +288,8 @@ Quick cheat-sheet for those who have never contributed to a github open-source p
 4. Push to the branch: git push origin my-new-feature
 5. Submit a pull request
 
+This guide may be helpful: https://akrabat.com/the-beginners-guide-to-contributing-to-a-github-project/
+
 Design Requirements For New Features
 ------------------------------------
 
