@@ -98,11 +98,9 @@ if debug:
 
 print ("Converting to DOS-friendly 8.3 filenames...")
 """
-Currently, this uses titleid as the short name for simplicity and testing.
-Later versions will use a funging function to generate human-readable
+Currently, this uses a funging function to generate human-readable
 filenames (ie. "Wizard's Crown (1985)" will become "WIZARDSC", etc.
-(Or maybe just discard vowels, like "WZRDSCRW"?)
-(One unsolved challenge is how to elegantly detect and resolve collisions.)
+(One unsolved challenge is how to *elegantly* detect and resolve collisions.)
 """
 translation_table = dict.fromkeys(map(ord, ' [](),.~!@#$%^&*{}:'), None)
 
@@ -125,17 +123,18 @@ with FAT12 filesystems, so we mangle the unicode out of them.
 
 for idx, longname in enumerate(baseFiles):
     # FAT12 doesn't support unicode - avert thine eyes
-    dname = longname.encode('ascii','ignore').decode()
+    longname_sanitized = longname.encode('ascii','ignore').decode()
+    dname = longname_sanitized
     # Truncate basename while keeping extension
-    if len(longname) > 12:
-        dname = dname.translate(translation_table)[0:8] + longname[-4:]
+    if len(longname_sanitized) > 12:
+        dname = dname.translate(translation_table)[0:8] + longname_sanitized[-4:]
     dname = str.upper(dname)
     collided = dname
     if debug: print ("Starting check for",dname)
     # Do we have a collision?
     if dname in DOSnames:
         for i in string.ascii_uppercase + string.digits:
-            dname = longname.translate(translation_table)[0:7] + i + longname[-4:]
+            dname = longname_sanitized.translate(translation_table)[0:7] + i + longname_sanitized[-4:]
             dname = str.upper(dname)                                                      
             if dname not in DOSnames:
                 break
@@ -144,7 +143,7 @@ for idx, longname in enumerate(baseFiles):
             for i in string.ascii_uppercase + string.digits:
                 for j in string.ascii_uppercase + string.digits:
                     oldname = dname
-                    dname = longname.translate(translation_table)[0:6] + i + j + longname[-4:]
+                    dname = longname_sanitized.translate(translation_table)[0:6] + i + j + longname_sanitized[-4:]
                     dname = str.upper(dname)                                                      
                     if debug: print ("Extra mangling:",oldname,"to",dname)
                     if dname not in DOSnames:

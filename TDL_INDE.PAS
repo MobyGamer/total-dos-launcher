@@ -198,26 +198,49 @@ begin
 end;
 
 Function TFileIndex.Verify:boolean;
+const
+  err_lengthuneven=1;
+  err_wronglength=2;
+  err_outoforder=4;
 var
-  w,numf:word;
+  calcedEntries,w,numf:word;
+  mangled:word;
 begin
   Verify:=false;
+  mangled:=0;
   {verify length is correct}
-  if ((data^.GetSize-2) mod (2+12)) <> 0 then exit;
+  if ((data^.GetSize-2) mod (2+12)) <> 0
+    then mangled:=mangled OR err_lengthuneven;
   {verify Entries is correct}
-  w:=((data^.GetSize-2) div (2+12));
-  if w<>entries then exit;
+  calcedEntries:=((data^.GetSize-2) div (2+12));
+  if calcedEntries<>entries
+    then mangled:=mangled OR err_wronglength;
 
   {verify all fileIDs are correct}
   data^.seek(2);
   for numf:=0 to Entries-1 do begin
     data^.read(w,2);
-    if w<>numf then exit;
+    if w<>numf then begin
+      mangled:=mangled OR err_outoforder;
+      break;
+    end;
     data^.seek(data^.GetPos+12);
   end;
 
-  {if we get here, we didn't detect anything wrong}
-  Verify:=true;
+  if mangled<>0 then begin
+    writeln('File index errors found: ');
+    if (mangled AND err_lengthuneven)=err_lengthuneven
+      then writeln('Index wrong length; expected ',(14*entries),' but length is ',data^.GetSize-2);
+    if (mangled AND err_wronglength)=err_wronglength
+      then writeln('Expected ',entries,' entries but index appears to contain ',calcedEntries);
+    if (mangled AND err_outoforder)=err_outoforder
+      then writeln('Wrong fileID found; expected ',numf,', found ',w);
+    writeln('Hit enter when done reviewing');
+    readln;
+  end else begin
+    {if we get here, we didn't detect anything wrong}
+    Verify:=true;
+  end
 end;
 
 Constructor TTitleIndex.Init;
