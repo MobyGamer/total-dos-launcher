@@ -288,6 +288,8 @@ Quick cheat-sheet for those who have never contributed to a github open-source p
 4. Push to the branch: git push origin my-new-feature
 5. Submit a pull request
 
+This guide may be helpful: https://akrabat.com/the-beginners-guide-to-contributing-to-a-github-project/
+
 Design Requirements For New Features
 ------------------------------------
 
@@ -360,7 +362,7 @@ features as modern emulator front-ends.
 Any internet search can help you.  As of this writing, "DOS game collection"
 produced 3.2 million hits in google.  If you'd like to support commercial
 entities that legally sell vintage games, some choice exists, with
-`Good Old Games <http://www.gog.com/`_ being the most popular as of 2018.
+`Good Old Games <http://www.gog.com/>` being the most popular as of 2018.
 
 Extending the code
 ------------------
