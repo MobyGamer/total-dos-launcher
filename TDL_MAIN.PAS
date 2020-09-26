@@ -397,7 +397,7 @@ begin
       if s2<>''
         then addline(' TDL is using '+s2+' to accelerate index operations');
 
-      addline(' # of Titles: '+inttostr(numtitles)+' ('+inttostr(titleMetadata^.Used)+' marked as favorites) ');
+      addline(' # of Titles: '+inttostr(numtitles)+' ('+inttostr(titleMetadata^.Used)+' with additional metadata) ');
       addline(' Debug messsages logged to disk: '+boolToStr(logging,'ENABLED','disabled'));
       addline(' Treating filesystem as read-only: '+boolToStr(readonly,'YES','no'));
       {addline(' Excessive debug messages: '+boolToStr(edebug,'ENABLED','disabled'));}
@@ -406,7 +406,7 @@ begin
       if fileCache^.bytesfree > (1024*1024)
         then s:=inttostr(fileCache^.megsFree)+' MB free)'
         else s:=inttostr(fileCache^.bytesFree div 1024)+' KB free)';
-      addline(' Cache directory: '+fileCache^.path+' ('+s);
+      addline(' Cache directory: '+fileCache^.path+' ('+s+' ');
     end;
     addline(' ');
     show;
@@ -523,7 +523,8 @@ begin
 
   {Diskspace check: Do we have the disk space to handle this?}
   unpackEstimate:=fileCache^.EstimateCacheUsage(ext,filepath);
-  if fileCache^.bytesfree < unpackEstimate then begin
+  if (DirExists(tcachedir) = false)
+  and (fileCache^.bytesfree < unpackEstimate) then begin
     s:='This title could require up to '
       +inttostr(unpackEstimate div 1024)
       +' KB of disk space to run properly, but your cache only has '
