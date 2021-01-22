@@ -20,7 +20,7 @@ TODO:
 - "fill to xxMB or xxGB" option, either via alpha, random, or best-fit
 - remove duplicate filenames (ie. same file exists in multiple input paths)
 """
-import sys, os, shutil, glob, struct, hashlib, string, unicodedata
+import sys, os, shutil, glob, struct, hashlib, string, unicodedata, urllib.request, re
 
 verbosity=1
 debug=0
@@ -31,19 +31,56 @@ debug=0
     
 #sourceDir = sys.argv[1] if (len(sys.argv) > 1) else 'src/1985'
 sourceDir = sys.argv[1] if (len(sys.argv) > 1) else 'src'
-destDir = sys.argv[2] if (len(sys.argv) > 1) else 'output'
+destDir = sys.argv[2] if (len(sys.argv) > 2) else 'output'
+mappingFile = sys.argv[3] if (len(sys.argv) > 3) else 'https://raw.githubusercontent.com/Voljega/ExoDOSConverter/master/data/eXoDOSv5.csv'
 distroDir = 'distro'
 filesDir = destDir+'/files/'
 filesIDX = distroDir+'/FILES.IDX'
 titlesIDX = distroDir+'/TITLES.IDX'
 
+# Cleans filenames for safer matching
+def clean_name(name):
+    # Replace any number of spaces with _
+    name = re.sub(r'\s+', '_', name)
+    # Allow letters, numbers, and meaningful punctuation
+    return re.sub(r'[^a-zA-Z0-9_!$]', '', name)
+
+# Loads mapping from a CSV locally or on the web
+def load_mappings(path):
+    data = ''
+    if path.startswith("http://") or path.startswith("https://"):
+        with urllib.request.urlopen(path) as response:
+            data = response.read()
+    else:
+        data = open(path, "rb").read()
+
+    map = {}
+    for line in data.decode("utf8").strip().split('\n'):
+        match = re.search(r"(.*)\;([^;]+)", line)
+        name = clean_name(match.group(1))
+        if name in map:
+            print(f"Warning: duplicate game name '{name}' (raw name was {match.group(1)})")
+        map[name] = match.group(2)
+
+    return map
+
+# Find any zip files
 def scantree_files(path):
     """Recursively yield DirEntry objects for given directory."""
     for entry in os.scandir(path):
         if entry.is_dir(follow_symlinks=False):
             yield from scantree_files(entry.path)
         else:
-            yield entry
+            # Make sure it's a zip
+            if not entry.name.endswith("zip"):
+                continue
+            if entry.stat().st_size <= 22: # The smallest possible zip file
+                continue
+            signature = open(f"{entry.path}", "rb").read(2)
+            if signature == b'PK':
+                yield entry
+
+mappings = load_mappings(mappingFile)
 
 if verbosity: print ("Gathering list of files...")
 
@@ -97,68 +134,24 @@ if debug:
     #print(titles[-5:],"\n")
 
 print ("Converting to DOS-friendly 8.3 filenames...")
-"""
-Currently, this uses a funging function to generate human-readable
-filenames (ie. "Wizard's Crown (1985)" will become "WIZARDSC", etc.
-(One unsolved challenge is how to *elegantly* detect and resolve collisions.)
-"""
-translation_table = dict.fromkeys(map(ord, ' [](),.~!@#$%^&*{}:'), None)
 
-"""
-Handle long-to-short collisions by changing the last letter of the filename.
-This allows us up to 35 collisions before we give up.  Back-of-the-napkin
-analysis shows we should never get to that point under normal circumstances,
-but if we do, die and inform the user to complain to the programmer.
-
-BTW: We are forcing letters and numbers in ASCII order instead of incrementing
-the last character because that is less likely to confuse the inquisitive
-end-user who wants to use the 8.3 files manually.  If we incremented the last
-character, we'd have stuff like filename, filenamf, filenamg, (or filenam0,
-filenam1, filenam2) which may imply a relationship between the files that does
-not exist.
-
-BTW2: Filenames can't have any unicode in them to be universally compatible
-with FAT12 filesystems, so we mangle the unicode out of them.
-"""
-
-for idx, longname in enumerate(baseFiles):
-    # FAT12 doesn't support unicode - avert thine eyes
-    longname_sanitized = longname.encode('ascii','ignore').decode()
-    dname = longname_sanitized
-    # Truncate basename while keeping extension
-    if len(longname_sanitized) > 12:
-        dname = dname.translate(translation_table)[0:8] + longname_sanitized[-4:]
-    dname = str.upper(dname)
-    collided = dname
-    if debug: print ("Starting check for",dname)
-    # Do we have a collision?
-    if dname in DOSnames:
-        for i in string.ascii_uppercase + string.digits:
-            dname = longname_sanitized.translate(translation_table)[0:7] + i + longname_sanitized[-4:]
-            dname = str.upper(dname)                                                      
-            if dname not in DOSnames:
-                break
-        else:
-            # If we still have a collision, we need to mangle the name some more
-            for i in string.ascii_uppercase + string.digits:
-                for j in string.ascii_uppercase + string.digits:
-                    oldname = dname
-                    dname = longname_sanitized.translate(translation_table)[0:6] + i + j + longname_sanitized[-4:]
-                    dname = str.upper(dname)                                                      
-                    if debug: print ("Extra mangling:",oldname,"to",dname)
-                    if dname not in DOSnames:
-                        if debug: print("Success:",collided,dname)
-                        break
-                if dname not in DOSnames:
-                    break
-
-    # If we got here, too many collisions (need more code!)
-    if dname in DOSnames:
-        print ("Namespace collision converting",longname,"to",dname)
-        print ("Ask the progammer to enhance the collision algorithm.")
-        sys.exit(8)
-
-    DOSnames.append(dname)
+for entry in sfoundfiles:
+    if debug>1: print(entry.path)
+    baseFiles.append(entry.name)
+    base_name = entry.name.replace('.zip', '')
+    if entry.name.startswith('-'):
+        # For 'custom' files starting with -, we just remove all the bits of the filename that aren't
+        # valid DOS chars. We assume there won't be any conflicts here.
+        cleaned_name = '-' + re.sub(r'[^a-zA-Z0-9]', '', base_name).upper()
+        if len(cleaned_name) > 8:
+            cleaned_name = cleaned_name[0:8]
+        DOSnames.append(f"{cleaned_name}.zip")
+    else:
+        cleaned_name = clean_name(base_name)
+        if not cleaned_name in mappings:
+            print(f"Error: unknown game found ({entry.name}, matching name was {cleaned_name})")
+            sys.exit(1)
+        DOSnames.append(f"{mappings[cleaned_name]}.zip")
 
 if debug:
     print ("first 5 DOS-friendly filenames are:")
