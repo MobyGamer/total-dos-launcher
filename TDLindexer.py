@@ -83,6 +83,10 @@ for entry in sfoundfiles:
     tmptitle=fname.rsplit(sep='.',maxsplit=1)[0]
     if debug: print (tmptitle,':',len(tmptitle))
     tmptitle=tmptitle.encode('ascii','backslashreplace').decode()
+    # Just in case our DOS-friendly ASCII expansion created a title over 254
+    # characters, truncate (otherwise we can't display it in DOS without a ton
+    # of extra effort)
+    tmptitle = tmptitle[:253]
     if debug: print (tmptitle,':',len(tmptitle))
     titles.append(tmptitle)
 
@@ -215,8 +219,6 @@ for idx, name in enumerate(titles):
     thash=hashlib.md5(name.encode()).digest()
     f.write(thash)
     # write titleLen
-    # If name is longer than 255 chars, we can't write it, so we must truncate
-    name = name[:254]
     if debug: print (name,' has length ',len(name))
     f.write(struct.pack('B',len(name)))
     # write title itself
