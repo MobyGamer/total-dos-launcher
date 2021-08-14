@@ -215,6 +215,9 @@ for idx, name in enumerate(titles):
     thash=hashlib.md5(name.encode()).digest()
     f.write(thash)
     # write titleLen
+    # If name is longer than 255 chars, we can't write it, so we must truncate
+    name = name[:254]
+    if debug: print (name,' has length ',len(name))
     f.write(struct.pack('B',len(name)))
     # write title itself
     f.write(name.encode())                    
