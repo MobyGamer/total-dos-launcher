@@ -27,13 +27,11 @@ type
     PUBLIC
     entries:word;
     {cached:boolean;}
+    data:PStream;
 
     Constructor Init(fpath:PathStr;caching:boolean); {caching=are we allowed to}
     Destructor Done; VIRTUAL;
     Function verify:boolean; VIRTUAL;
-
-    PRIVATE
-    data:PStream;
   end;
 
   PFileIndex=^TFileIndex;

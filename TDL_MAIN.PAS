@@ -25,6 +25,7 @@ implementation
 
 uses
   DOS,
+  objects,
   support,
   strings,
   cmdlin,
@@ -76,6 +77,18 @@ var
   w:word;
   {wantNlines:byte;}
   tf:PFileStruct;
+  t:pointer;
+
+  procedure expressType;
+  begin
+         if (t=typeof(TEMSStream)) or (t=typeof(TEMSStream2))
+                                        then temps:=temps+'in EMS'
+    else if (t=typeof(TNamedBufStream)) or (t=typeof(TTempBufStream))
+                                        then temps:=temps+'on disk'
+    else if t = typeof(TMemoryStream)   then temps:=temps+'in lower DOS RAM'
+    else if t = typeof(TXMSStream)      then temps:=temps+'in XMS'
+    else temps:=temps+'somewhere unknown';
+  end;
 
 begin
   {If user requested help, then print it and exit}
@@ -177,6 +190,17 @@ begin
 
   if (config^.userlevel=power) or (config^.edebug=true) then begin
     writeln('Performing additional checks:');
+
+    temps:='Files index is located ';
+    t:=typeof(files^.data^);
+    expressType;
+    writeln(temps);
+
+    temps:='Titles index is located ';
+    t:=typeof(titles^.data^);
+    expressType;
+    writeln(temps);
+
     with config^ do begin
       {power users like to ensure they copied the stuff over correctly}
       write('Index locations: ');
