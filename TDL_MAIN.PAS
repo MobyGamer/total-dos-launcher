@@ -80,14 +80,17 @@ var
   t:pointer;
 
   procedure expressType;
+  var
+    ws:string[24];
   begin
-         if (t=typeof(TEMSStream)) or (t=typeof(TEMSStream2))
-                                        then temps:=temps+'in EMS'
-    else if (t=typeof(TNamedBufStream)) or (t=typeof(TTempBufStream))
-                                        then temps:=temps+'on disk'
-    else if t = typeof(TMemoryStream)   then temps:=temps+'in lower DOS RAM'
-    else if t = typeof(TXMSStream)      then temps:=temps+'in XMS'
-    else temps:=temps+'somewhere unknown';
+    ws:='somewhere unknown';
+    if t=typeof(TEMSStream)      then ws:='in EMS';
+    if t=typeof(TEMSStream2)     then ws:='in EMS';
+    if t=typeof(TNamedBufStream) then ws:='on disk';
+    if t=typeof(TTempBufStream)  then ws:='on disk';
+    if t=typeof(TMemoryStream)   then ws:='in lower DOS RAM';
+    if t=typeof(TXMSStream)      then ws:='in XMS';
+    temps:=temps+ws;
   end;
 
 begin
@@ -149,15 +152,16 @@ begin
   config^.EMSatStartup:=ems_memavail;
   config^.XMSatStartup:=xms_memavail;
 
-  {attempt initializing indexes}
-  writeln('Initializing files index...');
-  files:=new(PFileIndex,
-         init(config^.baseDir+config^.filesIDXname,config^.preloading));
-  if files=nil then fatalerror(1,'Files index init failed');
+  {Initialize indexes. Titles is more important to be fast, so
+  try to init it first in case there's enough lower RAM to hold it.}
   writeln('Initializing titles index...');
   titles:=new(PTitleIndex,
           init(config^.baseDir+config^.titlesIDXname,config^.preloading));
   if titles=nil then fatalerror(1,'Titles index init failed');
+  writeln('Initializing files index...');
+  files:=new(PFileIndex,
+         init(config^.baseDir+config^.filesIDXname,config^.preloading));
+  if files=nil then fatalerror(1,'Files index init failed');
 
   write('Title metadata: ');
   temps:=stdpath(sd)+'titles.dat';

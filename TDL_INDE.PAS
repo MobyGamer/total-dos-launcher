@@ -139,6 +139,13 @@ begin
   {register index as a stream on disk}
   odata:=new(pbufstream,init(fpath,stOpenRead,indexMinRAM));
 
+  {If we have no EMS or XMS, and if stream is > than RAM,
+  disable caching to speed up program initialization.}
+  if (ems_memavail=0)
+  and (xms_memavail=0)
+  and (odata^.getsize > maxavail)
+    then caching:=false;
+
   if caching then begin
     {create a new RAM-based stream and copy index into it (STREAM16)}
     l:=indexMinRAM;
