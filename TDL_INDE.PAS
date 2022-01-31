@@ -147,17 +147,21 @@ begin
     then caching:=false;
 
   if caching then begin
-    {create a new RAM-based stream and copy index into it (STREAM16)}
+    {create a new RAM-based stream and copy index into it}
     l:=indexMinRAM;
     {if index is tiny, just load entire thing}
     if l > odata^.getsize then l:=odata^.getsize;
     data:=TempStream(l,odata^.getsize,ForSpeed);
     if data=nil
-      then fatalerror(16,fpath+' failed during init');
-    {copy disk-based stream into memory-based stream}
-    FastCopy(odata^,data^,odata^.GetSize);
+      then fatalerror(16,'Caching '+fpath+' failed during init');
+    {Copy disk-based stream into memory-based stream.
+    Do size-efficient copy if index is loaded into lower DOS RAM,
+    as we might not have enough low RAM for FastCopy's 64K temp buffer.}
+    if typeof(data^) = typeof(TMemoryStream)
+      then data^.copyfrom(odata^,odata^.getsize)
+      else FastCopy(odata^,data^,odata^.GetSize);
     if data^.status <> stOK
-      then fatalerror(16,fpath+' failed during copy');
+      then fatalerror(16,'Caching '+fpath+' failed during copy');
     dispose(odata,done);
   end else begin
     {Just use the stream on disk as-is.  Slow, but low RAM usage.}

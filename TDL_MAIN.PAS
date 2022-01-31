@@ -83,11 +83,13 @@ var
   var
     ws:string[24];
   begin
-    ws:='somewhere unknown';
+    ws:='on disk';
     if t=typeof(TEMSStream)      then ws:='in EMS';
     if t=typeof(TEMSStream2)     then ws:='in EMS';
+    (*
     if t=typeof(TNamedBufStream) then ws:='on disk';
     if t=typeof(TTempBufStream)  then ws:='on disk';
+    *)
     if t=typeof(TMemoryStream)   then ws:='in lower DOS RAM';
     if t=typeof(TXMSStream)      then ws:='in XMS';
     temps:=temps+ws;
@@ -158,6 +160,7 @@ begin
   titles:=new(PTitleIndex,
           init(config^.baseDir+config^.titlesIDXname,config^.preloading));
   if titles=nil then fatalerror(1,'Titles index init failed');
+
   writeln('Initializing files index...');
   files:=new(PFileIndex,
          init(config^.baseDir+config^.filesIDXname,config^.preloading));

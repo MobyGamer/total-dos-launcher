@@ -21,17 +21,14 @@ uses
 {$IFDEF USEOVERLAYS}
   {Note: documentation discourages overlaying TOTSYS, TOTINPUT, and TOTFAST}
   {$O totDATE}
-  {{$O totDIR}
   {$O totFAST}
   {$O totINPUT}
   {$O totIO1}
   {$O totIO2}
-  {{$O totIO3}
   {$O totKEY}
   {$O totLINK}
   {$O totLIST}
   {$O totLOOK}
-  {{$O totMENU}
   {$O totMISC}
   {$O totMSG}
   {$O totREAL}

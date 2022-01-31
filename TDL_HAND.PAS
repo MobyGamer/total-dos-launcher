@@ -328,6 +328,10 @@ begin
     then system.delete(wrkdir,length(wrkdir),1);
   chdir(wrkDir);
 
+  {$IFDEF DPMI}
+  !This code is not compatible with protected-mode compilation targets!
+  {$ENDIF}
+
   {determine end of actual memory used}
   NewHeapEnd:=Seg(HeapPtr^)-PrefixSeg;
   OldHeapEnd:=Seg(HeapEnd^)-PrefixSeg;
