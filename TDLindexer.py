@@ -22,20 +22,21 @@ TODO:
 """
 import sys, os, shutil, glob, struct, hashlib, string, unicodedata
 
-verbosity=1
-debug=0
+verbosity = 1
+debug = 0
 
-#if len(sys.argv) < 3:
-    #print ("Usage: tdl_indexer.py <source> <destination>")
-    #sys.exit(2)
-    
-#sourceDir = sys.argv[1] if (len(sys.argv) > 1) else 'src/1985'
-sourceDir = sys.argv[1] if (len(sys.argv) > 1) else 'src'
-destDir = sys.argv[2] if (len(sys.argv) > 1) else 'output'
-distroDir = 'distro'
-filesDir = destDir+'/files/'
-filesIDX = distroDir+'/FILES.IDX'
-titlesIDX = distroDir+'/TITLES.IDX'
+# if len(sys.argv) < 3:
+# print ("Usage: tdl_indexer.py <source> <destination>")
+# sys.exit(2)
+
+# sourceDir = sys.argv[1] if (len(sys.argv) > 1) else 'src/1985'
+sourceDir = sys.argv[1] if (len(sys.argv) > 1) else "src"
+destDir = sys.argv[2] if (len(sys.argv) > 1) else "output"
+distroDir = "distro"
+filesDir = destDir + "/files/"
+filesIDX = distroDir + "/FILES.IDX"
+titlesIDX = distroDir + "/TITLES.IDX"
+
 
 def scantree_files(path):
     """Recursively yield DirEntry objects for given directory."""
@@ -45,28 +46,32 @@ def scantree_files(path):
         else:
             yield entry
 
-if verbosity: print ("Gathering list of files...")
 
-foundfiles=[]   # Source filenames with full paths and extensions
-sourceFiles=[]  # Source filenames with full paths and extensions (sorted)
-baseFiles=[]    # Source filenames with extensions (no paths)
-titles=[]       # Source filenames without paths or extensions
-DOSnames=[]     # titles() converted to 8.3-friendly DOS names
+if verbosity:
+    print("Gathering list of files...")
 
-foundfiles=list(scantree_files(sourceDir))
+foundfiles = []  # Source filenames with full paths and extensions
+sourceFiles = []  # Source filenames with full paths and extensions (sorted)
+baseFiles = []  # Source filenames with extensions (no paths)
+titles = []  # Source filenames without paths or extensions
+DOSnames = []  # titles() converted to 8.3-friendly DOS names
 
-print ("Found",len(foundfiles),"files to copy.")
+foundfiles = list(scantree_files(sourceDir))
 
-if len(foundfiles)>32767:
+print("Found", len(foundfiles), "files to copy.")
+
+if len(foundfiles) > 32767:
     print("Fatal: Current design of DOS TDL does not support more than 32767 files.")
     sys.exit(64)
 
-if len(foundfiles)>16383:
-    print("""
+if len(foundfiles) > 16383:
+    print(
+        """
 Warning: This many files may cause the DOS TDL to operate slower than normal
 due to the titles index not being able to be cached in memory.  TDL will still
 run, but might require a very fast I/O device for acceptable speed.
-""")
+"""
+    )
 
 # Sort discovered files by their filename, case insensitive.  Additional
 # sort criteria may be added in the future, but I lack the skills to do so,
@@ -76,37 +81,40 @@ run, but might require a very fast I/O device for acceptable speed.
 sfoundfiles = sorted(foundfiles, key=lambda dirent: dirent.name.lower())
 
 for entry in sfoundfiles:
-    if debug>1: print(entry.path)
+    if debug > 1:
+        print(entry.path)
     sourceFiles.append(entry.path)
     fname = entry.name
     baseFiles.append(fname)
-    tmptitle=fname.rsplit(sep='.',maxsplit=1)[0]
-    if debug: print (tmptitle,':',len(tmptitle))
-    tmptitle=tmptitle.encode('ascii','backslashreplace').decode()
+    tmptitle = fname.rsplit(sep=".", maxsplit=1)[0]
+    if debug:
+        print(tmptitle, ":", len(tmptitle))
+    tmptitle = tmptitle.encode("ascii", "backslashreplace").decode()
     # Just in case our DOS-friendly ASCII expansion created a title over 254
     # characters, truncate (otherwise we can't display it in DOS without a ton
     # of extra effort)
     tmptitle = tmptitle[:253]
-    if debug: print (tmptitle,':',len(tmptitle))
+    if debug:
+        print(tmptitle, ":", len(tmptitle))
     titles.append(tmptitle)
 
 if debug:
-    print ("First 5 files found were:")
-    print(baseFiles[0:5],"\n")
-    print ("First 5 titles found were:")
-    print(titles[0:5],"\n")
-    #print ("Last 5 files found were:")
-    #print(baseFiles[-5:],"\n")
-    #print ("Last 5 titles found were:")
-    #print(titles[-5:],"\n")
+    print("First 5 files found were:")
+    print(baseFiles[0:5], "\n")
+    print("First 5 titles found were:")
+    print(titles[0:5], "\n")
+    # print ("Last 5 files found were:")
+    # print(baseFiles[-5:],"\n")
+    # print ("Last 5 titles found were:")
+    # print(titles[-5:],"\n")
 
-print ("Converting to DOS-friendly 8.3 filenames...")
+print("Converting to DOS-friendly 8.3 filenames...")
 """
 Currently, this uses a funging function to generate human-readable
 filenames (ie. "Wizard's Crown (1985)" will become "WIZARDSC", etc.
 (One unsolved challenge is how to *elegantly* detect and resolve collisions.)
 """
-translation_table = dict.fromkeys(map(ord, ' [](),.~!@#$%^&*{}:'), None)
+translation_table = dict.fromkeys(map(ord, " [](),.~!@#$%^&*{}:"), None)
 
 """
 Handle long-to-short collisions by changing the last letter of the filename.
@@ -127,19 +135,24 @@ with FAT12 filesystems, so we mangle the unicode out of them.
 
 for idx, longname in enumerate(baseFiles):
     # FAT12 doesn't support unicode - avert thine eyes
-    longname_sanitized = longname.encode('ascii','ignore').decode()
+    longname_sanitized = longname.encode("ascii", "ignore").decode()
     dname = longname_sanitized
     # Truncate basename while keeping extension
     if len(longname_sanitized) > 12:
         dname = dname.translate(translation_table)[0:8] + longname_sanitized[-4:]
     dname = str.upper(dname)
     collided = dname
-    if debug: print ("Starting check for",dname)
+    if debug:
+        print("Starting check for", dname)
     # Do we have a collision?
     if dname in DOSnames:
         for i in string.ascii_uppercase + string.digits:
-            dname = longname_sanitized.translate(translation_table)[0:7] + i + longname_sanitized[-4:]
-            dname = str.upper(dname)                                                      
+            dname = (
+                longname_sanitized.translate(translation_table)[0:7]
+                + i
+                + longname_sanitized[-4:]
+            )
+            dname = str.upper(dname)
             if dname not in DOSnames:
                 break
         else:
@@ -147,36 +160,43 @@ for idx, longname in enumerate(baseFiles):
             for i in string.ascii_uppercase + string.digits:
                 for j in string.ascii_uppercase + string.digits:
                     oldname = dname
-                    dname = longname_sanitized.translate(translation_table)[0:6] + i + j + longname_sanitized[-4:]
-                    dname = str.upper(dname)                                                      
-                    if debug: print ("Extra mangling:",oldname,"to",dname)
+                    dname = (
+                        longname_sanitized.translate(translation_table)[0:6]
+                        + i
+                        + j
+                        + longname_sanitized[-4:]
+                    )
+                    dname = str.upper(dname)
+                    if debug:
+                        print("Extra mangling:", oldname, "to", dname)
                     if dname not in DOSnames:
-                        if debug: print("Success:",collided,dname)
+                        if debug:
+                            print("Success:", collided, dname)
                         break
                 if dname not in DOSnames:
                     break
 
     # If we got here, too many collisions (need more code!)
     if dname in DOSnames:
-        print ("Namespace collision converting",longname,"to",dname)
-        print ("Ask the progammer to enhance the collision algorithm.")
+        print("Namespace collision converting", longname, "to", dname)
+        print("Ask the progammer to enhance the collision algorithm.")
         sys.exit(8)
 
     DOSnames.append(dname)
 
 if debug:
-    print ("first 5 DOS-friendly filenames are:")
-    print(DOSnames[0:5],"\n")
-    print ("Last 5 DOS-friendly filenames are:")
-    print(DOSnames[-5:],"\n")
+    print("first 5 DOS-friendly filenames are:")
+    print(DOSnames[0:5], "\n")
+    print("Last 5 DOS-friendly filenames are:")
+    print(DOSnames[-5:], "\n")
 
 # refer to index_formats.txt for info on what is being generated for all the index files, and why
-print ("Generating files index...")
-f = open(filesIDX, 'wb')
-f.write(struct.pack('<H', len(DOSnames)))
+print("Generating files index...")
+f = open(filesIDX, "wb")
+f.write(struct.pack("<H", len(DOSnames)))
 for idx, fname in enumerate(DOSnames):
-    f.write(struct.pack('<H',idx))
-    f.write(str.encode(fname[0:12].ljust(12,"\x00")))
+    f.write(struct.pack("<H", idx))
+    f.write(str.encode(fname[0:12].ljust(12, "\x00")))
 f.close()
 
 
@@ -200,38 +220,41 @@ END
 # There is likely a very elegant way to do this using tuples or something
 # but this is my first python program so I'll figure it out later
 
-print ("Generating titles index...")
-f = open(titlesIDX, 'wb')
-f.write(struct.pack('<H', len(titles)))
+print("Generating titles index...")
+f = open(titlesIDX, "wb")
+f.write(struct.pack("<H", len(titles)))
 # build list of offsets
-toffsets=[]
-curofs=2+(len(titles)*4) #real starting offset is past the offset structure itself
+toffsets = []
+curofs = 2 + (
+    len(titles) * 4
+)  # real starting offset is past the offset structure itself
 for tlen in titles:
     toffsets.append(curofs)
-    curofs = curofs + (2+16+1+len(tlen))
+    curofs = curofs + (2 + 16 + 1 + len(tlen))
 # dump offsets to index file
 for tmpofs in toffsets:
-    f.write(struct.pack('<L',tmpofs))
+    f.write(struct.pack("<L", tmpofs))
 for idx, name in enumerate(titles):
     # write titleID
-    f.write(struct.pack('<H',idx))
+    f.write(struct.pack("<H", idx))
     # write titleHash
-    thash=hashlib.md5(name.encode()).digest()
+    thash = hashlib.md5(name.encode()).digest()
     f.write(thash)
     # write titleLen
-    if debug: print (name,' has length ',len(name))
-    f.write(struct.pack('B',len(name)))
+    if debug:
+        print(name, " has length ", len(name))
+    f.write(struct.pack("B", len(name)))
     # write title itself
-    f.write(name.encode())                    
+    f.write(name.encode())
 f.close()
 
 # Create mapping table so the user can weed things out and try again.
 # For example, it would be a good idea to not put any "porn" or "adult"
 # games on a system at a show/convention or out on the museum floor.
 
-f = open("name_mapping.txt", 'w')
+f = open("name_mapping.txt", "w")
 for idx, shortn in enumerate(DOSnames):
-    f.write(shortn + ' ;' + titles[idx] + '\n')
+    f.write(shortn + " ;" + titles[idx] + "\n")
 f.close()
 
 
@@ -240,16 +263,23 @@ Copy everything over to the destination.
 Also copy the TDL itself, the index files, tools needed, etc.
 """
 if os.path.exists(filesDir):
-    print ('Output directory "',destDir,'" already exists.'
-           '\nPlease specify a non-existent directory for the destination.',sep='')
+    print(
+        'Output directory "',
+        destDir,
+        '" already exists.'
+        "\nPlease specify a non-existent directory for the destination.",
+        sep="",
+    )
     sys.exit(1)
-print ("Copying files from", sourceDir, "to", destDir, "...")
-shutil.copytree(distroDir,destDir)
-if not os.path.exists(filesDir): os.makedirs(filesDir)
+print("Copying files from", sourceDir, "to", destDir, "...")
+shutil.copytree(distroDir, destDir)
+if not os.path.exists(filesDir):
+    os.makedirs(filesDir)
 
 # Copy source:longfilenames to destination:shortfilenames
 for i in range(len(DOSnames)):
-    if debug: print (DOSnames[i])
-    shutil.copy(sourceFiles[i],filesDir+DOSnames[i])
+    if debug:
+        print(DOSnames[i])
+    shutil.copy(sourceFiles[i], filesDir + DOSnames[i])
 
 print("Done.")
