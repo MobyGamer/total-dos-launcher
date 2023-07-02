@@ -162,8 +162,9 @@ begin
   if titles=nil then fatalerror(1,'Titles index init failed');
 
   writeln('Initializing files index...');
+  {never cache files index; doesn't need it, accessed infrequently}
   files:=new(PFileIndex,
-         init(config^.baseDir+config^.filesIDXname,config^.preloading));
+         init(config^.baseDir+config^.filesIDXname,false));
   if files=nil then fatalerror(1,'Files index init failed');
 
   write('Title metadata: ');

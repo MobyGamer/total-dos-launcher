@@ -92,6 +92,47 @@ storeloop:
         jnz     storeloop
         stosb                           ;write string terminator
         ret
+;Converts a dword into a DOS string.
+;Input: DX:AX   dword to be converted.
+;       ES:DI   pointer to where the string is stored
+;       BL      radix (10 for decimal, 16 for hex, etc., up to 36)
+;
+;Output: ES:DI points just past the converted string.
+;
+;Destroys: AX, BH, CX, DX, SI.
+        xor     bh, bh                  ;Clear bh so bx=radix
+        cld                             ;Direction for stosb
+        mov     si, ax
+        mov     cx, dx                  ;Put dword in cx:si
+        mov     al,'$'
+        push    ax                      ;Store string terminator
+mainloop:
+        mov     ax, cx                  ;\
+        xor     dx, dx                  ;|
+        div     bx                      ;|
+        xchg    ax, si                  ;| Perform the division
+        div     bx                      ;|
+        mov     cx, ax                  ;|
+        xchg    cx, si                  ;/
+        mov     al, dl                  ;Move dl into al and
+        add     al, 30h                 ;convert to a digit.
+;The following four lines (cmp al, 39h up to the is_decimal_digit
+;label) can be left out if you don't want to use a radix over 10.
+;        cmp     al, 39h
+;        jbe     is_decimal_digit
+;        add     al, 7
+;is_decimal_digit:
+        push    ax                      ;Store the digit
+        mov     ax, cx                  ;Are we done yet?
+        or      ax, si
+        jnz     mainloop
+storeloop:
+        pop     ax                      ;pop digits from stack
+        stosb                           ;write to string loc
+        cmp     al, '$'                 ;end of string?
+        jnz     storeloop
+        stosb                           ;write string terminator
+        ret
 
 strbuf  db 8 DUP '$'
 bfr     db ' bytes ($'
