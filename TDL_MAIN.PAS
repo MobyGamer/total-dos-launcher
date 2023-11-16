@@ -359,10 +359,11 @@ end;
 
 Procedure PrintHelp;
 begin
+  writeln(TDLTitleFull);
   asm
     jmp @start
 @message:
-    db 0ah,'Usage: TDL.EXE <switches>',0dh,0ah,0ah
+    db 'Usage: TDL.EXE <switches>',0dh,0ah,0ah
 
     db 'Switches:',0dh,0ah
     db '-?, -h  This help',0dh,0ah
