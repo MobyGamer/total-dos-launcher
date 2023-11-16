@@ -95,7 +95,7 @@ to navigate and launch the programs you copied over.
 
 Where to download
 ^^^^^^^^^^^^^^^^^
-For those not familiar with how github works, you can grab the most recent release from this repository's releases tab: https://github.com/MobyGamer/total-dos-launcher/releases
+For those not familiar with how github works, you can grab the most recent tagged codebase from https://github.com/MobyGamer/total-dos-launcher/tags
 
 
 Prerequisites
