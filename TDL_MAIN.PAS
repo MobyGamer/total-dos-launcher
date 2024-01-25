@@ -769,7 +769,7 @@ var
   tid:word;
   iconPosX,iconPosY:byte;
 
-  bsl,bsr,bsm:integer;
+  bsl,bsr,bsm:longint;
   bsch:char;
 
   ttbuf:PTitleStruct;

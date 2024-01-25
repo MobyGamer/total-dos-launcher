@@ -11,7 +11,7 @@ uses
 const
   maxTitles=maxbufsize div sizeof(word);
   maxCacheableTitles=maxbufsize div sizeof(longint);
-  TDLtitleFull='The Total DOS Launcher, v. 20231115';
+  TDLtitleFull='The Total DOS Launcher, v. 20240124';
   TDLtitle='The Total DOS Launcher';
   (*TDLstatus='F1=Help~³~'#24'/'#25'/PgUp/PgDn/Home/End = Navigate~³~Enter = START~³~ESC=exit~³~';*)
   TDLstatus='F1=Help~³~'#24'/'#25'/PgUp/PgDn/Home/End = Navigate~³~Enter = LAUNCH~³~ESC = exit~³~';
