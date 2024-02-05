@@ -362,17 +362,22 @@ features as modern emulator front-ends.
 Any internet search can help you.  As of this writing, "DOS game collection"
 produced 3.2 million hits in google.  If you'd like to support commercial
 entities that legally sell vintage games, some choice exists, with
-`Good Old Games <http://www.gog.com/>` being the most popular as of 2018.
+`Good Old Games <http://www.gog.com/>` being the most popular as of 2024.
+
+*I'm using TDL with DOSBOX and it won't unzip some of the larger games, claiming there is not enough free space in the cache to extract them.*
+Some DOSBOX variants default to limiting the amount of free space to 16MB
+regardless of how much is actually free.  To get around this, mount the drive
+with the option " -freesize [size]".  For example::
+
+ mount C C:\dosgames -freesize 1024
 
 Extending the code
 ------------------
 
-*Why was this written in Pascal and assembler, instead of something more
-popular like C?*
+*Why was this written in Pascal and assembler, instead of something more popular like C?*
 The principle developer of the TDL prefers the Turbo Pascal 7 IDE when writing code on, and for, 8088-based systems.
-The TP7 IDE is a powerful
-development environment that allows an 8088-based IBM PC
-with 640KB to perform symbolic debugging with conditional breakpoints,
+The TP7 IDE is a powerful development environment that allows an 8088-based IBM
+PC with 640KB to perform symbolic debugging with conditional breakpoints,
 watch/inspect/change variables at runtime, and watch CPU registers change line
 by line, all without leaving the IDE.  Also, TP7 makes it easy to speed up
 sections by either writing in-line assembler directly in the pascal source, or
@@ -391,6 +396,6 @@ Philosophy
 *Emulators are much easier to use than maintaining original hardware.  Why not just use emulators?*
 Both hardware and emulators are useful for running programs for which the
 hardware environments are no longer sold or maintained.  Emulators are
-unparalleled for their accessibility.  But, as good as emulators are,
-the only way to truly research a historical work is to experience
-it on the hardware that work targeted.
+unparalleled for their accessibility.  But, as good as emulators are, the only
+way to truly research a historical work is to experience it on the hardware
+that work targeted.
