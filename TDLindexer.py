@@ -10,9 +10,9 @@ list to perform the following:
 For more information on the index file formats this tool generates, consult
 index_formats.txt.
 
-This is my very first Python project.  All mockery and jeers can be
-directed to trixter@oldskool.org, although it would be more helpful
-to the project if you could fix my novice coding and make this program better.
+This is my very first Python script.  I'm a DOS assembly programmer so it is
+very likely I am doing this completely wrong.  Please help me fix and rewrite
+it to be better.
 
 TODO:
 - import argparse and accept multiple source arguments properly
@@ -114,7 +114,10 @@ Currently, this uses a funging function to generate human-readable
 filenames (ie. "Wizard's Crown (1985)" will become "WIZARDSC", etc.
 (One unsolved challenge is how to *elegantly* detect and resolve collisions.)
 """
-translation_table = dict.fromkeys(map(ord, " [](),.~!@#$%^&*{}:"), None)
+longname_chars_to_remove = "[](),.~!@#$%^&*{}: "
+basename_chars_to_remove = "[],~!@#$%^&*{}: "
+long_translation_table = str.maketrans("","",longname_chars_to_remove)
+base_translation_table = str.maketrans("","",basename_chars_to_remove)
 
 """
 Handle long-to-short collisions by changing the last letter of the filename.
@@ -137,10 +140,19 @@ for idx, longname in enumerate(baseFiles):
     # FAT12 doesn't support unicode - avert thine eyes
     longname_sanitized = longname.encode("ascii", "ignore").decode()
     dname = longname_sanitized
-    # Truncate basename while keeping extension
+    if debug:
+        print("dname1: ", dname)
+    # Truncate basename while keeping extension.  Copy the first 8 translated chars
+    # and then just the extension.
     if len(longname_sanitized) > 12:
-        dname = dname.translate(translation_table)[0:8] + longname_sanitized[-4:]
+        dname = dname.translate(long_translation_table)[0:8] + longname_sanitized[-4:]
+        if debug:
+            print("dname2: ", dname)
+
+    # Ensure DOS filename is upper-case and doesn't have spaces or other crud in it
     dname = str.upper(dname)
+    dname = dname.translate(base_translation_table)
+
     collided = dname
     if debug:
         print("Starting check for", dname)
@@ -148,11 +160,12 @@ for idx, longname in enumerate(baseFiles):
     if dname in DOSnames:
         for i in string.ascii_uppercase + string.digits:
             dname = (
-                longname_sanitized.translate(translation_table)[0:7]
+                longname_sanitized.translate(long_translation_table)[0:7]
                 + i
                 + longname_sanitized[-4:]
             )
             dname = str.upper(dname)
+            dname = dname.translate(base_translation_table)
             if dname not in DOSnames:
                 break
         else:
@@ -161,12 +174,13 @@ for idx, longname in enumerate(baseFiles):
                 for j in string.ascii_uppercase + string.digits:
                     oldname = dname
                     dname = (
-                        longname_sanitized.translate(translation_table)[0:6]
+                        longname_sanitized.translate(long_translation_table)[0:6]
                         + i
                         + j
                         + longname_sanitized[-4:]
                     )
                     dname = str.upper(dname)
+                    dname = dname.translate(base_translation_table)
                     if debug:
                         print("Extra mangling:", oldname, "to", dname)
                     if dname not in DOSnames:
@@ -176,11 +190,14 @@ for idx, longname in enumerate(baseFiles):
                 if dname not in DOSnames:
                     break
 
-    # If we got here, too many collisions (need more code!)
+    # Exit if too many collisions (need more code!)
     if dname in DOSnames:
         print("Namespace collision converting", longname, "to", dname)
         print("Ask the progammer to enhance the collision algorithm.")
         sys.exit(8)
+
+    if debug:
+        print("final: ", dname)
 
     DOSnames.append(dname)
 
