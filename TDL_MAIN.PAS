@@ -48,6 +48,7 @@ uses
 
 const
   favsOn:boolean=false;
+  unpackedOn:boolean=false;
 
 type
   txtcoords=record
@@ -966,13 +967,15 @@ begin
         end;
       end;
       kCtlF:begin
+        {code isn't yet flexible enough to deal with multiple filters}
+        if unpackedOn then continue;
         if not favson then begin
           {build a new title set out of just the favorites}
           {find how many favorites there are}
           w:=titleMetadata^.countFlag(m_favorite);
           {no favorites?  Get out of here}
           if w=0
-            then goto nofavorites; {yes, not pure pascal-elegant. So sue me.}
+            then continue;
           {build new title set}
           inc(activeSet);
           titleSets[activeSet]:=New(PTitleSet,init(w));
@@ -1000,6 +1003,44 @@ begin
         opwinloc:=-1;                   {force a window refresh}
         favson:=not favson;             {toggle "favorites on" status}
 nofavorites:
+      end;
+      {this is a modified copy of the above; can they be combined without side effects?}
+      kCtlU:begin
+        {code isn't yet flexible enough to deal with multiple filters}
+        if favsOn then continue;
+        if not unpackedOn then begin
+          {build a new title set out of just the favorites}
+          {find how many favorites there are}
+          w:=titleMetadata^.countFlag(m_unpacked);
+          {nothing unpacked?  Get out of here}
+          if w=0
+            then continue;
+          {build new title set}
+          inc(activeSet);
+          titleSets[activeSet]:=New(PTitleSet,init(w));
+          {populate new title set}
+          w:=0;
+          {we use "with" to preload addressing to the existing larger titleset, as each of its elements will be iterated}
+          with titleSets[activeSet-1]^ do begin
+            for dl:=0 to numTitles-1 do begin
+              {intentionally not using getFlag() here because we need the speed}
+              if (titleMetadata^.metaFlags^[TitleIDs^[dl]] AND m_unpacked)=m_unpacked then begin
+                titleSets[activeSet]^.TitleIDs^[w]:=dl;
+                inc(w);
+              end;
+            end;
+          end;
+          clearBlank:=true;
+        end else begin
+          {discard our unpacked titleset}
+          dispose(titleSets[activeSet],done);
+          titleSets[activeSet]:=nil;
+          dec(activeSet);
+        end;
+        pcursor:=0;
+        pwinloc:=0;
+        opwinloc:=-1;                   {force a window refresh}
+        unpackedOn:=not unpackedOn;     {toggle "unpacked on" status}
       end;
       kEnter:begin {LAUNCH!}
         recordKeyState;
