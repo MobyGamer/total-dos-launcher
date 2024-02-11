@@ -59,7 +59,7 @@ type
     datacacheDir:DirStr;                {cache directory}
     baseDir:DirStr;                     {base directory (where config file is)}
     swapDir:DirStr;                     {directory to hold the swap file}
-    progLocs:PathStr;                   {paths to look for source files}
+    progLocs:string;                    {paths to look for source files}
     subheader:PathStr;                  {optional subheader, limited to 80 ch}
     startupDir:DirStr;                  {directory user was in at program start}
     exePath:DirStr;                     {full path to where exe is running from}
