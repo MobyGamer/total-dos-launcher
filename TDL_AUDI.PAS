@@ -150,11 +150,24 @@ end;
 Function TAuditLog.closeEntry;
 var
   tDT:DateTime;
+
+  Function MinutesSinceDay1(_day,_hour,_min:word):longint;
+  begin
+    MinutesSinceDay1:=(_day * 24 * 60) + (_hour * 60) + _min;
+  end;
+
 begin
   getLast;
   grabTime(tDT);
   entry.endTime:=tDT;
-  Entry.minsActive:=0; {this will be populated later by a call to a monitoring TSR}
+  {Calculate # of minutes active in a simple but flawed way by calculating
+  # of minutes since the beginning of the month.  This will produce an
+  incorrect value 12 times a year if someone ends a program after midnight
+  on the 1st day of a month.}
+  with entry do begin
+    minsActive:=MinutesSinceDay1(endtime.day, endtime.hour, endtime.min)
+               -MinutesSinceDay1(starttime.day, starttime.hour, starttime.min);
+  end;
   {seek to the beginning of the last entry}
   aStream^.seek(aStream^.getsize-sizeof(Entry));
   {update the last entry}

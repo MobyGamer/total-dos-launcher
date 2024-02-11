@@ -711,12 +711,12 @@ var
 
   function DTString(td:datetime):string;
   begin
-    DTString:=inttostr(auditLog^.Entry.StartTime.month)+'/'
-             +inttostr(auditLog^.Entry.StartTime.day)+'/'
-             +inttostr(auditLog^.Entry.StartTime.year)+' '
-             +inttostr(auditLog^.Entry.StartTime.hour)+':'
-             +inttostr(auditLog^.Entry.StartTime.min);
-
+    DTString:=intpadded(td.month,2,'0')+'/'
+             +intpadded(td.day,  2,'0')+'/'
+             +intpadded(td.year, 2,'0')+' '
+             +intpadded(td.hour, 2,'0')+':'
+             +intPadded(td.min,  2,'0')+':'
+             +intpadded(td.sec,  2,'0');
   end;
 
   function buildASCIILine(_tid:word):string;
@@ -731,7 +731,7 @@ var
 begin
   assign(ol,'audit.csv');
   rewrite(ol);
-  writeln('Start Time,End Time,Minutes Active,Title');
+  writeln(ol,'Start Time,End Time,Minutes Active,Title');
 
   auditLog^.getFirst;
   writeln(ol,buildASCIILine(auditLog^.Entry.titleID));
