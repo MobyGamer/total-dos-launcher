@@ -181,7 +181,7 @@ end;
 Function TFileCache.cDir(tf:PFileStruct):PathStr;
 begin
   {must NOT have trailing slash due to chdir() assumption/limitation}
-  cDir:=path+basename(tf^.name)
+  cDir:=path+basename(StrPas(tf^.name))
 end;
 
 Function TFileCache.cDirExists(tf:PFileStruct):boolean;
