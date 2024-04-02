@@ -179,9 +179,15 @@ begin
 end;
 
 Function TFileCache.cDir(tf:PFileStruct):PathStr;
+var
+  s:baseftype;
 begin
+  {Convert or cast to pascal string as needed}
+  if tf^.name[11]=#0
+    then s:=StrPas(tf^.name)
+    else s:=tf^.name;
   {must NOT have trailing slash due to chdir() assumption/limitation}
-  cDir:=path+basename(StrPas(tf^.name))
+  cDir:=path+basename(s)
 end;
 
 Function TFileCache.cDirExists(tf:PFileStruct):boolean;
