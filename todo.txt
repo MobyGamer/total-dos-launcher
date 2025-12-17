@@ -2,6 +2,10 @@ To-Do list of planned but current unimplemented features
 
 [User Interface]=============================================================
 
+See if anything in
+https://github.com/bbond007/total-dos-launcher-1/commit/1e20a0dfcc2041399fb6482a125962112d18273c
+can be used.
+
 - Search-as-you-type.  (Implementation to be determined via interpretation of
 file_formats.txt.)
 
@@ -14,7 +18,7 @@ and list the default text colors in the ini for convenience.
 - Complex color scheme support.  Modify colors.ini to accept palette remapping
 for a specific color.  Ensure that the default palette on program entry is
 saved and restored as necessary so that text colors in launched programs
-aren't goofy.  
+aren't goofy.
 
 - Font support.  Modify colors.ini to accept a font file for various text
 modes.  INI could look something like:
@@ -32,14 +36,14 @@ know they're going to)
 if COMSPEC is set to something that resolves.
 
 - Cache management strategy for when the cache doesn't have enough space to
-decompress a title.  Move all cache management into unit so we can: 
+decompress a title.  Move all cache management into unit so we can:
   . come up with cache purge strategy (multiple strategies in the future, but
     for now can just trash the first one, then next one, etc. until enough
     space is available)
   . strategy can be limited to 5 dirs for testing and then avail disk space
     for final code
   . strategy should determine exact amount of storage needed from archive
-    header but can estimate 4*archive size for 
+    header but can estimate 4*archive size for
 
 - A power user command to decompress every title.  This is useful for prepping
 a show system for the public (so that they won't have to sit through the
